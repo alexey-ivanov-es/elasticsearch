@@ -9,7 +9,7 @@
 
 package org.elasticsearch.index.rankeval;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -26,7 +26,7 @@ import java.util.Objects;
 /**
  * Request to perform a search ranking evaluation.
  */
-public final class RankEvalRequest extends ActionRequest implements IndicesRequest.Replaceable {
+public final class RankEvalRequest extends AbstractActionRequest implements IndicesRequest.Replaceable {
 
     private RankEvalSpec rankingEvaluationSpec;
 

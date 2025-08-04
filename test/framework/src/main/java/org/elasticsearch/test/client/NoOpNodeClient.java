@@ -10,7 +10,9 @@
 package org.elasticsearch.test.client;
 
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.TransportAction;
@@ -53,8 +55,17 @@ public class NoOpNodeClient extends NodeClient {
     }
 
     @Override
+    public <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        executionCount.incrementAndGet();
+        listener.onResponse(null);
+    }
+
+    @Override
     public void initialize(
-        Map<ActionType<? extends ActionResponse>, TransportAction<? extends ActionRequest, ? extends ActionResponse>> actions,
+        Map<ActionType<?>, TransportAction<?, ?>> actions,
         TaskManager taskManager,
         Supplier<String> localNodeId,
         Transport.Connection localConnection,
@@ -66,6 +77,16 @@ public class NoOpNodeClient extends NodeClient {
     @Override
     public <Request extends ActionRequest, Response extends ActionResponse> Task executeLocally(
         ActionType<Response> action,
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        executionCount.incrementAndGet();
+        listener.onResponse(null);
+        return null;
+    }
+
+    @Override
+    public <Request extends ActionRequest2<Response>, Response extends ActionResponse> Task executeLocally(
         Request request,
         ActionListener<Response> listener
     ) {

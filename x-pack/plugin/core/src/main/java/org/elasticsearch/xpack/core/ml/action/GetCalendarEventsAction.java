@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.ValidateActions;
@@ -37,7 +37,7 @@ public class GetCalendarEventsAction extends ActionType<GetCalendarEventsAction.
         super(NAME);
     }
 
-    public static class Request extends ActionRequest implements ToXContentObject {
+    public static class Request extends AbstractActionRequest implements ToXContentObject {
 
         public static final ParseField START = new ParseField("start");
         public static final ParseField END = new ParseField("end");

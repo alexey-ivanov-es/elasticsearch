@@ -11,7 +11,7 @@ package org.elasticsearch.action.ingest;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionListenerResponseHandler;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.cluster.ClusterChangedEvent;
@@ -40,7 +40,7 @@ public final class IngestActionForwarder implements ClusterStateApplier {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void forwardIngestRequest(ActionType<BulkResponse> action, ActionRequest request, ActionListener<?> listener) {
+    public void forwardIngestRequest(ActionType<BulkResponse> action, AbstractActionRequest request, ActionListener<?> listener) {
         transportService.sendRequest(
             randomIngestNode(),
             action.name(),

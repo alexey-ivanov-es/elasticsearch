@@ -147,14 +147,14 @@ public class OutboundHandlerTests extends ESTestCase {
         AtomicReference<DiscoveryNode> nodeRef = new AtomicReference<>();
         AtomicLong requestIdRef = new AtomicLong();
         AtomicReference<String> actionRef = new AtomicReference<>();
-        AtomicReference<TransportRequest> requestRef = new AtomicReference<>();
+        AtomicReference<AbstractTransportRequest> requestRef = new AtomicReference<>();
         handler.setMessageListener(new TransportMessageListener() {
             @Override
             public void onRequestSent(
                 DiscoveryNode node,
                 long requestId,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options
             ) {
                 nodeRef.set(node);

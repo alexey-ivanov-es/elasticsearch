@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.ilm.history;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteRequest;
@@ -296,7 +296,7 @@ public class ILMHistoryStoreTests extends ESTestCase {
      */
     public static class VerifyingClient extends NoOpClient {
 
-        private TriFunction<ActionType<?>, ActionRequest, ActionListener<?>, ActionResponse> verifier = (a, r, l) -> {
+        private TriFunction<ActionType<?>, AbstractActionRequest, ActionListener<?>, ActionResponse> verifier = (a, r, l) -> {
             fail("verifier not set");
             return null;
         };
@@ -307,7 +307,7 @@ public class ILMHistoryStoreTests extends ESTestCase {
 
         @Override
         @SuppressWarnings("unchecked")
-        protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+        protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
             ActionType<Response> action,
             Request request,
             ActionListener<Response> listener
@@ -319,7 +319,7 @@ public class ILMHistoryStoreTests extends ESTestCase {
             }
         }
 
-        VerifyingClient setVerifier(TriFunction<ActionType<?>, ActionRequest, ActionListener<?>, ActionResponse> verifier) {
+        VerifyingClient setVerifier(TriFunction<ActionType<?>, AbstractActionRequest, ActionListener<?>, ActionResponse> verifier) {
             this.verifier = verifier;
             return this;
         }

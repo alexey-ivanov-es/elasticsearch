@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.rolemapping;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -32,7 +32,7 @@ import static org.elasticsearch.xpack.core.security.authc.support.mapper.Express
  *
  * see org.elasticsearch.xpack.security.authc.support.mapper.NativeRoleMappingStore
  */
-public class PutRoleMappingRequest extends ActionRequest implements WriteRequest<PutRoleMappingRequest> {
+public class PutRoleMappingRequest extends AbstractActionRequest implements WriteRequest<PutRoleMappingRequest> {
 
     private String name = null;
     private boolean enabled = true;

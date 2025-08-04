@@ -9,7 +9,7 @@
 
 package org.elasticsearch.action.search;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -24,7 +24,7 @@ import java.util.List;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
 
-public class ClearScrollRequest extends ActionRequest implements ToXContentObject {
+public class ClearScrollRequest extends AbstractActionRequest implements ToXContentObject {
 
     private List<String> scrollIds;
 

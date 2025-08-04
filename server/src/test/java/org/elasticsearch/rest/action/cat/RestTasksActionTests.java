@@ -10,6 +10,7 @@
 package org.elasticsearch.rest.action.cat;
 
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;

@@ -7,6 +7,7 @@
 
 package org.elasticsearch.xpack.core.action;
 
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.PlainActionFuture;
@@ -289,9 +290,9 @@ public class DataStreamLifecycleUsageTransportActionIT extends ESIntegTestCase {
      */
     public static final class TestDateLifecycleUsagePlugin extends XPackClientPlugin {
         @Override
-        public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> actions = new ArrayList<>();
-            actions.add(new ActionPlugin.ActionHandler<>(DATA_STREAM_LIFECYCLE, DataStreamLifecycleUsageTransportAction.class));
+        public Collection<ActionHandler> getActions() {
+            List<ActionHandler> actions = new ArrayList<>();
+            actions.add(new ActionPlugin.ActionHandler(DATA_STREAM_LIFECYCLE, DataStreamLifecycleUsageTransportAction.class));
             return actions;
         }
     }

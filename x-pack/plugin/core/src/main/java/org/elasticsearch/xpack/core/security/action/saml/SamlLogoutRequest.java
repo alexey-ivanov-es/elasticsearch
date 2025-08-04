@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.saml;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -19,7 +19,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Represents a request to prepare a SAML {@code &lt;LogoutRequest&gt;}.
  */
-public final class SamlLogoutRequest extends ActionRequest {
+public final class SamlLogoutRequest extends AbstractActionRequest {
 
     private String token;
     @Nullable

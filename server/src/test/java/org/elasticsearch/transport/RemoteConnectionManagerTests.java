@@ -165,7 +165,7 @@ public class RemoteConnectionManagerTests extends ESTestCase {
             credentialsResolver
         );
         final long requestId = randomLong();
-        final TransportRequest request = mock(TransportRequest.class);
+        final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         final TransportRequestOptions options = mock(TransportRequestOptions.class);
 
         wrappedConnection.sendRequest(requestId, TransportService.HANDSHAKE_ACTION_NAME, request, options);

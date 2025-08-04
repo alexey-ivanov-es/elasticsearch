@@ -10,7 +10,7 @@ package org.elasticsearch.xpack.core.security.action.apikey;
 import org.elasticsearch.ElasticsearchParseException;
 import org.elasticsearch.core.Strings;
 import org.elasticsearch.test.ESTestCase;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.XContentParseException;
 import org.elasticsearch.xcontent.XContentParserConfiguration;
 import org.elasticsearch.xcontent.json.JsonXContent;
@@ -374,7 +374,7 @@ public class CrossClusterApiKeyRoleDescriptorBuilderTests extends ESTestCase {
             for (String action : actionsToTest) {
                 if (clusterPrivilege.buildPermission(ClusterPermission.builder())
                     .build()
-                    .check(action, mock(TransportRequest.class), AuthenticationTestHelper.builder().build())) {
+                    .check(action, mock(AbstractTransportRequest.class), AuthenticationTestHelper.builder().build())) {
                     actionPassesRemoteClusterPermissionCheck = true;
                     break;
                 }
@@ -391,7 +391,7 @@ public class CrossClusterApiKeyRoleDescriptorBuilderTests extends ESTestCase {
             for (String action : actionsToTest) {
                 if (clusterPrivilege.buildPermission(ClusterPermission.builder())
                     .build()
-                    .check(action, mock(TransportRequest.class), AuthenticationTestHelper.builder().build())) {
+                    .check(action, mock(AbstractTransportRequest.class), AuthenticationTestHelper.builder().build())) {
                     actionPassesRemoteCCSCheck = true;
                     break;
                 }

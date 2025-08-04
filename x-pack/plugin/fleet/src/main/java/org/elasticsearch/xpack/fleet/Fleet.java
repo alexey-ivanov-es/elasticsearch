@@ -345,13 +345,13 @@ public class Fleet extends Plugin implements SystemIndexPlugin {
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionHandler<>(GetGlobalCheckpointsAction.INSTANCE, GetGlobalCheckpointsAction.LocalAction.class),
-            new ActionHandler<>(GetGlobalCheckpointsShardAction.INSTANCE, GetGlobalCheckpointsShardAction.TransportAction.class),
-            new ActionHandler<>(GetSecretAction.INSTANCE, TransportGetSecretAction.class),
-            new ActionHandler<>(PostSecretAction.INSTANCE, TransportPostSecretAction.class),
-            new ActionHandler<>(DeleteSecretAction.INSTANCE, TransportDeleteSecretAction.class)
+            new ActionHandler(GetGlobalCheckpointsAction.INSTANCE, GetGlobalCheckpointsAction.LocalAction.class),
+            new ActionHandler(GetGlobalCheckpointsShardAction.INSTANCE, GetGlobalCheckpointsShardAction.TransportAction.class),
+            new ActionHandler(GetSecretAction.INSTANCE, TransportGetSecretAction.class),
+            new ActionHandler(PostSecretAction.INSTANCE, TransportPostSecretAction.class),
+            new ActionHandler(DeleteSecretAction.INSTANCE, TransportDeleteSecretAction.class)
         );
     }
 

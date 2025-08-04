@@ -58,7 +58,7 @@ import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.ConnectTransportException;
 import org.elasticsearch.transport.TransportChannel;
 import org.elasticsearch.transport.TransportException;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportResponseHandler;
@@ -358,7 +358,7 @@ public class PeerRecoveryTargetService implements IndexEventListener {
             }
         }
 
-        record StartRecoveryRequestToSend(StartRecoveryRequest startRecoveryRequest, String actionName, TransportRequest requestToSend) {}
+        record StartRecoveryRequestToSend(StartRecoveryRequest startRecoveryRequest, String actionName, AbstractTransportRequest requestToSend) {}
         final ActionListener<StartRecoveryRequestToSend> toSendListener = cleanupOnly.map(r -> {
             logger.trace(
                 "{} [{}]: recovery from {}",

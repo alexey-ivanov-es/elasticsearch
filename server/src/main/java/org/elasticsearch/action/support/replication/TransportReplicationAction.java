@@ -67,7 +67,7 @@ import org.elasticsearch.transport.ConnectTransportException;
 import org.elasticsearch.transport.RawIndexingDataTransportRequest;
 import org.elasticsearch.transport.TransportChannel;
 import org.elasticsearch.transport.TransportException;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponseHandler;
 import org.elasticsearch.transport.TransportService;
@@ -987,7 +987,7 @@ public abstract class TransportReplicationAction<
             final DiscoveryNode node,
             final String action,
             final boolean isPrimaryAction,
-            final TransportRequest requestToPerform
+            final AbstractTransportRequest requestToPerform
         ) {
             transportService.sendRequest(node, action, requestToPerform, transportOptions, new TransportResponseHandler<Response>() {
 
@@ -1332,7 +1332,7 @@ public abstract class TransportReplicationAction<
     }
 
     /** a wrapper class to encapsulate a request when being sent to a specific allocation id **/
-    public static class ConcreteShardRequest<R extends TransportRequest> extends TransportRequest
+    public static class ConcreteShardRequest<R extends AbstractTransportRequest> extends AbstractTransportRequest
         implements
             RawIndexingDataTransportRequest {
 
@@ -1455,7 +1455,7 @@ public abstract class TransportReplicationAction<
         }
     }
 
-    protected static final class ConcreteReplicaRequest<R extends TransportRequest> extends ConcreteShardRequest<R> {
+    protected static final class ConcreteReplicaRequest<R extends AbstractTransportRequest> extends ConcreteShardRequest<R> {
 
         private final long globalCheckpoint;
         private final long maxSeqNoOfUpdatesOrDeletes;

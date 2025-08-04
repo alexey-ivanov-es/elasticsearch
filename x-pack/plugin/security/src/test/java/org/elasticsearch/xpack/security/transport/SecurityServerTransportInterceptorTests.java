@@ -41,7 +41,7 @@ import org.elasticsearch.transport.Transport.Connection;
 import org.elasticsearch.transport.TransportChannel;
 import org.elasticsearch.transport.TransportException;
 import org.elasticsearch.transport.TransportInterceptor.AsyncSender;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportResponse.Empty;
@@ -166,7 +166,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -217,7 +217,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -263,7 +263,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -324,7 +324,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -392,7 +392,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -456,7 +456,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -624,7 +624,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
         when(connection.getTransportVersion()).thenReturn(TransportVersion.current());
         final AtomicBoolean calledHandleException = new AtomicBoolean(false);
         final AtomicReference<TransportException> actualException = new AtomicReference<>();
-        sender.sendRequest(connection, "action", mock(TransportRequest.class), null, new TransportResponseHandler<>() {
+        sender.sendRequest(connection, "action", mock(AbstractTransportRequest.class), null, new TransportResponseHandler<>() {
             @Override
             public Executor executor() {
                 return TransportResponseHandler.TRANSPORT_WORKER;
@@ -669,10 +669,10 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
 
     public void testSendWithCrossClusterAccessHeadersForSystemUserRegularAction() throws Exception {
         final String action;
-        final TransportRequest request;
+        final AbstractTransportRequest request;
         if (randomBoolean()) {
             action = randomAlphaOfLengthBetween(5, 30);
-            request = mock(TransportRequest.class);
+            request = mock(AbstractTransportRequest.class);
         } else {
             action = ClusterStateAction.NAME;
             request = mock(ClusterStateRequest.class);
@@ -691,7 +691,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             "internal:admin/ccr/restore/session/clear",
             "internal:admin/ccr/restore/file_chunk/get"
         );
-        final TransportRequest request = mock(TransportRequest.class);
+        final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         doTestSendWithCrossClusterAccessHeaders(
             true,
             action,
@@ -706,7 +706,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             () -> AuthenticationTestHelper.builder().build()
         );
         final String action = randomAlphaOfLengthBetween(5, 30);
-        final TransportRequest request = mock(TransportRequest.class);
+        final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         doTestSendWithCrossClusterAccessHeaders(false, action, request, authentication);
     }
 
@@ -716,14 +716,14 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             () -> AuthenticationTestHelper.builder().build()
         );
         final String action = ClusterStateAction.NAME;
-        final TransportRequest request = mock(ClusterStateRequest.class);
+        final AbstractTransportRequest request = mock(ClusterStateRequest.class);
         doTestSendWithCrossClusterAccessHeaders(true, action, request, authentication);
     }
 
     private void doTestSendWithCrossClusterAccessHeaders(
         boolean shouldAssertForSystemUser,
         String action,
-        TransportRequest request,
+        AbstractTransportRequest request,
         Authentication authentication
     ) throws IOException {
         authentication.writeToContext(threadContext);
@@ -763,7 +763,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -903,7 +903,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -917,7 +917,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
         });
         final Transport.Connection connection = mock(Transport.Connection.class);
         when(connection.getTransportVersion()).thenReturn(TransportVersion.current());
-        sender.sendRequest(connection, "action", mock(TransportRequest.class), null, null);
+        sender.sendRequest(connection, "action", mock(AbstractTransportRequest.class), null, null);
         assertTrue(calledWrappedSender.get());
         assertThat(sentAuthentication.get(), equalTo(authentication));
         verify(authzService, never()).getRoleDescriptorsIntersectionForRemoteCluster(any(), any(), any(), anyActionListener());
@@ -956,7 +956,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -975,7 +975,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
         when(connection.getTransportVersion()).thenReturn(version);
         final AtomicBoolean calledHandleException = new AtomicBoolean(false);
         final AtomicReference<TransportException> actualException = new AtomicReference<>();
-        sender.sendRequest(connection, "action", mock(TransportRequest.class), null, new TransportResponseHandler<>() {
+        sender.sendRequest(connection, "action", mock(AbstractTransportRequest.class), null, new TransportResponseHandler<>() {
             @Override
             public Executor executor() {
                 return TransportResponseHandler.TRANSPORT_WORKER;
@@ -1055,7 +1055,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
             public <T extends TransportResponse> void sendRequest(
                 Transport.Connection connection,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions options,
                 TransportResponseHandler<T> handler
             ) {
@@ -1069,7 +1069,7 @@ public class SecurityServerTransportInterceptorTests extends ESTestCase {
         when(authzService.remoteActionDenied(authentication, "action", remoteClusterAlias)).thenReturn(expectedException);
 
         final var actualException = new AtomicReference<Throwable>();
-        sender.sendRequest(connection, "action", mock(TransportRequest.class), null, new TransportResponseHandler<>() {
+        sender.sendRequest(connection, "action", mock(AbstractTransportRequest.class), null, new TransportResponseHandler<>() {
             @Override
             public Executor executor() {
                 return TransportResponseHandler.TRANSPORT_WORKER;

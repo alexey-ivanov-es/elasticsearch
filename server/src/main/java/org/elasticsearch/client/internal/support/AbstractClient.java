@@ -11,9 +11,11 @@ package org.elasticsearch.client.internal.support;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteResponse;
@@ -127,6 +129,15 @@ public abstract class AbstractClient implements Client {
         return actionFuture;
     }
 
+    @Override
+    public final <Request extends ActionRequest2<Response>, Response extends ActionResponse> ActionFuture<Response> execute(
+        Request request
+    ) {
+        PlainActionFuture<Response> actionFuture = new RefCountedFuture<>();
+        execute(request, actionFuture);
+        return actionFuture;
+    }
+
     /**
      * This is the single execution point of *all* clients.
      */
@@ -144,8 +155,26 @@ public abstract class AbstractClient implements Client {
         }
     }
 
+    @Override
+    public final <Request extends ActionRequest2<Response>, Response extends ActionResponse> void execute(
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        try {
+            doExecute(request, listener);
+        } catch (Exception e) {
+            assert false : new AssertionError(e);
+            listener.onFailure(e);
+        }
+    }
+
     protected abstract <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
         ActionType<Response> action,
+        Request request,
+        ActionListener<Response> listener
+    );
+
+    protected abstract <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
         Request request,
         ActionListener<Response> listener
     );
@@ -402,6 +431,17 @@ public abstract class AbstractClient implements Client {
                 ThreadContext threadContext = threadPool().getThreadContext();
                 try (ThreadContext.StoredContext ctx = threadContext.stashAndMergeHeaders(headers)) {
                     super.doExecute(action, request, listener);
+                }
+            }
+
+            @Override
+            protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+                Request request,
+                ActionListener<Response> listener
+            ) {
+                ThreadContext threadContext = threadPool().getThreadContext();
+                try (ThreadContext.StoredContext ctx = threadContext.stashAndMergeHeaders(headers)) {
+                    super.doExecute(request, listener);
                 }
             }
         };

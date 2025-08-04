@@ -9,7 +9,7 @@
 
 package org.elasticsearch.indices;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.RequestBuilder;
@@ -48,7 +48,7 @@ public class DateMathIndexExpressionsIntegrationIT extends ESIntegTestCase {
      * of failing when index resolution with `now` is one day off, this method wraps calls with the assumption that
      * the day did not change during the test run.
      */
-    public <Q extends ActionRequest, R extends ActionResponse> void dateSensitiveGet(RequestBuilder<Q, R> builder, Consumer<R> consumer) {
+    public <Q extends AbstractActionRequest, R extends ActionResponse> void dateSensitiveGet(RequestBuilder<Q, R> builder, Consumer<R> consumer) {
         Runnable dayChangeAssumption = () -> assumeTrue(
             "day changed between requests",
             ZonedDateTime.now(ZoneOffset.UTC).getDayOfYear() == now.getDayOfYear()

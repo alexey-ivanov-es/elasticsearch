@@ -9,6 +9,7 @@
 
 package org.elasticsearch.rest.action.ingest;
 
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.ingest.PutPipelineRequest;

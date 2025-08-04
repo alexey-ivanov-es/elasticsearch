@@ -11,7 +11,7 @@ package org.elasticsearch.action;
 
 /**
  * Indicates that a request can execute in realtime (reads from the translog).
- * All {@link ActionRequest} that are realtime should implement this interface.
+ * All {@link AbstractActionRequest} that are realtime should implement this interface.
  */
 public interface RealtimeRequest {
 

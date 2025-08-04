@@ -35,6 +35,7 @@ import org.elasticsearch.xpack.textstructure.transport.TransportFindStructureAct
 import org.elasticsearch.xpack.textstructure.transport.TransportTestGrokPatternAction;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -68,12 +69,12 @@ public class TextStructurePlugin extends Plugin implements ActionPlugin {
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Arrays.asList(
-            new ActionHandler<>(FindFieldStructureAction.INSTANCE, TransportFindFieldStructureAction.class),
-            new ActionHandler<>(FindMessageStructureAction.INSTANCE, TransportFindMessageStructureAction.class),
-            new ActionHandler<>(FindStructureAction.INSTANCE, TransportFindStructureAction.class),
-            new ActionHandler<>(TestGrokPatternAction.INSTANCE, TransportTestGrokPatternAction.class)
+            new ActionHandler(FindFieldStructureAction.INSTANCE, TransportFindFieldStructureAction.class),
+            new ActionHandler(FindMessageStructureAction.INSTANCE, TransportFindMessageStructureAction.class),
+            new ActionHandler(FindStructureAction.INSTANCE, TransportFindStructureAction.class),
+            new ActionHandler(TestGrokPatternAction.INSTANCE, TransportTestGrokPatternAction.class)
         );
     }
 }

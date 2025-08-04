@@ -9,7 +9,7 @@
 
 package org.elasticsearch.action.synonyms;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.ValidateActions;
@@ -29,7 +29,7 @@ public class DeleteSynonymRuleAction extends ActionType<SynonymUpdateResponse> {
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
         private final String synonymsSetId;
 
         private final String synonymRuleId;

@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.ccr;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.PlainActionFuture;
 import org.elasticsearch.client.internal.Client;
@@ -47,7 +47,7 @@ class CcrRepositoryManager extends AbstractLifecycleComponent {
     protected void doClose() {}
 
     private void putRepository(String repositoryName) {
-        ActionRequest request = new PutInternalCcrRepositoryRequest(repositoryName, CcrRepository.TYPE);
+        AbstractActionRequest request = new PutInternalCcrRepositoryRequest(repositoryName, CcrRepository.TYPE);
         PlainActionFuture<ActionResponse.Empty> f = new PlainActionFuture<>();
         client.execute(PutInternalCcrRepositoryAction.INSTANCE, request, f);
         assert f.isDone() : "Should be completed as it is executed synchronously";

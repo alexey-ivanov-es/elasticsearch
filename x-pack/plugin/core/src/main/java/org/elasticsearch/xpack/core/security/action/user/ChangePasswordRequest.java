@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.user;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.common.bytes.BytesArray;
@@ -22,7 +22,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Request to change a user's password.
  */
-public class ChangePasswordRequest extends ActionRequest implements UserRequest, WriteRequest<ChangePasswordRequest> {
+public class ChangePasswordRequest extends AbstractActionRequest implements UserRequest, WriteRequest<ChangePasswordRequest> {
 
     private String username;
     private char[] passwordHash;

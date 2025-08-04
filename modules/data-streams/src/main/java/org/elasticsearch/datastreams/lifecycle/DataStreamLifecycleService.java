@@ -80,7 +80,7 @@ import org.elasticsearch.index.IndexSettings;
 import org.elasticsearch.index.MergePolicyConfig;
 import org.elasticsearch.snapshots.SnapshotInProgressException;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 
 import java.io.Closeable;
 import java.time.Clock;
@@ -165,7 +165,7 @@ public class DataStreamLifecycleService implements ClusterStateListener, Closeab
     private final Client client;
     private final ClusterService clusterService;
     private final ThreadPool threadPool;
-    final ResultDeduplicator<TransportRequest, Void> transportActionsDeduplicator;
+    final ResultDeduplicator<AbstractTransportRequest, Void> transportActionsDeduplicator;
     final ResultDeduplicator<String, Void> clusterStateChangesDeduplicator;
     private final DataStreamLifecycleHealthInfoPublisher dslHealthInfoPublisher;
     private final DataStreamGlobalRetentionSettings globalRetentionSettings;

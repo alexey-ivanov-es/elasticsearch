@@ -57,7 +57,7 @@ import org.elasticsearch.test.MockLog;
 import org.elasticsearch.test.TransportVersionUtils;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.EmptyRequest;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentType;
 import org.elasticsearch.xpack.core.XPackPlugin;
@@ -1016,9 +1016,9 @@ public class CompositeRolesStoreTests extends ESTestCase {
     }
 
     public void testMergingBasicRoles() {
-        final TransportRequest request1 = mock(TransportRequest.class);
-        final TransportRequest request2 = mock(TransportRequest.class);
-        final TransportRequest request3 = mock(TransportRequest.class);
+        final AbstractTransportRequest request1 = mock(AbstractTransportRequest.class);
+        final AbstractTransportRequest request2 = mock(AbstractTransportRequest.class);
+        final AbstractTransportRequest request3 = mock(AbstractTransportRequest.class);
         final Authentication authentication = AuthenticationTestHelper.builder().build();
 
         ConfigurableClusterPrivilege ccp1 = new MockConfigurableClusterPrivilege() {
@@ -3545,7 +3545,7 @@ public class CompositeRolesStoreTests extends ESTestCase {
             TransportNodesStatsAction.TYPE.name()
         )) {
             assertThat(
-                getAsyncSearchUserRole().cluster().check(action, mock(TransportRequest.class), AuthenticationTestHelper.builder().build()),
+                getAsyncSearchUserRole().cluster().check(action, mock(AbstractTransportRequest.class), AuthenticationTestHelper.builder().build()),
                 Matchers.is(false)
             );
         }
@@ -3559,7 +3559,7 @@ public class CompositeRolesStoreTests extends ESTestCase {
             TransportNodesStatsAction.TYPE.name()
         )) {
             assertThat(
-                getXPackUserRole().cluster().check(action, mock(TransportRequest.class), AuthenticationTestHelper.builder().build()),
+                getXPackUserRole().cluster().check(action, mock(AbstractTransportRequest.class), AuthenticationTestHelper.builder().build()),
                 Matchers.is(true)
             );
         }

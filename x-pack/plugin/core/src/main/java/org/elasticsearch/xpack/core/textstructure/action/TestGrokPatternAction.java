@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.textstructure.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -34,7 +34,7 @@ public class TestGrokPatternAction {
         "cluster:monitor/text_structure/test_grok_pattern"
     );
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         public static final ParseField GROK_PATTERN = new ParseField("grok_pattern");
         public static final ParseField TEXT = new ParseField("text");

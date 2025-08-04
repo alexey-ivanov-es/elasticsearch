@@ -12,7 +12,7 @@ import org.elasticsearch.search.SearchContextMissingException;
 import org.elasticsearch.search.internal.ReaderContext;
 import org.elasticsearch.search.internal.ScrollContext;
 import org.elasticsearch.search.internal.SearchContext;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.SecurityContext;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationField;
@@ -59,7 +59,7 @@ public final class SecuritySearchOperationListener implements SearchOperationLis
      * object from the scroll context with the current authentication context
      */
     @Override
-    public void validateReaderContext(ReaderContext readerContext, TransportRequest request) {
+    public void validateReaderContext(ReaderContext readerContext, AbstractTransportRequest request) {
         if (readerContext.scrollContext() != null) {
             final Authentication originalAuth = readerContext.getFromContext(AuthenticationField.AUTHENTICATION_KEY);
             if (false == securityContext.canIAccessResourcesCreatedBy(originalAuth)) {
@@ -102,7 +102,7 @@ public final class SecuritySearchOperationListener implements SearchOperationLis
         }
     }
 
-    private void auditAccessDenied(TransportRequest request) {
+    private void auditAccessDenied(AbstractTransportRequest request) {
         auditTrailService.get()
             .accessDenied(
                 AuditUtil.extractRequestId(securityContext.getThreadContext()),

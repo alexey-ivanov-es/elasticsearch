@@ -10,7 +10,7 @@ package org.elasticsearch.ingest.common;
 
 import org.elasticsearch.TransportVersions;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -47,7 +47,7 @@ public class GrokProcessorGetAction {
 
     private GrokProcessorGetAction() {/* no instances */}
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         private final boolean sorted;
         private final String ecsCompatibility;

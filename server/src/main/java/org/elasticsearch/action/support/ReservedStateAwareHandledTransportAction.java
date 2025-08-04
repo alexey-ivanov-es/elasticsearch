@@ -10,7 +10,7 @@
 package org.elasticsearch.action.support;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.cluster.service.ClusterService;
 import org.elasticsearch.common.io.stream.Writeable;
@@ -23,7 +23,7 @@ import org.elasticsearch.transport.TransportService;
  * An extension of the {@link HandledTransportAction} class, which wraps the doExecute call with a check for clashes
  * with the reserved cluster state.
  */
-public abstract class ReservedStateAwareHandledTransportAction<Request extends ActionRequest, Response extends ActionResponse> extends
+public abstract class ReservedStateAwareHandledTransportAction<Request extends AbstractActionRequest, Response extends ActionResponse> extends
     HandledTransportAction<Request, Response>
     implements
         ActionWithReservedState<Request> {

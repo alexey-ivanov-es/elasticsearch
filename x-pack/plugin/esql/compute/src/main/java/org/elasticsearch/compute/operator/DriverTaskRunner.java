@@ -8,7 +8,7 @@
 package org.elasticsearch.compute.operator;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.CompositeIndicesRequest;
 import org.elasticsearch.action.support.ChannelActionListener;
@@ -65,7 +65,7 @@ public class DriverTaskRunner {
         runner.runToCompletion(drivers, listener);
     }
 
-    private static class DriverRequest extends ActionRequest implements CompositeIndicesRequest {
+    private static class DriverRequest extends AbstractActionRequest implements CompositeIndicesRequest {
         private final Driver driver;
         private final Executor executor;
 

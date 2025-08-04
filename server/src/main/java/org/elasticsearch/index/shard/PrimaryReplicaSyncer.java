@@ -11,7 +11,7 @@ package org.elasticsearch.index.shard;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.resync.ResyncReplicationRequest;
 import org.elasticsearch.action.resync.ResyncReplicationResponse;
@@ -374,7 +374,7 @@ public class PrimaryReplicaSyncer {
         }
     }
 
-    public static class ResyncRequest extends ActionRequest {
+    public static class ResyncRequest extends AbstractActionRequest {
 
         private final ShardId shardId;
         private final String allocationId;

@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.idp.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
 
-public class SamlInitiateSingleSignOnRequest extends ActionRequest {
+public class SamlInitiateSingleSignOnRequest extends AbstractActionRequest {
 
     private String spEntityId;
     private String assertionConsumerService;

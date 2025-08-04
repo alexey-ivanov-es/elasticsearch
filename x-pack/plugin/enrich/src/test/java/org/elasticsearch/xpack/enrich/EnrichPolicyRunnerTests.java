@@ -8,7 +8,7 @@ package org.elasticsearch.xpack.enrich;
 
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteResponse;
@@ -1951,7 +1951,7 @@ public class EnrichPolicyRunnerTests extends ESSingleNodeTestCase {
         // with an empty segments response.
         Client client = new FilterClient(client()) {
             @Override
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -2061,7 +2061,7 @@ public class EnrichPolicyRunnerTests extends ESSingleNodeTestCase {
         // with an failed segments response.
         Client client = new FilterClient(client()) {
             @Override
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -2151,7 +2151,7 @@ public class EnrichPolicyRunnerTests extends ESSingleNodeTestCase {
         Client client = new FilterClient(client()) {
 
             @Override
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -2433,7 +2433,7 @@ public class EnrichPolicyRunnerTests extends ESSingleNodeTestCase {
         // state for the resulting index.
         Client client = new FilterClient(client()) {
             @Override
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

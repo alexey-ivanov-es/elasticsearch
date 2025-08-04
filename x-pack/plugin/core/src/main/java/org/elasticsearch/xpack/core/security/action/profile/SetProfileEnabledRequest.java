@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.security.action.profile;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -15,7 +15,7 @@ import org.elasticsearch.common.io.stream.StreamOutput;
 
 import java.io.IOException;
 
-public class SetProfileEnabledRequest extends ActionRequest {
+public class SetProfileEnabledRequest extends AbstractActionRequest {
 
     private final String uid;
     private final boolean enabled;

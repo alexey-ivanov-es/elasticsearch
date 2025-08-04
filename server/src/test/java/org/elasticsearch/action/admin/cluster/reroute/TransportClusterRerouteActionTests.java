@@ -33,7 +33,7 @@ import org.elasticsearch.common.util.concurrent.ThreadContext;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportService;
 import org.mockito.Mockito;
 
@@ -70,7 +70,7 @@ public class TransportClusterRerouteActionTests extends ESTestCase {
         Mockito.clearInvocations(transportService);
         statefulAction.masterOperation(mock(Task.class), request, ClusterState.builder(ClusterName.DEFAULT).build(), ActionListener.noop());
         if (request.getCommands().commands().stream().anyMatch(command -> command instanceof AllocateStalePrimaryAllocationCommand)) {
-            verify(transportService).sendRequest(any(DiscoveryNode.class), anyString(), any(TransportRequest.class), any());
+            verify(transportService).sendRequest(any(DiscoveryNode.class), anyString(), any(AbstractTransportRequest.class), any());
         } else {
             verify(clusterService).submitUnbatchedStateUpdateTask(anyString(), any(ClusterStateUpdateTask.class));
         }

@@ -22,6 +22,7 @@ import org.elasticsearch.xpack.core.action.XPackInfoFeatureAction;
 import org.elasticsearch.xpack.core.action.XPackUsageFeatureAction;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -36,10 +37,10 @@ public class AggregateMetricMapperPlugin extends Plugin implements MapperPlugin,
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Arrays.asList(
-            new ActionHandler<>(XPackUsageFeatureAction.AGGREGATE_METRIC, AggregateMetricUsageTransportAction.class),
-            new ActionHandler<>(XPackInfoFeatureAction.AGGREGATE_METRIC, AggregateMetricInfoTransportAction.class)
+            new ActionHandler(XPackUsageFeatureAction.AGGREGATE_METRIC, AggregateMetricUsageTransportAction.class),
+            new ActionHandler(XPackInfoFeatureAction.AGGREGATE_METRIC, AggregateMetricInfoTransportAction.class)
         );
     }
 

@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.security.action.filter;
 import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.MockIndicesRequest;
 import org.elasticsearch.action.admin.indices.close.TransportCloseIndexAction;
@@ -31,7 +31,7 @@ import org.elasticsearch.license.XPackLicenseState;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.SecurityContext;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.Authentication.RealmRef;
@@ -124,7 +124,7 @@ public class SecurityActionFilterTests extends ESTestCase {
     }
 
     public void testApply() throws Exception {
-        ActionRequest request = mock(ActionRequest.class);
+        AbstractActionRequest request = mock(AbstractActionRequest.class);
         ActionListener listener = mock(ActionListener.class);
         Task task = mock(Task.class);
         User user = new User("username", "r1", "r2");
@@ -143,7 +143,7 @@ public class SecurityActionFilterTests extends ESTestCase {
     }
 
     public void testApplyRestoresThreadContext() throws Exception {
-        ActionRequest request = mock(ActionRequest.class);
+        AbstractActionRequest request = mock(AbstractActionRequest.class);
         ActionListener listener = mock(ActionListener.class);
         Task task = mock(Task.class);
         User user = new User("username", "r1", "r2");
@@ -168,7 +168,7 @@ public class SecurityActionFilterTests extends ESTestCase {
     }
 
     public void testApplyAsSystemUser() throws Exception {
-        ActionRequest request = mock(ActionRequest.class);
+        AbstractActionRequest request = mock(AbstractActionRequest.class);
         ActionListener listener = mock(ActionListener.class);
         User user = new User("username", "r1", "r2");
         Authentication authentication = AuthenticationTestHelper.builder()
@@ -230,7 +230,7 @@ public class SecurityActionFilterTests extends ESTestCase {
     }
 
     public void testApplyDestructiveOperations() throws Exception {
-        ActionRequest request = new MockIndicesRequest(
+        AbstractActionRequest request = new MockIndicesRequest(
             IndicesOptions.fromOptions(randomBoolean(), randomBoolean(), randomBoolean(), randomBoolean()),
             randomFrom("*", "_all", "test*")
         );
@@ -259,7 +259,7 @@ public class SecurityActionFilterTests extends ESTestCase {
             ActionListener<Void> callback = (ActionListener<Void>) i.getArguments()[3];
             callback.onResponse(null);
             return Void.TYPE;
-        }).when(authzService).authorize(any(Authentication.class), any(String.class), any(TransportRequest.class), anyActionListener());
+        }).when(authzService).authorize(any(Authentication.class), any(String.class), any(AbstractTransportRequest.class), anyActionListener());
         filter.apply(task, action, request, listener, chain);
         if (failDestructiveOperations) {
             verify(listener).onFailure(isA(IllegalArgumentException.class));
@@ -278,7 +278,7 @@ public class SecurityActionFilterTests extends ESTestCase {
     }
 
     public void testActionProcessException() throws Exception {
-        ActionRequest request = mock(ActionRequest.class);
+        AbstractActionRequest request = mock(AbstractActionRequest.class);
         ActionListener listener = mock(ActionListener.class);
         ActionFilterChain chain = mock(ActionFilterChain.class);
         RuntimeException exception = new RuntimeException("process-error");
@@ -312,7 +312,7 @@ public class SecurityActionFilterTests extends ESTestCase {
     }
 
     public void testSecondaryAuth() throws Exception {
-        ActionRequest request = mock(ActionRequest.class);
+        AbstractActionRequest request = mock(AbstractActionRequest.class);
         ActionListener listener = mock(ActionListener.class);
         Task task = mock(Task.class);
         User user1 = new User("user1", "r1", "r2");
@@ -357,7 +357,7 @@ public class SecurityActionFilterTests extends ESTestCase {
     }
 
     public void testSecondaryAuthRequired() throws Exception {
-        ActionRequest request = mock(ActionRequest.class);
+        AbstractActionRequest request = mock(AbstractActionRequest.class);
         ActionListener listener = mock(ActionListener.class);
         Task task = mock(Task.class);
         User user1 = new User("user1", "r1", "r2");
@@ -384,7 +384,7 @@ public class SecurityActionFilterTests extends ESTestCase {
         verifyNoInteractions(authzService);
     }
 
-    private void mockAuthentication(ActionRequest request, Authentication authentication, String requestId) {
+    private void mockAuthentication(AbstractActionRequest request, Authentication authentication, String requestId) {
         doAnswer(i -> {
             final Object[] args = i.getArguments();
             assertThat(args, arrayWithSize(4));
@@ -411,10 +411,10 @@ public class SecurityActionFilterTests extends ESTestCase {
             new SecurityContext(Settings.EMPTY, threadContext).putIndicesAccessControl(indicesAccessControl);
             callback.onResponse(null);
             return Void.TYPE;
-        }).when(authzService).authorize(any(Authentication.class), any(String.class), any(TransportRequest.class), anyActionListener());
+        }).when(authzService).authorize(any(Authentication.class), any(String.class), any(AbstractTransportRequest.class), anyActionListener());
     }
 
-    private void mockChain(Task task, String action, ActionRequest request, ActionResponse actionResponse) {
+    private void mockChain(Task task, String action, AbstractActionRequest request, ActionResponse actionResponse) {
         doAnswer(i -> {
             final Object[] args = i.getArguments();
             assertThat(args, arrayWithSize(4));

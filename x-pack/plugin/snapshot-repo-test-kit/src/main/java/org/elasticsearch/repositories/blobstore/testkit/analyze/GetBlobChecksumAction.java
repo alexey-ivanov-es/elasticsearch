@@ -10,7 +10,7 @@ package org.elasticsearch.repositories.blobstore.testkit.analyze;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionFilters;
@@ -176,7 +176,7 @@ class GetBlobChecksumAction extends HandledTransportAction<GetBlobChecksumAction
         listener.onResponse(response);
     }
 
-    static class Request extends ActionRequest {
+    static class Request extends AbstractActionRequest {
 
         private final String repositoryName;
         private final String blobPath;

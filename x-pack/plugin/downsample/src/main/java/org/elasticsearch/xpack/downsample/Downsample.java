@@ -7,9 +7,6 @@
 
 package org.elasticsearch.xpack.downsample;
 
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.ActionResponse;
-import org.elasticsearch.action.downsample.DownsampleAction;
 import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
 import org.elasticsearch.cluster.node.DiscoveryNodes;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
@@ -46,16 +43,16 @@ public class Downsample extends Plugin implements ActionPlugin, PersistentTaskPl
         "xpack.downsample.thread_pool"
     );
 
-    @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    /*@Override
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionHandler<>(DownsampleAction.INSTANCE, TransportDownsampleAction.class),
-            new ActionHandler<>(
+            new ActionHandler(DownsampleAction.INSTANCE, TransportDownsampleAction.class),
+            new ActionHandler(
                 DownsampleShardPersistentTaskExecutor.DelegatingAction.INSTANCE,
                 DownsampleShardPersistentTaskExecutor.DelegatingAction.TA.class
             )
         );
-    }
+    }*/
 
     @Override
     public List<RestHandler> getRestHandlers(

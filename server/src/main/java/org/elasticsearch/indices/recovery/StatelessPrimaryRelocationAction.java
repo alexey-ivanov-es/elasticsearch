@@ -9,7 +9,7 @@
 
 package org.elasticsearch.indices.recovery;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -27,7 +27,7 @@ public class StatelessPrimaryRelocationAction {
         "internal:index/shard/recovery/stateless_primary_relocation"
     );
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         private final long recoveryId;
         private final ShardId shardId;

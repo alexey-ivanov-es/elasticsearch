@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -25,7 +25,7 @@ public class UpdateCalendarJobAction extends ActionType<PutCalendarAction.Respon
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         private String calendarId;
         private String jobIdsToAddExpression;

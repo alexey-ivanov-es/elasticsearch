@@ -14,7 +14,7 @@ import org.elasticsearch.search.internal.SearchContext;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.TestSearchContext;
 import org.elasticsearch.transport.EmptyRequest;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class SearchOperationListenerTests extends ESTestCase {
             }
 
             @Override
-            public void validateReaderContext(ReaderContext readerContext, TransportRequest request) {
+            public void validateReaderContext(ReaderContext readerContext, AbstractTransportRequest request) {
                 assertNotNull(readerContext);
                 validateSearchContext.incrementAndGet();
             }

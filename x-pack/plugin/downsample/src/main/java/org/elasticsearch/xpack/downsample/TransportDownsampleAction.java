@@ -27,6 +27,7 @@ import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.support.master.AcknowledgedTransportMasterNodeAction;
 import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.client.internal.OriginSettingClient;
+import org.elasticsearch.client.internal.node.NodeClient;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.ClusterStateTaskListener;
 import org.elasticsearch.cluster.SimpleBatchedExecutor;
@@ -70,6 +71,7 @@ import org.elasticsearch.injection.guice.Inject;
 import org.elasticsearch.persistent.PersistentTaskParams;
 import org.elasticsearch.persistent.PersistentTasksCustomMetadata;
 import org.elasticsearch.persistent.PersistentTasksService;
+import org.elasticsearch.plugin.NamedComponent;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskId;
@@ -107,6 +109,7 @@ import static org.elasticsearch.xpack.core.ilm.DownsampleAction.DOWNSAMPLED_INDE
  *  -  instantiating {@link org.elasticsearch.persistent.PersistentTasksExecutor} to start a persistent downsample task
  *  -  cleaning up state
  */
+@NamedComponent("indices:admin/xpack/downsample")
 public class TransportDownsampleAction extends AcknowledgedTransportMasterNodeAction<DownsampleAction.Request> {
 
     private static final Logger logger = LogManager.getLogger(TransportDownsampleAction.class);
@@ -149,7 +152,7 @@ public class TransportDownsampleAction extends AcknowledgedTransportMasterNodeAc
 
     @Inject
     public TransportDownsampleAction(
-        Client client,
+        NodeClient client,
         IndicesService indicesService,
         ClusterService clusterService,
         TransportService transportService,
@@ -179,6 +182,11 @@ public class TransportDownsampleAction extends AcknowledgedTransportMasterNodeAc
         this.taskQueue = clusterService.createTaskQueue("downsample", Priority.URGENT, STATE_UPDATE_TASK_EXECUTOR);
         this.persistentTasksService = persistentTasksService;
         this.downsampleMetrics = downsampleMetrics;
+    }
+
+    @Override
+    public Class<DownsampleAction.Request> getRequestClass() {
+        return DownsampleAction.Request.class;
     }
 
     private void recordSuccessMetrics(long startTime) {

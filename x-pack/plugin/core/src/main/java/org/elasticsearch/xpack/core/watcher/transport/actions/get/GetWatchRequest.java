@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.watcher.transport.actions.get;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ValidateActions;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * The request to get the watch by name (id)
  */
-public class GetWatchRequest extends ActionRequest {
+public class GetWatchRequest extends AbstractActionRequest {
 
     private String id;
 

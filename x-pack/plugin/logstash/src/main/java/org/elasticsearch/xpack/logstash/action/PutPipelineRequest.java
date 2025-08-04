@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.logstash.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -17,7 +17,7 @@ import org.elasticsearch.xcontent.XContentType;
 import java.io.IOException;
 import java.util.Objects;
 
-public class PutPipelineRequest extends ActionRequest {
+public class PutPipelineRequest extends AbstractActionRequest {
 
     private final String id;
     private final String source;

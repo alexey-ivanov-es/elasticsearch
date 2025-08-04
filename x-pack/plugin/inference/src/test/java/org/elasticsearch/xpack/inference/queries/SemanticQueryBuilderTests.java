@@ -18,7 +18,7 @@ import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.client.internal.Client;
@@ -257,7 +257,7 @@ public class SemanticQueryBuilderTests extends AbstractQueryTestCase<SemanticQue
 
     @Override
     protected boolean canSimulateMethod(Method method, Object[] args) throws NoSuchMethodException {
-        return method.equals(Client.class.getMethod("execute", ActionType.class, ActionRequest.class, ActionListener.class))
+        return method.equals(Client.class.getMethod("execute", ActionType.class, AbstractActionRequest.class, ActionListener.class))
             && (args[0] instanceof InferenceAction);
     }
 

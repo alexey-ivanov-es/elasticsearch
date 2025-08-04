@@ -10,7 +10,7 @@ package org.elasticsearch.xpack.slm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionRunnable;
@@ -249,7 +249,7 @@ public class TransportSLMGetExpiredSnapshotsAction extends TransportAction<
         }).toList();
     }
 
-    public static final class Request extends ActionRequest {
+    public static final class Request extends AbstractActionRequest {
         private final Collection<String> repositories;
         private final Map<String, SnapshotLifecyclePolicy> policies;
 

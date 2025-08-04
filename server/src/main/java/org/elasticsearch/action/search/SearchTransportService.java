@@ -51,7 +51,7 @@ import org.elasticsearch.transport.RemoteClusterService;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportActionProxy;
 import org.elasticsearch.transport.TransportException;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponse;
@@ -318,7 +318,7 @@ public class SearchTransportService {
         return new HashMap<>(clientConnections);
     }
 
-    static class ScrollFreeContextRequest extends TransportRequest {
+    static class ScrollFreeContextRequest extends AbstractTransportRequest {
         private final ShardSearchContextId contextId;
 
         ScrollFreeContextRequest(ShardSearchContextId contextId) {
@@ -342,7 +342,7 @@ public class SearchTransportService {
 
     }
 
-    private static class ClearScrollContextsRequest extends TransportRequest {
+    private static class ClearScrollContextsRequest extends AbstractTransportRequest {
         ClearScrollContextsRequest() {}
 
         ClearScrollContextsRequest(StreamInput in) throws IOException {

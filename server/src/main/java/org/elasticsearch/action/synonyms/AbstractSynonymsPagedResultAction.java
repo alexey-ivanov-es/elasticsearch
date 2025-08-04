@@ -9,7 +9,7 @@
 
 package org.elasticsearch.action.synonyms;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -42,7 +42,7 @@ public abstract class AbstractSynonymsPagedResultAction<T extends ActionResponse
     /**
      * Base request class that includes support for pagination parameters
      */
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
         private static final int MAX_SYNONYMS_RESULTS = 10_000;
         private final int from;
         private final int size;

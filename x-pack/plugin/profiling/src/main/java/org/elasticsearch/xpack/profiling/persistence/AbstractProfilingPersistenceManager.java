@@ -10,7 +10,7 @@ package org.elasticsearch.xpack.profiling.persistence;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -162,7 +162,7 @@ abstract class AbstractProfilingPersistenceManager<T extends ProfilingIndexAbstr
         executeAsync("update settings", request, listener, (req, l) -> client.admin().indices().updateSettings(req, l));
     }
 
-    protected final <Request extends ActionRequest & IndicesRequest, Response extends AcknowledgedResponse> void executeAsync(
+    protected final <Request extends AbstractActionRequest & IndicesRequest, Response extends AcknowledgedResponse> void executeAsync(
         final String actionName,
         final Request request,
         final ActionListener<Response> listener,

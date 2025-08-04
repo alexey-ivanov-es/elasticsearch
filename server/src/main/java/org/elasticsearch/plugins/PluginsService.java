@@ -198,6 +198,10 @@ public class PluginsService implements ReportingService<PluginsAndModules> {
         plugins().stream().map(LoadedPlugin::instance).forEach(consumer);
     }
 
+    public final void forEachBundle(Consumer<BundleInfo> consumer) {
+        plugins().stream().map(LoadedPlugin::bundle).forEach(consumer);
+    }
+
     /**
      * Sometimes we want the plugin name for error handling.
      * @return A map of plugin names to plugin instances.

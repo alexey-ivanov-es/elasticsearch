@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.ccr.action.repositories;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.support.IndicesOptions;
@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import static org.elasticsearch.xpack.ccr.Ccr.TRANSPORT_VERSION_ACTION_WITH_SHARD_ID;
 
-public class ClearCcrRestoreSessionRequest extends ActionRequest implements RemoteClusterAwareRequest, IndicesRequest {
+public class ClearCcrRestoreSessionRequest extends AbstractActionRequest implements RemoteClusterAwareRequest, IndicesRequest {
 
     private DiscoveryNode node;
     private final String sessionUUID;

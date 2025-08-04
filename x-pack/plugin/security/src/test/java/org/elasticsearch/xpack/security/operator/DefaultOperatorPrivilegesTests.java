@@ -22,7 +22,7 @@ import org.elasticsearch.rest.RestHandler;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.MockLog;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationField;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationTestHelper;
@@ -82,7 +82,7 @@ public class DefaultOperatorPrivilegesTests extends ESTestCase {
         final ElasticsearchSecurityException e = operatorPrivilegesService.check(
             AuthenticationTestHelper.builder().build(),
             "cluster:action",
-            mock(TransportRequest.class),
+            mock(AbstractTransportRequest.class),
             threadContext
         );
         assertNull(e);
@@ -177,19 +177,19 @@ public class DefaultOperatorPrivilegesTests extends ESTestCase {
 
         if (randomBoolean()) {
             threadContext.putHeader(AuthenticationField.PRIVILEGE_CATEGORY_KEY, AuthenticationField.PRIVILEGE_CATEGORY_VALUE_OPERATOR);
-            assertNull(operatorPrivilegesService.check(authentication, operatorAction, mock(TransportRequest.class), threadContext));
+            assertNull(operatorPrivilegesService.check(authentication, operatorAction, mock(AbstractTransportRequest.class), threadContext));
         } else {
             final ElasticsearchSecurityException e = operatorPrivilegesService.check(
                 authentication,
                 operatorAction,
-                mock(TransportRequest.class),
+                mock(AbstractTransportRequest.class),
                 threadContext
             );
             assertNotNull(e);
             assertThat(e.getMessage(), containsString("Operator privileges are required for " + message));
         }
 
-        assertNull(operatorPrivilegesService.check(authentication, nonOperatorAction, mock(TransportRequest.class), threadContext));
+        assertNull(operatorPrivilegesService.check(authentication, nonOperatorAction, mock(AbstractTransportRequest.class), threadContext));
     }
 
     public void testCheckWillPassForInternalUsersBecauseTheyHaveOperatorPrivileges() {
@@ -199,7 +199,7 @@ public class DefaultOperatorPrivilegesTests extends ESTestCase {
         when(xPackLicenseState.isAllowed(Security.OPERATOR_PRIVILEGES_FEATURE)).thenReturn(true);
         final Authentication internalAuth = AuthenticationTestHelper.builder().internal().build();
         assertNull(
-            operatorPrivilegesService.check(internalAuth, randomAlphaOfLengthBetween(20, 30), mock(TransportRequest.class), threadContext)
+            operatorPrivilegesService.check(internalAuth, randomAlphaOfLengthBetween(20, 30), mock(AbstractTransportRequest.class), threadContext)
         );
         verify(operatorOnlyRegistry, never()).check(anyString(), any());
     }
@@ -230,7 +230,7 @@ public class DefaultOperatorPrivilegesTests extends ESTestCase {
     }
 
     public void testMaybeInterceptRequestWillNotInterceptRequestsOtherThanRestoreSnapshotRequest() {
-        final TransportRequest transportRequest = mock(TransportRequest.class);
+        final AbstractTransportRequest transportRequest = mock(AbstractTransportRequest.class);
         operatorPrivilegesService.maybeInterceptRequest(new ThreadContext(Settings.EMPTY), transportRequest);
         verifyNoMoreInteractions(xPackLicenseState);
     }
@@ -241,7 +241,7 @@ public class DefaultOperatorPrivilegesTests extends ESTestCase {
         NOOP_OPERATOR_PRIVILEGES_SERVICE.maybeMarkOperatorUser(authentication, threadContext);
         assertNull(threadContext.getHeader(AuthenticationField.PRIVILEGE_CATEGORY_KEY));
 
-        final TransportRequest request = mock(TransportRequest.class);
+        final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         assertNull(
             NOOP_OPERATOR_PRIVILEGES_SERVICE.check(
                 AuthenticationTestHelper.builder().build(),
@@ -260,7 +260,7 @@ public class DefaultOperatorPrivilegesTests extends ESTestCase {
         verify(restoreSnapshotRequest).skipOperatorOnlyState(false);
 
         // The test just makes sure that other requests are also accepted without any error
-        NOOP_OPERATOR_PRIVILEGES_SERVICE.maybeInterceptRequest(threadContext, mock(TransportRequest.class));
+        NOOP_OPERATOR_PRIVILEGES_SERVICE.maybeInterceptRequest(threadContext, mock(AbstractTransportRequest.class));
     }
 
     public void testCheckRest() {

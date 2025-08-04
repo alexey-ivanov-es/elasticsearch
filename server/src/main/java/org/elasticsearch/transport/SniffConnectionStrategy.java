@@ -312,7 +312,7 @@ public class SniffConnectionStrategy extends RemoteConnectionStrategy {
                 ThreadContext threadContext = threadPool.getThreadContext();
 
                 final String action;
-                final TransportRequest request;
+                final AbstractTransportRequest request;
                 final AbstractSniffResponseHandler<?> sniffResponseHandler;
                 // Use different action to collect nodes information depending on the connection model
                 if (REMOTE_CLUSTER_PROFILE.equals(connectionManager.getConnectionProfile().getTransportProfile())) {

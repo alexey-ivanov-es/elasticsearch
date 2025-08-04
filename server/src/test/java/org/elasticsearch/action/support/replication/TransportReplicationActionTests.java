@@ -75,7 +75,7 @@ import org.elasticsearch.transport.TestTransportChannel;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportChannel;
 import org.elasticsearch.transport.TransportException;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.transport.netty4.Netty4Transport;
@@ -136,7 +136,7 @@ public class TransportReplicationActionTests extends ESTestCase {
      * This will throw a {@link ClassCastException} if the request is of the wrong type.
      */
     @SuppressWarnings("unchecked")
-    public static <R extends ReplicationRequest<?>> R resolveRequest(TransportRequest requestOrWrappedRequest) {
+    public static <R extends ReplicationRequest<?>> R resolveRequest(AbstractTransportRequest requestOrWrappedRequest) {
         if (requestOrWrappedRequest instanceof TransportReplicationAction.ConcreteShardRequest) {
             requestOrWrappedRequest = ((TransportReplicationAction.ConcreteShardRequest<?>) requestOrWrappedRequest).getRequest();
         }
@@ -1401,7 +1401,7 @@ public class TransportReplicationActionTests extends ESTestCase {
         );
     }
 
-    private void assertConcreteShardRequest(TransportRequest capturedRequest, Request expectedRequest, AllocationId expectedAllocationId) {
+    private void assertConcreteShardRequest(AbstractTransportRequest capturedRequest, Request expectedRequest, AllocationId expectedAllocationId) {
         final TransportReplicationAction.ConcreteShardRequest<?> concreteShardRequest = (TransportReplicationAction.ConcreteShardRequest<
             ?>) capturedRequest;
         assertThat(concreteShardRequest.getRequest(), equalTo(expectedRequest));

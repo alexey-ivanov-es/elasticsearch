@@ -14,6 +14,7 @@ import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.util.set.Sets;
 import org.elasticsearch.core.Nullable;
 import org.elasticsearch.core.Tuple;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequest;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authz.RestrictedIndices;
@@ -135,7 +136,7 @@ public interface Role {
      * authentication.
      *
      * @param action cluster action
-     * @param request {@link TransportRequest}
+     * @param request {@link AbstractTransportRequest}
      * @param authentication {@link Authentication}
      * @return {@code true} if action is allowed else returns {@code false}
      */

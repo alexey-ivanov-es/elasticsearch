@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.security.action.profile;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.common.Strings;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
 
-public class UpdateProfileDataRequest extends ActionRequest {
+public class UpdateProfileDataRequest extends AbstractActionRequest {
 
     private final String uid;
     private final Map<String, Object> labels;

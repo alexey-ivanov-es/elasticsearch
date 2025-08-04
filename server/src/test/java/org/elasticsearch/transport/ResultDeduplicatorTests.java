@@ -28,12 +28,12 @@ public class ResultDeduplicatorTests extends ESTestCase {
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger failureCount = new AtomicInteger();
         Exception failure = randomBoolean() ? new TransportException("simulated") : null;
-        final TransportRequest request = new TransportRequest() {
+        final AbstractTransportRequest request = new AbstractTransportRequest() {
             @Override
             public void setParentTask(final TaskId taskId) {}
         };
         final ThreadContext threadContext = new ThreadContext(Settings.EMPTY);
-        final ResultDeduplicator<TransportRequest, Void> deduplicator = new ResultDeduplicator<>(threadContext);
+        final ResultDeduplicator<AbstractTransportRequest, Void> deduplicator = new ResultDeduplicator<>(threadContext);
         final SetOnce<ActionListener<Void>> listenerHolder = new SetOnce<>();
         final var headerName = "thread-context-header";
         final var headerGenerator = new AtomicInteger();

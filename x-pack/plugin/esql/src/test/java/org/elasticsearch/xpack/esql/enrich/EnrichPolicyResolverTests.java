@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.esql.enrich;
 
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionRunnable;
 import org.elasticsearch.action.ActionType;
@@ -475,7 +475,7 @@ public class EnrichPolicyResolverTests extends ESTestCase {
 
         @Override
         @SuppressWarnings("unchecked")
-        protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+        protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
             ActionType<Response> action,
             Request transportRequest,
             ActionListener<Response> listener

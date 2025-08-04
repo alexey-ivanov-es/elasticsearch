@@ -12,7 +12,7 @@ package org.elasticsearch.migration;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.admin.cluster.migration.TransportGetFeatureUpgradeStatusAction;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -318,7 +318,7 @@ public abstract class AbstractFeatureMigrationIntegTest extends ESIntegTestCase 
             private Set<String> blockedActions = emptySet();
 
             @Override
-            protected boolean apply(String action, ActionRequest request, ActionListener<?> listener) {
+            protected boolean apply(String action, AbstractActionRequest request, ActionListener<?> listener) {
                 if (blockedActions.contains(action)) {
                     throw new ElasticsearchException("force exception on [" + action + "]");
                 }

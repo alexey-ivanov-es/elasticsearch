@@ -26,6 +26,7 @@ import org.elasticsearch.xpack.core.search.action.GetAsyncStatusAction;
 import org.elasticsearch.xpack.core.search.action.SubmitAsyncSearchAction;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -36,11 +37,11 @@ import static org.elasticsearch.xpack.core.async.AsyncTaskMaintenanceService.ASY
 public final class AsyncSearch extends Plugin implements ActionPlugin {
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Arrays.asList(
-            new ActionHandler<>(SubmitAsyncSearchAction.INSTANCE, TransportSubmitAsyncSearchAction.class),
-            new ActionHandler<>(GetAsyncSearchAction.INSTANCE, TransportGetAsyncSearchAction.class),
-            new ActionHandler<>(GetAsyncStatusAction.INSTANCE, TransportGetAsyncStatusAction.class)
+            new ActionHandler(SubmitAsyncSearchAction.INSTANCE, TransportSubmitAsyncSearchAction.class),
+            new ActionHandler(GetAsyncSearchAction.INSTANCE, TransportGetAsyncSearchAction.class),
+            new ActionHandler(GetAsyncStatusAction.INSTANCE, TransportGetAsyncStatusAction.class)
         );
     }
 

@@ -10,7 +10,7 @@
 package org.elasticsearch.repositories;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -67,7 +67,7 @@ public class VerifyNodeRepositoryAction {
         }
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         protected final String repository;
         protected final String verificationToken;

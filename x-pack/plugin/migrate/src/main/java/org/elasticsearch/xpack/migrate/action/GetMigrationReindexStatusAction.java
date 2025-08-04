@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.migrate.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -81,7 +81,7 @@ public class GetMigrationReindexStatusAction extends ActionType<GetMigrationRein
 
     }
 
-    public static class Request extends ActionRequest implements IndicesRequest {
+    public static class Request extends AbstractActionRequest implements IndicesRequest {
         private final String index;
 
         public Request(String index) {

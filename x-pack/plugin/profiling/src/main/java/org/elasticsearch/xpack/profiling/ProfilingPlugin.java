@@ -184,14 +184,14 @@ public class ProfilingPlugin extends Plugin implements ActionPlugin {
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionHandler<>(GetStackTracesAction.INSTANCE, TransportGetStackTracesAction.class),
-            new ActionHandler<>(GetFlamegraphAction.INSTANCE, TransportGetFlamegraphAction.class),
-            new ActionHandler<>(GetTopNFunctionsAction.INSTANCE, TransportGetTopNFunctionsAction.class),
-            new ActionHandler<>(GetStatusAction.INSTANCE, TransportGetStatusAction.class),
-            new ActionHandler<>(XPackUsageFeatureAction.UNIVERSAL_PROFILING, ProfilingUsageTransportAction.class),
-            new ActionHandler<>(XPackInfoFeatureAction.UNIVERSAL_PROFILING, ProfilingInfoTransportAction.class)
+            new ActionHandler(GetStackTracesAction.INSTANCE, TransportGetStackTracesAction.class),
+            new ActionHandler(GetFlamegraphAction.INSTANCE, TransportGetFlamegraphAction.class),
+            new ActionHandler(GetTopNFunctionsAction.INSTANCE, TransportGetTopNFunctionsAction.class),
+            new ActionHandler(GetStatusAction.INSTANCE, TransportGetStatusAction.class),
+            new ActionHandler(XPackUsageFeatureAction.UNIVERSAL_PROFILING, ProfilingUsageTransportAction.class),
+            new ActionHandler(XPackInfoFeatureAction.UNIVERSAL_PROFILING, ProfilingInfoTransportAction.class)
         );
     }
 

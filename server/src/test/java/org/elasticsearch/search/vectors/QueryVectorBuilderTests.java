@@ -9,7 +9,7 @@
 
 package org.elasticsearch.search.vectors;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.common.io.stream.Writeable;
 import org.elasticsearch.plugins.SearchPlugin;
@@ -58,7 +58,7 @@ public class QueryVectorBuilderTests extends AbstractQueryVectorBuilderTestCase<
     }
 
     @Override
-    protected void doAssertClientRequest(ActionRequest request, TestQueryVectorBuilderPlugin.TestQueryVectorBuilder builder) {
+    protected void doAssertClientRequest(AbstractActionRequest request, TestQueryVectorBuilderPlugin.TestQueryVectorBuilder builder) {
         // Nothing to assert here as this object does not make client calls
     }
 

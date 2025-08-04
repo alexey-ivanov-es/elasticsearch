@@ -38,7 +38,7 @@ import org.elasticsearch.tasks.TaskId;
 import org.elasticsearch.tasks.TaskManager;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.RemoteClusterAware;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.xpack.esql.action.EsqlExecutionInfo;
 import org.elasticsearch.xpack.esql.action.EsqlQueryAction;
@@ -482,7 +482,7 @@ public class ComputeService {
         }
     }
 
-    private static class ComputeGroupTaskRequest extends TransportRequest {
+    private static class ComputeGroupTaskRequest extends AbstractTransportRequest {
         private final Supplier<String> parentDescription;
 
         ComputeGroupTaskRequest(TaskId parentTask, Supplier<String> description) {

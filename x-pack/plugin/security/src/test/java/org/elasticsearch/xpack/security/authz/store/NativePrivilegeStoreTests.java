@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.security.authz.store;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteRequest;
@@ -116,7 +116,7 @@ import static org.mockito.Mockito.when;
 public class NativePrivilegeStoreTests extends ESTestCase {
 
     private NativePrivilegeStore store;
-    private List<ActionRequest> requests;
+    private List<AbstractActionRequest> requests;
     private AtomicReference<ActionListener<ActionResponse>> listener;
     private Client client;
     private SecurityIndexManager securityIndex;
@@ -134,7 +134,7 @@ public class NativePrivilegeStoreTests extends ESTestCase {
         client = new NoOpClient(threadPool) {
             @Override
             @SuppressWarnings("unchecked")
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -904,8 +904,8 @@ public class NativePrivilegeStoreTests extends ESTestCase {
         );
     }
 
-    private <T extends ActionRequest> T getLastRequest(Class<T> requestClass) {
-        final ActionRequest last = requests.get(requests.size() - 1);
+    private <T extends AbstractActionRequest> T getLastRequest(Class<T> requestClass) {
+        final AbstractActionRequest last = requests.get(requests.size() - 1);
         assertThat(last, instanceOf(requestClass));
         return requestClass.cast(last);
     }

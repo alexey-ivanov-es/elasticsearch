@@ -10,7 +10,7 @@
 package org.elasticsearch.xpack.core.security.authz.privilege;
 
 import org.elasticsearch.test.ESTestCase;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.action.apikey.ApiKeyTests;
 import org.elasticsearch.xpack.core.security.action.apikey.BulkUpdateApiKeyRequest;
 import org.elasticsearch.xpack.core.security.action.apikey.CreateApiKeyRequest;
@@ -49,14 +49,14 @@ public class ManageOwnApiKeyClusterPrivilegeTests extends ESTestCase {
         final String apiKeyId = randomAlphaOfLengthBetween(4, 7);
         final User userJoe = new User("joe");
         final Authentication authentication = AuthenticationTests.randomApiKeyAuthentication(userJoe, apiKeyId);
-        final TransportRequest getApiKeyRequest = GetApiKeyRequest.builder()
+        final AbstractTransportRequest getApiKeyRequest = GetApiKeyRequest.builder()
             .apiKeyId(apiKeyId)
             .ownedByAuthenticatedUser(randomBoolean())
             .build();
-        final TransportRequest invalidateApiKeyRequest = InvalidateApiKeyRequest.usingApiKeyId(apiKeyId, randomBoolean());
+        final AbstractTransportRequest invalidateApiKeyRequest = InvalidateApiKeyRequest.usingApiKeyId(apiKeyId, randomBoolean());
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/get", getApiKeyRequest, authentication));
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/invalidate", invalidateApiKeyRequest, authentication));
-        assertFalse(clusterPermission.check("cluster:admin/something", mock(TransportRequest.class), authentication));
+        assertFalse(clusterPermission.check("cluster:admin/something", mock(AbstractTransportRequest.class), authentication));
     }
 
     public void testAuthenticationWithApiKeyAllowsDeniesGetApiKeyWithLimitedByWhenItIsItself() {
@@ -79,7 +79,7 @@ public class ManageOwnApiKeyClusterPrivilegeTests extends ESTestCase {
             .build();
         final String apiKeyId = randomAlphaOfLengthBetween(4, 7);
         final Authentication authentication = AuthenticationTestHelper.builder().build();
-        final TransportRequest updateApiKeyRequest = UpdateApiKeyRequest.usingApiKeyId(apiKeyId);
+        final AbstractTransportRequest updateApiKeyRequest = UpdateApiKeyRequest.usingApiKeyId(apiKeyId);
 
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/update", updateApiKeyRequest, authentication));
     }
@@ -89,7 +89,7 @@ public class ManageOwnApiKeyClusterPrivilegeTests extends ESTestCase {
             .build();
         final List<String> apiKeyIds = randomList(1, 5, () -> randomAlphaOfLengthBetween(4, 7));
         final Authentication authentication = AuthenticationTestHelper.builder().build();
-        final TransportRequest bulkUpdateApiKeyRequest = new BulkUpdateApiKeyRequest(apiKeyIds, null, null, null);
+        final AbstractTransportRequest bulkUpdateApiKeyRequest = new BulkUpdateApiKeyRequest(apiKeyIds, null, null, null);
 
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/update", bulkUpdateApiKeyRequest, authentication));
     }
@@ -101,12 +101,12 @@ public class ManageOwnApiKeyClusterPrivilegeTests extends ESTestCase {
         final String apiKeyId = randomAlphaOfLengthBetween(4, 7);
         final User userJoe = new User("joe");
         final Authentication authentication = AuthenticationTests.randomApiKeyAuthentication(userJoe, randomAlphaOfLength(20));
-        final TransportRequest getApiKeyRequest = GetApiKeyRequest.builder()
+        final AbstractTransportRequest getApiKeyRequest = GetApiKeyRequest.builder()
             .apiKeyId(apiKeyId)
             .ownedByAuthenticatedUser(randomBoolean())
             .withLimitedBy(randomBoolean())
             .build();
-        final TransportRequest invalidateApiKeyRequest = InvalidateApiKeyRequest.usingApiKeyId(apiKeyId, randomBoolean());
+        final AbstractTransportRequest invalidateApiKeyRequest = InvalidateApiKeyRequest.usingApiKeyId(apiKeyId, randomBoolean());
 
         assertFalse(clusterPermission.check("cluster:admin/xpack/security/api_key/get", getApiKeyRequest, authentication));
         assertFalse(clusterPermission.check("cluster:admin/xpack/security/api_key/invalidate", invalidateApiKeyRequest, authentication));
@@ -119,18 +119,18 @@ public class ManageOwnApiKeyClusterPrivilegeTests extends ESTestCase {
         final Authentication.RealmRef realmRef = AuthenticationTests.randomRealmRef(randomBoolean());
         final Authentication authentication = AuthenticationTests.randomAuthentication(new User("joe"), realmRef);
 
-        TransportRequest getApiKeyRequest = GetApiKeyRequest.builder()
+        AbstractTransportRequest getApiKeyRequest = GetApiKeyRequest.builder()
             .realmName(realmRef.getName())
             .userName("joe")
             .withLimitedBy(randomBoolean())
             .build();
-        TransportRequest invalidateApiKeyRequest = InvalidateApiKeyRequest.usingRealmAndUserName(realmRef.getName(), "joe");
-        TransportRequest updateApiKeyRequest = UpdateApiKeyRequest.usingApiKeyId(randomAlphaOfLength(10));
+        AbstractTransportRequest invalidateApiKeyRequest = InvalidateApiKeyRequest.usingRealmAndUserName(realmRef.getName(), "joe");
+        AbstractTransportRequest updateApiKeyRequest = UpdateApiKeyRequest.usingApiKeyId(randomAlphaOfLength(10));
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/get", getApiKeyRequest, authentication));
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/invalidate", invalidateApiKeyRequest, authentication));
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/update", updateApiKeyRequest, authentication));
 
-        assertFalse(clusterPermission.check("cluster:admin/something", mock(TransportRequest.class), authentication));
+        assertFalse(clusterPermission.check("cluster:admin/something", mock(AbstractTransportRequest.class), authentication));
 
         getApiKeyRequest = GetApiKeyRequest.builder().realmName(realmRef.getName()).userName("jane").withLimitedBy(randomBoolean()).build();
         assertFalse(clusterPermission.check("cluster:admin/xpack/security/api_key/get", getApiKeyRequest, authentication));
@@ -185,15 +185,15 @@ public class ManageOwnApiKeyClusterPrivilegeTests extends ESTestCase {
             authentication = AuthenticationTests.randomAuthentication(userJoe, realmRef);
         }
 
-        final TransportRequest getApiKeyRequest = GetApiKeyRequest.builder()
+        final AbstractTransportRequest getApiKeyRequest = GetApiKeyRequest.builder()
             .ownedByAuthenticatedUser()
             .withLimitedBy(randomBoolean())
             .build();
-        final TransportRequest invalidateApiKeyRequest = InvalidateApiKeyRequest.forOwnedApiKeys();
+        final AbstractTransportRequest invalidateApiKeyRequest = InvalidateApiKeyRequest.forOwnedApiKeys();
 
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/get", getApiKeyRequest, authentication));
         assertTrue(clusterPermission.check("cluster:admin/xpack/security/api_key/invalidate", invalidateApiKeyRequest, authentication));
-        assertFalse(clusterPermission.check("cluster:admin/something", mock(TransportRequest.class), authentication));
+        assertFalse(clusterPermission.check("cluster:admin/something", mock(AbstractTransportRequest.class), authentication));
     }
 
     public void testAuthenticationWithUserDeniesAccessToApiKeyActionsWhenItIsNotOwner() {
@@ -216,12 +216,12 @@ public class ManageOwnApiKeyClusterPrivilegeTests extends ESTestCase {
             authentication = AuthenticationTests.randomAuthentication(userJoe, realmRef);
         }
 
-        final TransportRequest getApiKeyRequest = randomFrom(
+        final AbstractTransportRequest getApiKeyRequest = randomFrom(
             GetApiKeyRequest.builder().realmName("realm1").userName(randomAlphaOfLength(7)).withLimitedBy(randomBoolean()).build(),
             GetApiKeyRequest.builder().realmName(randomAlphaOfLength(5)).userName("joe").withLimitedBy(randomBoolean()).build(),
             GetApiKeyRequest.builder().realmName(randomAlphaOfLength(5)).userName(randomAlphaOfLength(7)).build()
         );
-        final TransportRequest invalidateApiKeyRequest = randomFrom(
+        final AbstractTransportRequest invalidateApiKeyRequest = randomFrom(
             InvalidateApiKeyRequest.usingRealmAndUserName("realm1", randomAlphaOfLength(7)),
             InvalidateApiKeyRequest.usingRealmAndUserName(randomAlphaOfLength(5), "joe"),
             new InvalidateApiKeyRequest(randomAlphaOfLength(5), randomAlphaOfLength(7), null, false, null)

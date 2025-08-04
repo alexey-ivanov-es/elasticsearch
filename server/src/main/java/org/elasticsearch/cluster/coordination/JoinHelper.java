@@ -43,7 +43,7 @@ import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.threadpool.ThreadPool.Names;
 import org.elasticsearch.transport.ConnectTransportException;
 import org.elasticsearch.transport.TransportException;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponse.Empty;
 import org.elasticsearch.transport.TransportResponseHandler;
@@ -610,7 +610,7 @@ public class JoinHelper {
     static final String PENDING_JOIN_CONNECT_FAILED = "failed to connect";
     static final String PENDING_JOIN_FAILED = "failed";
 
-    static class JoinPingRequest extends TransportRequest {
+    static class JoinPingRequest extends AbstractTransportRequest {
         JoinPingRequest() {}
 
         JoinPingRequest(StreamInput in) throws IOException {

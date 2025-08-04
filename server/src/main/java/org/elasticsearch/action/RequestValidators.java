@@ -15,7 +15,7 @@ import org.elasticsearch.index.Index;
 import java.util.Collection;
 import java.util.Optional;
 
-public class RequestValidators<T extends ActionRequest> {
+public class RequestValidators<T extends AbstractActionRequest> {
 
     private final Collection<RequestValidator<T>> validators;
 
@@ -40,7 +40,7 @@ public class RequestValidators<T extends ActionRequest> {
     /**
      * A validator that validates an request associated with indices before executing it.
      */
-    public interface RequestValidator<T extends ActionRequest> {
+    public interface RequestValidator<T extends AbstractActionRequest> {
 
         /**
          * Validates a given request with its associated concrete indices and the current state.

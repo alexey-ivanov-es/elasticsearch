@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.transform.action;
 
 import org.elasticsearch.ElasticsearchSecurityException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.LatchedActionListener;
@@ -87,7 +87,7 @@ public class TransformUpdaterTests extends ESTestCase {
 
         @SuppressWarnings("unchecked")
         @Override
-        protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+        protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
             ActionType<Response> action,
             Request request,
             ActionListener<Response> listener

@@ -13,7 +13,7 @@ import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.util.BytesRef;
 import org.elasticsearch.TransportVersions;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.IndicesRequest;
@@ -87,7 +87,7 @@ public class TransportGetFromTranslogAction extends HandledTransportAction<
         });
     }
 
-    public static class Request extends ActionRequest implements IndicesRequest {
+    public static class Request extends AbstractActionRequest implements IndicesRequest {
 
         private final GetRequest getRequest;
         private final ShardId shardId;

@@ -24,7 +24,7 @@ import org.elasticsearch.license.MockLicenseState;
 import org.elasticsearch.license.XPackLicenseState;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.transport.TransportChannel;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportSettings;
 import org.elasticsearch.xpack.core.security.SecurityContext;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
@@ -95,7 +95,7 @@ public class ServerTransportFilterTests extends ESTestCase {
     }
 
     public void testInbound() {
-        TransportRequest request = mock(TransportRequest.class);
+        AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         Authentication authentication = AuthenticationTestHelper.builder().build();
         doAnswer(getAnswer(authentication)).when(authcService).authenticate(eq("_action"), eq(request), eq(true), anyActionListener());
         ServerTransportFilter filter = getNodeFilter();
@@ -106,7 +106,7 @@ public class ServerTransportFilterTests extends ESTestCase {
     }
 
     public void testCrossClusterAccessInbound() {
-        TransportRequest request = mock(TransportRequest.class);
+        AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         Authentication authentication = AuthenticationTestHelper.builder().build();
         String action = randomAlphaOfLengthBetween(10, 20);
         doAnswer(getAnswer(authentication)).when(authcService).authenticate(eq(action), eq(request), eq(true), anyActionListener());
@@ -121,7 +121,7 @@ public class ServerTransportFilterTests extends ESTestCase {
     }
 
     public void testCrossClusterAccessInboundInvalidHeadersFail() {
-        TransportRequest request = mock(TransportRequest.class);
+        AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         Authentication authentication = AuthenticationTestHelper.builder().build();
         String action = randomAlphaOfLengthBetween(10, 20);
         doAnswer(getAnswer(authentication)).when(authcService).authenticate(eq(action), eq(request), eq(true), anyActionListener());
@@ -141,7 +141,7 @@ public class ServerTransportFilterTests extends ESTestCase {
     }
 
     public void testCrossClusterAccessInboundMissingHeadersFail() {
-        TransportRequest request = mock(TransportRequest.class);
+        AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         Authentication authentication = AuthenticationTestHelper.builder().build();
         String action = randomAlphaOfLengthBetween(10, 20);
         doAnswer(getAnswer(authentication)).when(authcService).authenticate(eq(action), eq(request), eq(true), anyActionListener());
@@ -189,7 +189,7 @@ public class ServerTransportFilterTests extends ESTestCase {
 
     public void testInboundDestructiveOperations() {
         String action = randomFrom(TransportCloseIndexAction.NAME, OpenIndexAction.NAME, TransportDeleteIndexAction.TYPE.name());
-        TransportRequest request = new MockIndicesRequest(
+        AbstractTransportRequest request = new MockIndicesRequest(
             IndicesOptions.fromOptions(randomBoolean(), randomBoolean(), randomBoolean(), randomBoolean()),
             randomFrom("*", "_all", "test*")
         );
@@ -207,7 +207,7 @@ public class ServerTransportFilterTests extends ESTestCase {
     }
 
     public void testInboundAuthenticationException() {
-        TransportRequest request = mock(TransportRequest.class);
+        AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         Exception authE = authenticationError("authc failed");
         doAnswer(i -> {
             final Object[] args = i.getArguments();
@@ -230,7 +230,7 @@ public class ServerTransportFilterTests extends ESTestCase {
     }
 
     public void testCrossClusterAccessInboundAuthenticationException() {
-        TransportRequest request = mock(TransportRequest.class);
+        AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         Exception authE = authenticationError("authc failed");
         String action = randomAlphaOfLengthBetween(10, 20);
         doAnswer(i -> {
@@ -266,7 +266,7 @@ public class ServerTransportFilterTests extends ESTestCase {
     public void testInboundAuthorizationException() {
         boolean crossClusterAccess = randomBoolean();
         ServerTransportFilter filter = crossClusterAccess ? getNodeCrossClusterAccessFilter() : getNodeFilter();
-        TransportRequest request = mock(TransportRequest.class);
+        AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         Authentication authentication = AuthenticationTestHelper.builder().build();
         String action = TransportSearchAction.TYPE.name();
         doAnswer(getAnswer(authentication)).when(authcService).authenticate(eq(action), eq(request), eq(true), anyActionListener());
@@ -296,7 +296,7 @@ public class ServerTransportFilterTests extends ESTestCase {
         ServerTransportFilter crossClusterAccessFilter = getNodeCrossClusterAccessFilter(unsupportedLicenseState);
         PlainActionFuture<Void> listener = new PlainActionFuture<>();
         String action = randomAlphaOfLengthBetween(10, 20);
-        crossClusterAccessFilter.inbound(action, mock(TransportRequest.class), channel, listener);
+        crossClusterAccessFilter.inbound(action, mock(AbstractTransportRequest.class), channel, listener);
 
         ElasticsearchSecurityException actualException = expectThrows(ElasticsearchSecurityException.class, listener::actionGet);
         assertThat(
@@ -313,7 +313,7 @@ public class ServerTransportFilterTests extends ESTestCase {
         final String internalAction = "internal:foo/bar";
         final String nodeOrShardAction = "indices:action" + randomFrom("[s]", "[p]", "[r]", "[n]", "[s][p]", "[s][r]", "[f]");
         ServerTransportFilter filter = getNodeFilter();
-        TransportRequest request = mock(TransportRequest.class);
+        AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         Authentication authentication = AuthenticationTestHelper.builder()
             .user(new User("test", "superuser"))
             .realmRef(new RealmRef("test", "test", "node1"))

@@ -64,6 +64,7 @@ import org.elasticsearch.xpack.rollup.rest.RestStopRollupJobAction;
 
 import java.time.Clock;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -115,18 +116,18 @@ public class Rollup extends Plugin implements ActionPlugin, PersistentTaskPlugin
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Arrays.asList(
-            new ActionHandler<>(RollupSearchAction.INSTANCE, TransportRollupSearchAction.class),
-            new ActionHandler<>(PutRollupJobAction.INSTANCE, TransportPutRollupJobAction.class),
-            new ActionHandler<>(StartRollupJobAction.INSTANCE, TransportStartRollupAction.class),
-            new ActionHandler<>(StopRollupJobAction.INSTANCE, TransportStopRollupAction.class),
-            new ActionHandler<>(DeleteRollupJobAction.INSTANCE, TransportDeleteRollupJobAction.class),
-            new ActionHandler<>(GetRollupJobsAction.INSTANCE, TransportGetRollupJobAction.class),
-            new ActionHandler<>(GetRollupCapsAction.INSTANCE, TransportGetRollupCapsAction.class),
-            new ActionHandler<>(GetRollupIndexCapsAction.INSTANCE, TransportGetRollupIndexCapsAction.class),
-            new ActionHandler<>(XPackUsageFeatureAction.ROLLUP, RollupUsageTransportAction.class),
-            new ActionHandler<>(XPackInfoFeatureAction.ROLLUP, RollupInfoTransportAction.class)
+            new ActionHandler(RollupSearchAction.INSTANCE, TransportRollupSearchAction.class),
+            new ActionHandler(PutRollupJobAction.INSTANCE, TransportPutRollupJobAction.class),
+            new ActionHandler(StartRollupJobAction.INSTANCE, TransportStartRollupAction.class),
+            new ActionHandler(StopRollupJobAction.INSTANCE, TransportStopRollupAction.class),
+            new ActionHandler(DeleteRollupJobAction.INSTANCE, TransportDeleteRollupJobAction.class),
+            new ActionHandler(GetRollupJobsAction.INSTANCE, TransportGetRollupJobAction.class),
+            new ActionHandler(GetRollupCapsAction.INSTANCE, TransportGetRollupCapsAction.class),
+            new ActionHandler(GetRollupIndexCapsAction.INSTANCE, TransportGetRollupIndexCapsAction.class),
+            new ActionHandler(XPackUsageFeatureAction.ROLLUP, RollupUsageTransportAction.class),
+            new ActionHandler(XPackInfoFeatureAction.ROLLUP, RollupInfoTransportAction.class)
         );
     }
 

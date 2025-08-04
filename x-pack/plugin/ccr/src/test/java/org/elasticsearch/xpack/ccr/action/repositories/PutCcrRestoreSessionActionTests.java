@@ -14,7 +14,7 @@ import org.elasticsearch.cluster.service.ClusterService;
 import org.elasticsearch.indices.IndicesService;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.xpack.ccr.repository.CcrRestoreSourceService;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationTestHelper;
@@ -36,7 +36,7 @@ public class PutCcrRestoreSessionActionTests extends ESTestCase {
         assertThat(IndexPrivilege.ALL.predicate().test(PutCcrRestoreSessionAction.INTERNAL_NAME), is(false));
         assertThat(
             ClusterPrivilegeResolver.ALL.permission()
-                .check(PutCcrRestoreSessionAction.INTERNAL_NAME, mock(TransportRequest.class), AuthenticationTestHelper.builder().build()),
+                .check(PutCcrRestoreSessionAction.INTERNAL_NAME, mock(AbstractTransportRequest.class), AuthenticationTestHelper.builder().build()),
             is(false)
         );
     }

@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.security.support;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -123,7 +123,7 @@ public class SecurityIndexManagerTests extends ESTestCase {
         final Client client = new NoOpClient(threadPool) {
             @Override
             @SuppressWarnings("unchecked")
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

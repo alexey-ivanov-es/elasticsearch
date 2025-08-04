@@ -7,7 +7,9 @@
 package org.elasticsearch.xpack.core.ilm;
 
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -134,6 +136,16 @@ public class SwapAliasesAndDeleteSourceIndexStepTests extends AbstractStepTestCa
                 ActionListener<Response> listener
             ) {
                 assertThat(action.name(), is(TransportIndicesAliasesAction.NAME));
+                assertTrue(request instanceof IndicesAliasesRequest);
+                assertThat(((IndicesAliasesRequest) request).getAliasActions(), equalTo(expectedAliasActions));
+            }
+
+            @Override
+            protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+                Request request,
+                ActionListener<Response> listener
+            ) {
+                //assertThat(action.name(), is(TransportIndicesAliasesAction.NAME));
                 assertTrue(request instanceof IndicesAliasesRequest);
                 assertThat(((IndicesAliasesRequest) request).getAliasActions(), equalTo(expectedAliasActions));
             }

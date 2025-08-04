@@ -31,7 +31,7 @@ import org.elasticsearch.tasks.CancellableTask;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskId;
 import org.elasticsearch.transport.TransportChannel;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponse;
@@ -271,7 +271,7 @@ public abstract class TransportTasksAction<
         }
     }
 
-    private class NodeTaskRequest extends TransportRequest {
+    private class NodeTaskRequest extends AbstractTransportRequest {
         private final TasksRequest tasksRequest;
 
         protected NodeTaskRequest(StreamInput in) throws IOException {

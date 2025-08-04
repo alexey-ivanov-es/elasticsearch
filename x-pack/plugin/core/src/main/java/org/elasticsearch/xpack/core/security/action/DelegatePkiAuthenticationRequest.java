@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.security.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -37,7 +37,7 @@ import static org.elasticsearch.xcontent.ConstructingObjectParser.optionalConstr
  * The request object for {@code TransportDelegatePkiAuthenticationAction} containing the certificate chain for the target subject
  * distinguished name to be granted an access token.
  */
-public final class DelegatePkiAuthenticationRequest extends ActionRequest implements ToXContentObject {
+public final class DelegatePkiAuthenticationRequest extends AbstractActionRequest implements ToXContentObject {
 
     private static final ParseField X509_CERTIFICATE_CHAIN_FIELD = new ParseField("x509_certificate_chain");
 

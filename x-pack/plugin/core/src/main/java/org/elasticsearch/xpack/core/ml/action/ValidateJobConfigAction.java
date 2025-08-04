@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -28,7 +28,7 @@ public class ValidateJobConfigAction extends ActionType<AcknowledgedResponse> {
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         private final Job job;
 

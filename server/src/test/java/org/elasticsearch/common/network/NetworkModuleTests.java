@@ -30,7 +30,7 @@ import org.elasticsearch.threadpool.TestThreadPool;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportInterceptor;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 
@@ -237,7 +237,7 @@ public class NetworkModuleTests extends ESTestCase {
 
         TransportInterceptor interceptor = new TransportInterceptor() {
             @Override
-            public <T extends TransportRequest> TransportRequestHandler<T> interceptHandler(
+            public <T extends AbstractTransportRequest> TransportRequestHandler<T> interceptHandler(
                 String action,
                 Executor executor,
                 boolean forceExecution,

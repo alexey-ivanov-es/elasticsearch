@@ -18,7 +18,7 @@ import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesActi
 import org.elasticsearch.action.admin.indices.template.put.TransportPutIndexTemplateAction;
 import org.elasticsearch.common.util.set.Sets;
 import org.elasticsearch.test.ESTestCase;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.enrich.action.DeleteEnrichPolicyAction;
 import org.elasticsearch.xpack.core.enrich.action.ExecuteEnrichPolicyAction;
 import org.elasticsearch.xpack.core.enrich.action.GetEnrichPolicyAction;
@@ -90,14 +90,14 @@ public class PrivilegeTests extends ESTestCase {
     private void verifyClusterActionAllowed(ClusterPrivilege clusterPrivilege, String... actions) {
         ClusterPermission clusterPermission = clusterPrivilege.buildPermission(ClusterPermission.builder()).build();
         for (String action : actions) {
-            assertTrue(clusterPermission.check(action, mock(TransportRequest.class), AuthenticationTestHelper.builder().build()));
+            assertTrue(clusterPermission.check(action, mock(AbstractTransportRequest.class), AuthenticationTestHelper.builder().build()));
         }
     }
 
     private void verifyClusterActionDenied(ClusterPrivilege clusterPrivilege, String... actions) {
         ClusterPermission clusterPermission = clusterPrivilege.buildPermission(ClusterPermission.builder()).build();
         for (String action : actions) {
-            assertFalse(clusterPermission.check(action, mock(TransportRequest.class), AuthenticationTestHelper.builder().build()));
+            assertFalse(clusterPermission.check(action, mock(AbstractTransportRequest.class), AuthenticationTestHelper.builder().build()));
         }
     }
 

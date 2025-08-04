@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.fleet.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -20,7 +20,7 @@ import org.elasticsearch.xcontent.XContentParser;
 import java.io.IOException;
 import java.util.Objects;
 
-public class PostSecretRequest extends ActionRequest {
+public class PostSecretRequest extends AbstractActionRequest {
 
     public static final ParseField VALUE_FIELD = new ParseField("value");
 

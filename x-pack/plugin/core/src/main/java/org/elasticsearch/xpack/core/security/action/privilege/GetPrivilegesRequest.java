@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.privilege;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -22,7 +22,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Request to retrieve one or more application privileges.
  */
-public final class GetPrivilegesRequest extends ActionRequest implements ApplicationPrivilegesRequest {
+public final class GetPrivilegesRequest extends AbstractActionRequest implements ApplicationPrivilegesRequest {
 
     @Nullable
     private String application;

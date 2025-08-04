@@ -10,7 +10,7 @@
 package org.elasticsearch.action.admin.indices.rollover;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
@@ -362,7 +362,7 @@ public class TransportRolloverActionTests extends ESTestCase {
             ActionListener<IndicesStatsResponse> listener = (ActionListener<IndicesStatsResponse>) args[2];
             listener.onResponse(statsResponse);
             return null;
-        }).when(mockClient).execute(eq(IndicesStatsAction.INSTANCE), any(ActionRequest.class), anyActionListener());
+        }).when(mockClient).execute(eq(IndicesStatsAction.INSTANCE), any(AbstractActionRequest.class), anyActionListener());
 
         assert statsResponse.getPrimaries().getDocs().getCount() == 500L;
         assert statsResponse.getTotal().getDocs().getCount() == (total + total);

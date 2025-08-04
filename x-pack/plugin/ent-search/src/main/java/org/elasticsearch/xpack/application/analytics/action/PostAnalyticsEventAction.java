@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.application.analytics.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -49,7 +49,7 @@ public class PostAnalyticsEventAction {
 
     private PostAnalyticsEventAction() {/* no instances */}
 
-    public static class Request extends ActionRequest implements AnalyticsEvent.Context, ToXContentObject {
+    public static class Request extends AbstractActionRequest implements AnalyticsEvent.Context, ToXContentObject {
 
         private final String eventCollectionName;
 

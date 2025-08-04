@@ -8,7 +8,7 @@ package org.elasticsearch.xpack.ml;
 
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionFilter;
 import org.elasticsearch.action.support.ActionFilterChain;
@@ -49,16 +49,16 @@ public class MlUpgradeModeActionFilterTests extends ESTestCase {
 
     private ClusterService clusterService;
     private Task task;
-    private ActionRequest request;
+    private AbstractActionRequest request;
     private ActionListener<ActionResponse> listener;
-    private ActionFilterChain<ActionRequest, ActionResponse> chain;
+    private ActionFilterChain<AbstractActionRequest, ActionResponse> chain;
 
     @Before
     @SuppressWarnings("unchecked")
     public void setUpMocks() {
         clusterService = mock(ClusterService.class);
         task = mock(Task.class);
-        request = mock(ActionRequest.class);
+        request = mock(AbstractActionRequest.class);
         listener = mock(ActionListener.class);
         chain = mock(ActionFilterChain.class);
     }

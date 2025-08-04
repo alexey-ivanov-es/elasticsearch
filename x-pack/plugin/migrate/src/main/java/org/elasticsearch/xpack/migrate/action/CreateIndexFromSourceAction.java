@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.migrate.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.IndicesRequest;
@@ -38,7 +38,7 @@ public class CreateIndexFromSourceAction extends ActionType<AcknowledgedResponse
         super(NAME);
     }
 
-    public static class Request extends ActionRequest implements IndicesRequest, ToXContent {
+    public static class Request extends AbstractActionRequest implements IndicesRequest, ToXContent {
         private final String sourceIndex;
         private final String destIndex;
         private Settings settingsOverride;

@@ -66,7 +66,7 @@ public class LocalStateEnterpriseSearch extends LocalStateCompositeXPackPlugin {
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return entSearchPlugin.getActions();
     }
 

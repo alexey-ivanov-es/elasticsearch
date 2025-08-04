@@ -10,7 +10,7 @@
 package org.elasticsearch.action.support;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.is;
 
 public class MappedActionFiltersTests extends ESTestCase {
 
-    static class DummyRequest extends ActionRequest {
+    static class DummyRequest extends AbstractActionRequest {
         @Override
         public ActionRequestValidationException validate() {
             return null;
@@ -61,7 +61,7 @@ public class MappedActionFiltersTests extends ESTestCase {
             }
 
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> void apply(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void apply(
                 Task task,
                 String action,
                 Request request,
@@ -97,7 +97,7 @@ public class MappedActionFiltersTests extends ESTestCase {
             }
 
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> void apply(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void apply(
                 Task task,
                 String action,
                 Request request,
@@ -115,7 +115,7 @@ public class MappedActionFiltersTests extends ESTestCase {
             }
 
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> void apply(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void apply(
                 Task task,
                 String action,
                 Request request,
@@ -151,7 +151,7 @@ public class MappedActionFiltersTests extends ESTestCase {
             }
 
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> void apply(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void apply(
                 Task task,
                 String action,
                 Request request,

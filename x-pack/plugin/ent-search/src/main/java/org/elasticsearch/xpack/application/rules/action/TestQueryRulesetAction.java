@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.application.rules.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -42,7 +42,7 @@ public class TestQueryRulesetAction {
 
     private TestQueryRulesetAction() {/* no instances */}
 
-    public static class Request extends ActionRequest implements ToXContentObject, IndicesRequest {
+    public static class Request extends AbstractActionRequest implements ToXContentObject, IndicesRequest {
         private final String rulesetId;
         private final Map<String, Object> matchCriteria;
 

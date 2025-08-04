@@ -15,7 +15,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.SearchShardTarget;
 import org.elasticsearch.search.fetch.FetchSearchResult;
 import org.elasticsearch.test.ESTestCase;
-import org.elasticsearch.transport.TransportMessage;
+import org.elasticsearch.transport.AbstractTransportMessage;
 
 import java.util.List;
 import java.util.Map;
@@ -77,7 +77,7 @@ public class SearchProfileResultsBuilderTests extends ESTestCase {
                 equalTo((long) searchPhase.size())
             );
         } finally {
-            fetchPhase.forEach(TransportMessage::decRef);
+            fetchPhase.forEach(AbstractTransportMessage::decRef);
         }
     }
 

@@ -19,12 +19,14 @@ import org.elasticsearch.action.ActionRunnable;
 import org.elasticsearch.common.util.concurrent.EsExecutors;
 import org.elasticsearch.core.Releasable;
 import org.elasticsearch.core.Releasables;
+import org.elasticsearch.plugin.Extensible;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskManager;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Extensible
 public abstract class TransportAction<Request extends ActionRequest, Response extends ActionResponse> {
 
     public final String actionName;
@@ -36,6 +38,14 @@ public abstract class TransportAction<Request extends ActionRequest, Response ex
      */
     @Deprecated
     protected Logger logger = LogManager.getLogger(getClass());
+
+    public Class<Request> getRequestClass() {
+        return null;
+    }
+
+    public String getActionName() {
+        return actionName;
+    }
 
     interface TransportActionHandler<Request extends ActionRequest, Response extends ActionResponse> {
         void execute(Task task, Request request, ActionListener<Response> listener);

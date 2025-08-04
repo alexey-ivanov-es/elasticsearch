@@ -21,7 +21,7 @@ import org.elasticsearch.features.FeatureService;
 import org.elasticsearch.injection.guice.Inject;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportService;
 
 import java.io.IOException;
@@ -82,7 +82,7 @@ public class TransportNodesFeaturesAction extends TransportNodesAction<
         return new NodeFeatures(featureService.getNodeFeatures().keySet(), transportService.getLocalNode());
     }
 
-    public static class NodeFeaturesRequest extends TransportRequest {
+    public static class NodeFeaturesRequest extends AbstractTransportRequest {
         public NodeFeaturesRequest(StreamInput in) throws IOException {
             super(in);
         }

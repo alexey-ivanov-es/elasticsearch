@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.application.connector.secrets.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -23,7 +23,7 @@ import java.util.Objects;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
 
-public class PostConnectorSecretRequest extends ActionRequest {
+public class PostConnectorSecretRequest extends AbstractActionRequest {
 
     private static final ParseField VALUE_FIELD = new ParseField("value");
 

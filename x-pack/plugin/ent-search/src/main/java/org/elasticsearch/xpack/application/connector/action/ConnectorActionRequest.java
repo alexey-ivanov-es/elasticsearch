@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.application.connector.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.cluster.metadata.MetadataCreateIndexService;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -21,7 +21,7 @@ import static org.elasticsearch.xpack.application.connector.ConnectorTemplateReg
 /**
  * Abstract base class for action requests targeting the connectors index.
  */
-public abstract class ConnectorActionRequest extends ActionRequest {
+public abstract class ConnectorActionRequest extends AbstractActionRequest {
 
     public ConnectorActionRequest() {
         super();

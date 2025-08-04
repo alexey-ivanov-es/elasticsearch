@@ -8,7 +8,7 @@ package org.elasticsearch.protocol.xpack;
 
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -21,7 +21,7 @@ import java.util.Locale;
 /**
  * Fetch information about X-Pack from the cluster.
  */
-public class XPackInfoRequest extends ActionRequest {
+public class XPackInfoRequest extends AbstractActionRequest {
 
     public enum Category {
         BUILD,

@@ -312,10 +312,10 @@ public class SecurityRestFilterTests extends ESTestCase {
 
                     @Override
                     public ElasticsearchSecurityException check(
-                        Authentication authentication,
-                        String action,
-                        TransportRequest request,
-                        ThreadContext threadContext
+                            Authentication authentication,
+                            String action,
+                            TransportRequest request,
+                            ThreadContext threadContext
                     ) {
                         return null;
                     }

@@ -13,7 +13,7 @@ import org.elasticsearch.common.UUIDs;
 import org.elasticsearch.common.util.concurrent.ThreadContext;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.rest.RestRequest;
-import org.elasticsearch.transport.TransportMessage;
+import org.elasticsearch.transport.AbstractTransportMessage;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public class AuditUtil {
         return "";
     }
 
-    public static Set<String> indices(TransportMessage message) {
+    public static Set<String> indices(AbstractTransportMessage message) {
         if (message instanceof IndicesRequest) {
             return arrayToSetOrNull(((IndicesRequest) message).indices());
         }

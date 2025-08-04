@@ -11,6 +11,7 @@ package org.elasticsearch.client.internal.node;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.TransportAction;
@@ -29,14 +30,18 @@ import org.elasticsearch.transport.Transport;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Client that executes actions on the local node.
  */
 public class NodeClient extends AbstractClient {
 
-    private Map<ActionType<? extends ActionResponse>, TransportAction<? extends ActionRequest, ? extends ActionResponse>> actions;
+    private Map<ActionType<?>, TransportAction<?, ?>> actions;
+    private Map<Class<? extends ActionRequest>, TransportAction<?, ?>> newActions;
 
     private TaskManager taskManager;
 
@@ -53,7 +58,7 @@ public class NodeClient extends AbstractClient {
     }
 
     public void initialize(
-        Map<ActionType<? extends ActionResponse>, TransportAction<? extends ActionRequest, ? extends ActionResponse>> actions,
+        Map<ActionType<?>, TransportAction<?, ?>> actions,
         TaskManager taskManager,
         Supplier<String> localNodeId,
         Transport.Connection localConnection,
@@ -66,11 +71,17 @@ public class NodeClient extends AbstractClient {
         this.remoteClusterService = remoteClusterService;
     }
 
+    public void initialize2(
+        List<TransportAction<?, ?>> newActions
+    ) {
+        this.newActions = newActions.stream().collect(Collectors.toMap(TransportAction::getRequestClass, Function.identity()));
+    }
+
     /**
      * Return the names of all available actions registered with this client.
      */
     public List<String> getActionNames() {
-        return actions.keySet().stream().map(ActionType::name).toList();
+        return Stream.concat(actions.values().stream(), newActions.values().stream()).map(TransportAction::getActionName).toList();
     }
 
     @Override
@@ -82,6 +93,23 @@ public class NodeClient extends AbstractClient {
         // Discard the task because the Client interface doesn't use it.
         try {
             executeLocally(action, request, listener);
+        } catch (TaskCancelledException | IllegalArgumentException | IllegalStateException e) {
+            // #executeLocally returns the task and throws TaskCancelledException if it fails to register the task because the parent
+            // task has been cancelled, IllegalStateException if the client was not in a state to execute the request because it was not
+            // yet properly initialized or IllegalArgumentException if header validation fails we forward them to listener since this API
+            // does not concern itself with the specifics of the task handling
+            listener.onFailure(e);
+        }
+    }
+
+    @Override
+    public <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        // Discard the task because the Client interface doesn't use it.
+        try {
+            executeLocally(request, listener);
         } catch (TaskCancelledException | IllegalArgumentException | IllegalStateException e) {
             // #executeLocally returns the task and throws TaskCancelledException if it fails to register the task because the parent
             // task has been cancelled, IllegalStateException if the client was not in a state to execute the request because it was not
@@ -105,7 +133,20 @@ public class NodeClient extends AbstractClient {
     ) {
         return taskManager.registerAndExecute(
             "transport",
-            transportAction(action),
+            transportAction(action, request),
+            request,
+            localConnection,
+            ActionListener.assertOnce(listener)
+        );
+    }
+
+    public <Request extends ActionRequest2<Response>, Response extends ActionResponse> Task executeLocally(
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        return taskManager.registerAndExecute(
+            "transport",
+            transportAction(request.getClass()),
             request,
             localConnection,
             ActionListener.assertOnce(listener)
@@ -124,7 +165,8 @@ public class NodeClient extends AbstractClient {
      * Get the {@link TransportAction} for an {@link ActionType}, throwing exceptions if the action isn't available.
      */
     private <Request extends ActionRequest, Response extends ActionResponse> TransportAction<Request, Response> transportAction(
-        ActionType<Response> action
+        ActionType<Response> action,
+        Request request
     ) {
         if (actions == null) {
             throw new IllegalStateException("NodeClient has not been initialized");
@@ -132,7 +174,21 @@ public class NodeClient extends AbstractClient {
         @SuppressWarnings("unchecked")
         TransportAction<Request, Response> transportAction = (TransportAction<Request, Response>) actions.get(action);
         if (transportAction == null) {
-            throw new IllegalStateException("failed to find action [" + action + "] to execute");
+            return transportAction(request.getClass());
+        }
+        return transportAction;
+    }
+
+    private <Request extends ActionRequest, Response extends ActionResponse> TransportAction<Request, Response> transportAction(
+        Class<?> requestClass
+    ) {
+        if (newActions == null) {
+            throw new IllegalStateException("NodeClient has not been initialized");
+        }
+        @SuppressWarnings("unchecked")
+        TransportAction<Request, Response> transportAction = (TransportAction<Request, Response>) newActions.get(requestClass);
+        if (transportAction == null) {
+            throw new IllegalStateException("failed to find action to execute for request type [" + requestClass + "]");
         }
         return transportAction;
     }

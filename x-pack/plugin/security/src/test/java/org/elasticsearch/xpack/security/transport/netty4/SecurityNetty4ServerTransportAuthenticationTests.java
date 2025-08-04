@@ -46,7 +46,7 @@ import org.elasticsearch.transport.RemoteConnectionStrategy;
 import org.elasticsearch.transport.RemoteTransportException;
 import org.elasticsearch.transport.SniffConnectionStrategy;
 import org.elasticsearch.transport.TransportInterceptor;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.netty4.SharedGroupFactory;
 import org.elasticsearch.xpack.core.XPackSettings;
@@ -141,7 +141,7 @@ public class SecurityNetty4ServerTransportAuthenticationTests extends ESTestCase
             // other before the action handler here. This is in order to accurately simulate the complete Elasticsearch node behavior.
             new TransportInterceptor() {
                 @Override
-                public <T extends TransportRequest> TransportRequestHandler<T> interceptHandler(
+                public <T extends AbstractTransportRequest> TransportRequestHandler<T> interceptHandler(
                     String action,
                     Executor executor,
                     boolean forceExecution,

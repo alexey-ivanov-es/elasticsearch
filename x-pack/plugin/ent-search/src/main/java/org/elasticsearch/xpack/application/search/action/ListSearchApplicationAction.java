@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.application.search.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -39,7 +39,7 @@ public class ListSearchApplicationAction {
 
     private ListSearchApplicationAction() {/* no instances */}
 
-    public static class Request extends ActionRequest implements ToXContentObject {
+    public static class Request extends AbstractActionRequest implements ToXContentObject {
 
         private static final String DEFAULT_QUERY = "*";
         public static final ParseField QUERY = new ParseField("query");

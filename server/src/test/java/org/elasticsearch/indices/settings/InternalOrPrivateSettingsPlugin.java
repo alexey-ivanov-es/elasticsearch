@@ -38,6 +38,7 @@ import org.elasticsearch.transport.TransportService;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -180,9 +181,9 @@ public class InternalOrPrivateSettingsPlugin extends Plugin implements ActionPlu
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Collections.singletonList(
-            new ActionHandler<>(UpdateInternalOrPrivateAction.INSTANCE, TransportUpdateInternalOrPrivateAction.class)
+            new ActionHandler(UpdateInternalOrPrivateAction.INSTANCE, TransportUpdateInternalOrPrivateAction.class)
         );
     }
 

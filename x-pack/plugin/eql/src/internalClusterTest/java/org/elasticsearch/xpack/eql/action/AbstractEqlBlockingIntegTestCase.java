@@ -10,7 +10,7 @@ package org.elasticsearch.xpack.eql.action;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.admin.cluster.node.tasks.list.ListTasksResponse;
 import org.elasticsearch.action.fieldcaps.TransportFieldCapabilitiesAction;
@@ -186,7 +186,7 @@ public abstract class AbstractEqlBlockingIntegTestCase extends AbstractEqlIntegT
                 }
 
                 @Override
-                public <Request extends ActionRequest, Response extends ActionResponse> void apply(
+                public <Request extends AbstractActionRequest, Response extends ActionResponse> void apply(
                     Task task,
                     String action,
                     Request request,

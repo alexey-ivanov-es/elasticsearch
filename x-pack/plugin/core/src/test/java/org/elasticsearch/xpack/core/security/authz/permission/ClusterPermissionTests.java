@@ -9,6 +9,7 @@ package org.elasticsearch.xpack.core.security.authz.permission;
 
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.test.ESTestCase;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequest;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
@@ -31,7 +32,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
 public class ClusterPermissionTests extends ESTestCase {
-    private TransportRequest mockTransportRequest;
+    private AbstractTransportRequest mockTransportRequest;
     private Authentication mockAuthentication;
     private ClusterPrivilege cpThatDoesNothing = new ClusterPrivilege() {
         @Override
@@ -42,7 +43,7 @@ public class ClusterPermissionTests extends ESTestCase {
 
     @Before
     public void setup() {
-        mockTransportRequest = mock(TransportRequest.class);
+        mockTransportRequest = mock(AbstractTransportRequest.class);
         mockAuthentication = AuthenticationTestHelper.builder().build();
     }
 

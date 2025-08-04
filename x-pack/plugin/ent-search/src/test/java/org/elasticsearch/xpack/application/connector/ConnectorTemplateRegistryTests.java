@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.application.connector;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.template.put.PutComponentTemplateAction;
@@ -304,7 +304,7 @@ public class ConnectorTemplateRegistryTests extends ESTestCase {
      */
     private static class VerifyingClient extends NoOpClient {
 
-        private TriFunction<ActionType<?>, ActionRequest, ActionListener<?>, ActionResponse> verifier = (a, r, l) -> {
+        private TriFunction<ActionType<?>, AbstractActionRequest, ActionListener<?>, ActionResponse> verifier = (a, r, l) -> {
             fail("verifier not set");
             return null;
         };
@@ -315,7 +315,7 @@ public class ConnectorTemplateRegistryTests extends ESTestCase {
 
         @Override
         @SuppressWarnings("unchecked")
-        protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+        protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
             ActionType<Response> action,
             Request request,
             ActionListener<Response> listener
@@ -327,7 +327,7 @@ public class ConnectorTemplateRegistryTests extends ESTestCase {
             }
         }
 
-        public void setVerifier(TriFunction<ActionType<?>, ActionRequest, ActionListener<?>, ActionResponse> verifier) {
+        public void setVerifier(TriFunction<ActionType<?>, AbstractActionRequest, ActionListener<?>, ActionResponse> verifier) {
             this.verifier = verifier;
         }
     }
@@ -335,7 +335,7 @@ public class ConnectorTemplateRegistryTests extends ESTestCase {
     private ActionResponse verifyComposableTemplateInstalled(
         AtomicInteger calledTimes,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action == PutPipelineTransportAction.TYPE) {
@@ -372,7 +372,7 @@ public class ConnectorTemplateRegistryTests extends ESTestCase {
     private ActionResponse verifyComponentTemplateInstalled(
         AtomicInteger calledTimes,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action == PutPipelineTransportAction.TYPE) {

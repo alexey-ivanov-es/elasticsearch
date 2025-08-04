@@ -14,6 +14,7 @@ import org.elasticsearch.ResourceNotFoundException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionListenerResponseHandler;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
@@ -418,7 +419,7 @@ public class CancellableTasksIT extends ESIntegTestCase {
         }
     }
 
-    static class TestRequest extends ActionRequest {
+    static class TestRequest extends AbstractActionRequest {
         final int id;
         final DiscoveryNode node;
         final List<TestRequest> subRequests;
@@ -603,8 +604,8 @@ public class CancellableTasksIT extends ESIntegTestCase {
 
     public static class TaskPlugin extends Plugin implements ActionPlugin {
         @Override
-        public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            return Collections.singletonList(new ActionHandler<>(TransportTestAction.ACTION, TransportTestAction.class));
+        public Collection<ActionHandler> getActions() {
+            return Collections.singletonList(new ActionHandler(TransportTestAction.ACTION, TransportTestAction.class));
         }
     }
 

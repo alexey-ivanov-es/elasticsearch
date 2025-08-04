@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.apmdata;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.template.put.PutComponentTemplateAction;
@@ -444,7 +444,7 @@ public class APMIndexTemplateRegistryTests extends ESTestCase {
         AtomicInteger ingestPipelinesCounter,
         AtomicInteger ilmPolicyCounter,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action instanceof PutComponentTemplateAction) {

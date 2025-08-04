@@ -31,6 +31,7 @@ import org.elasticsearch.tasks.Task;
 import org.elasticsearch.xcontent.XContentBuilder;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -38,10 +39,10 @@ import java.util.function.Supplier;
 public class SnapshotRepositoryTestKit extends Plugin implements ActionPlugin {
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionHandler<>(RepositoryAnalyzeAction.INSTANCE, RepositoryAnalyzeAction.class),
-            new ActionHandler<>(
+            new ActionHandler(RepositoryAnalyzeAction.INSTANCE, RepositoryAnalyzeAction.class),
+            new ActionHandler(
                 TransportRepositoryVerifyIntegrityCoordinationAction.INSTANCE,
                 TransportRepositoryVerifyIntegrityCoordinationAction.class
             )

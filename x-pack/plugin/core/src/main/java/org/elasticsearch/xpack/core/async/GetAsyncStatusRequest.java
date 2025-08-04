@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.core.async;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * A request class to get a status update of the async search request
  */
-public class GetAsyncStatusRequest extends ActionRequest {
+public class GetAsyncStatusRequest extends AbstractActionRequest {
     private final String id;
     private TimeValue keepAlive = TimeValue.MINUS_ONE;
 

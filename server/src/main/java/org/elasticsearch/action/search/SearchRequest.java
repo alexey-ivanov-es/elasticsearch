@@ -11,7 +11,7 @@ package org.elasticsearch.action.search;
 
 import org.elasticsearch.TransportVersions;
 import org.elasticsearch.Version;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.support.IndicesOptions;
@@ -52,7 +52,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
  * @see org.elasticsearch.client.internal.Client#search(SearchRequest)
  * @see SearchResponse
  */
-public class SearchRequest extends ActionRequest implements IndicesRequest.Replaceable, Rewriteable<SearchRequest> {
+public class SearchRequest extends AbstractActionRequest implements IndicesRequest.Replaceable, Rewriteable<SearchRequest> {
 
     public static final ToXContent.Params FORMAT_PARAMS = new ToXContent.MapParams(Collections.singletonMap("pretty", "false"));
 

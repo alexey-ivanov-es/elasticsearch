@@ -64,7 +64,7 @@ import org.elasticsearch.test.rest.FakeRestRequest;
 import org.elasticsearch.test.transport.MockTransportService;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportMessageListener;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestOptions;
 
 import java.io.IOException;
@@ -1057,7 +1057,7 @@ public class DedicatedClusterSnapshotRestoreIT extends AbstractSnapshotIntegTest
                 DiscoveryNode node,
                 long requestId,
                 String action,
-                TransportRequest request,
+                AbstractTransportRequest request,
                 TransportRequestOptions finalOptions
             ) {
                 if (blocked.get() && action.equals(SnapshotsService.UPDATE_SNAPSHOT_STATUS_ACTION_NAME)) {

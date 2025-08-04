@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.ml.vectors;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.common.io.stream.Writeable;
 import org.elasticsearch.common.settings.Settings;
@@ -35,7 +35,7 @@ public class TextEmbeddingQueryVectorBuilderTests extends AbstractQueryVectorBui
     }
 
     @Override
-    protected void doAssertClientRequest(ActionRequest request, TextEmbeddingQueryVectorBuilder builder) {
+    protected void doAssertClientRequest(AbstractActionRequest request, TextEmbeddingQueryVectorBuilder builder) {
         assertThat(request, instanceOf(CoordinatedInferenceAction.Request.class));
         CoordinatedInferenceAction.Request inferRequest = (CoordinatedInferenceAction.Request) request;
         assertThat(inferRequest.getInputs(), hasSize(1));

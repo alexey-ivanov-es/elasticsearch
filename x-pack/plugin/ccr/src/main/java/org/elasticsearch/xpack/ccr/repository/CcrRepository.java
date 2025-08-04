@@ -14,7 +14,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchSecurityException;
 import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.RemoteClusterActionType;
 import org.elasticsearch.action.SingleResultDeduplicator;
@@ -252,7 +252,7 @@ public class CcrRepository extends AbstractLifecycleComponent implements Reposit
         }
     }
 
-    private <Request extends ActionRequest, Response extends ActionResponse> Response executeRecoveryAction(
+    private <Request extends AbstractActionRequest, Response extends ActionResponse> Response executeRecoveryAction(
         RemoteClusterClient client,
         RemoteClusterActionType<Response> action,
         Request request

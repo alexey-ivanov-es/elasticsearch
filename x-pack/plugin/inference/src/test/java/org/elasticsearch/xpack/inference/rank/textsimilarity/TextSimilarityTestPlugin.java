@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.inference.rank.textsimilarity;
 
 import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionFilter;
 import org.elasticsearch.action.support.ActionFilterChain;
@@ -95,7 +95,7 @@ public class TextSimilarityTestPlugin extends Plugin implements ActionPlugin {
         }
 
         @Override
-        public <Request extends ActionRequest, Response extends ActionResponse> void apply(
+        public <Request extends AbstractActionRequest, Response extends ActionResponse> void apply(
             Task task,
             String action,
             Request request,

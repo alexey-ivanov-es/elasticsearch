@@ -55,7 +55,7 @@ import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.ConnectTransportException;
 import org.elasticsearch.transport.RemoteTransportException;
 import org.elasticsearch.transport.TransportChannel;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportResponseHandler;
@@ -88,7 +88,7 @@ public class ShardStateAction {
     private final ThreadPool threadPool;
 
     // we deduplicate these shard state requests in order to avoid sending duplicate failed/started shard requests for a shard
-    private final ResultDeduplicator<TransportRequest, Void> remoteShardStateUpdateDeduplicator;
+    private final ResultDeduplicator<AbstractTransportRequest, Void> remoteShardStateUpdateDeduplicator;
 
     @Inject
     public ShardStateAction(
@@ -120,7 +120,7 @@ public class ShardStateAction {
     private void sendShardAction(
         final String actionName,
         final ClusterState currentState,
-        final TransportRequest request,
+        final AbstractTransportRequest request,
         final ActionListener<Void> listener
     ) {
         ClusterStateObserver observer = new ClusterStateObserver(currentState, clusterService, null, logger, threadPool.getThreadContext());
@@ -249,7 +249,7 @@ public class ShardStateAction {
     protected void waitForNewMasterAndRetry(
         String actionName,
         ClusterStateObserver observer,
-        TransportRequest request,
+        AbstractTransportRequest request,
         ActionListener<Void> listener
     ) {
         observer.waitForNextChange(new ClusterStateObserver.Listener() {
@@ -445,7 +445,7 @@ public class ShardStateAction {
         }
     }
 
-    public static class FailedShardEntry extends TransportRequest {
+    public static class FailedShardEntry extends AbstractTransportRequest {
         final ShardId shardId;
         final String allocationId;
         final long primaryTerm;
@@ -827,7 +827,7 @@ public class ShardStateAction {
         }
     }
 
-    public static class StartedShardEntry extends TransportRequest {
+    public static class StartedShardEntry extends AbstractTransportRequest {
         final ShardId shardId;
         final String allocationId;
         final long primaryTerm;

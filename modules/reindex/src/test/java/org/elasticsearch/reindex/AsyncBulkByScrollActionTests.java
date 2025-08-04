@@ -13,6 +13,7 @@ import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -1160,7 +1161,7 @@ public class AsyncBulkByScrollActionTests extends ESTestCase {
         }
     }
 
-    private static class RequestAndListener<Request extends ActionRequest, Response> {
+    private static class RequestAndListener<Request extends AbstractActionRequest, Response> {
         private final Request request;
         private final ActionListener<Response> listener;
 

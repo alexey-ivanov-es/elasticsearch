@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.core.ml.action;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -48,7 +48,7 @@ public class InferModelAction extends ActionType<InferModelAction.Response> {
         super(name);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         public static final ParseField ID = new ParseField("id");
         public static final ParseField DEPLOYMENT_ID = new ParseField("deployment_id");

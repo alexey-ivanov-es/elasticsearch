@@ -83,6 +83,7 @@ import org.elasticsearch.xpack.spatial.search.aggregations.support.GeoShapeValue
 import org.elasticsearch.xpack.spatial.search.aggregations.support.GeoShapeValuesSourceType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -126,11 +127,11 @@ public class SpatialPlugin extends Plugin implements ActionPlugin, MapperPlugin,
     private final SetOnce<GeoFormatterFactory<Geometry>> geoFormatterFactory = new SetOnce<>();
 
     @Override
-    public List<ActionPlugin.ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionPlugin.ActionHandler<>(XPackUsageFeatureAction.SPATIAL, SpatialUsageTransportAction.class),
-            new ActionPlugin.ActionHandler<>(XPackInfoFeatureAction.SPATIAL, SpatialInfoTransportAction.class),
-            new ActionPlugin.ActionHandler<>(SpatialStatsAction.INSTANCE, SpatialStatsTransportAction.class)
+            new ActionPlugin.ActionHandler(XPackUsageFeatureAction.SPATIAL, SpatialUsageTransportAction.class),
+            new ActionPlugin.ActionHandler(XPackInfoFeatureAction.SPATIAL, SpatialInfoTransportAction.class),
+            new ActionPlugin.ActionHandler(SpatialStatsAction.INSTANCE, SpatialStatsTransportAction.class)
         );
     }
 

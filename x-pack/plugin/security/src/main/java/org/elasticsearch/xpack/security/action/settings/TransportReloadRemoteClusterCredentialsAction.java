@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.security.action.settings;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionFilters;
@@ -85,7 +85,7 @@ public class TransportReloadRemoteClusterCredentialsAction extends TransportActi
         return clusterState.blocks().globalBlockedException(ClusterBlockLevel.METADATA_READ);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
         private final Settings settings;
 
         public Request(Settings settings) {

@@ -49,7 +49,7 @@ import org.elasticsearch.threadpool.TestThreadPool;
 import org.elasticsearch.transport.AbstractSimpleTransportTestCase;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportChannel;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportResponse;
 import org.junit.After;
@@ -595,8 +595,8 @@ public class ExchangeServiceTests extends ESTestCase {
         node1.addRequestHandlingBehavior(ExchangeService.EXCHANGE_ACTION_NAME, new StubbableTransport.RequestHandlingBehavior<>() {
             @Override
             public void messageReceived(
-                TransportRequestHandler<TransportRequest> handler,
-                TransportRequest request,
+                TransportRequestHandler<AbstractTransportRequest> handler,
+                AbstractTransportRequest request,
                 TransportChannel channel,
                 Task task
             ) throws Exception {

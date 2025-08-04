@@ -14,7 +14,7 @@ import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.ResourceAlreadyExistsException;
 import org.elasticsearch.ResourceNotFoundException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteRequest;
@@ -835,7 +835,7 @@ public class IndexBasedTransformConfigManager implements TransformConfigManager 
         ClientHelper.executeAsyncWithOrigin(client.threadPool().getThreadContext(), TRANSFORM_ORIGIN, request, listener, consumer);
     }
 
-    private <Request extends ActionRequest, Response extends ActionResponse> void executeAsyncWithOrigin(
+    private <Request extends AbstractActionRequest, Response extends ActionResponse> void executeAsyncWithOrigin(
         ActionType<Response> action,
         Request request,
         ActionListener<Response> listener

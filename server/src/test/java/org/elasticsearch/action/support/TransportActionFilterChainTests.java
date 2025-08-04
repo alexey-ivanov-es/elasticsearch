@@ -11,6 +11,7 @@ package org.elasticsearch.action.support;
 
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
@@ -288,7 +289,7 @@ public class TransportActionFilterChainTests extends ESTestCase {
         );
     }
 
-    public static class TestRequest extends ActionRequest {
+    public static class TestRequest extends AbstractActionRequest {
         @Override
         public ActionRequestValidationException validate() {
             return null;

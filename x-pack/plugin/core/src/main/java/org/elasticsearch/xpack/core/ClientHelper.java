@@ -9,6 +9,7 @@ package org.elasticsearch.xpack.core;
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.ContextPreservingActionListener;
@@ -305,6 +306,23 @@ public final class ClientHelper {
             request,
             listener,
             (r, l) -> client.execute(action, r, l)
+        );
+    }
+
+    public static <Request extends ActionRequest2<Response>, Response extends ActionResponse> void executeWithHeadersAsync(
+        Map<String, String> headers,
+        String origin,
+        Client client,
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        executeWithHeadersAsync(
+            client.threadPool().getThreadContext(),
+            headers,
+            origin,
+            request,
+            listener,
+            (r, l) -> client.execute(r, l)
         );
     }
 

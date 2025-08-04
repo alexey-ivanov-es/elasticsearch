@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.core.common.validation;
 
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.cluster.ClusterState;
@@ -338,7 +338,7 @@ public final class SourceDestValidator {
     /**
      * Validate request.
      *
-     * This runs a couple of simple validations at request time, to be executed from a {@link ActionRequest}}
+     * This runs a couple of simple validations at request time, to be executed from a {@link AbstractActionRequest}}
      * implementation.
      *
      * Note: Source can not be validated at request time as it might contain expressions.

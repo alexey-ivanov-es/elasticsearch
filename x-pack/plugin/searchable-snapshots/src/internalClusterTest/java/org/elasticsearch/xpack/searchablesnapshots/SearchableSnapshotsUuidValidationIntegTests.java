@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.searchablesnapshots;
 
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.admin.cluster.snapshots.restore.RestoreSnapshotResponse;
 import org.elasticsearch.action.admin.cluster.snapshots.restore.TransportRestoreSnapshotAction;
 import org.elasticsearch.action.support.ActionFilter;
@@ -56,7 +56,7 @@ public class SearchableSnapshotsUuidValidationIntegTests extends BaseFrozenSearc
         private final PlainActionFuture<Void> unblocked = new PlainActionFuture<>();
 
         @Override
-        protected boolean apply(String action, ActionRequest request, ActionListener<?> listener) {
+        protected boolean apply(String action, AbstractActionRequest request, ActionListener<?> listener) {
             if (TransportRestoreSnapshotAction.TYPE.name().equals(action)) {
                 executed.onResponse(null);
                 unblocked.actionGet();

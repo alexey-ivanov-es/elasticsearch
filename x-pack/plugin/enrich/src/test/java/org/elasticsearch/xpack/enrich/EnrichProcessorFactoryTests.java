@@ -8,7 +8,7 @@ package org.elasticsearch.xpack.enrich;
 
 import org.elasticsearch.ElasticsearchParseException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.cluster.ClusterName;
@@ -263,7 +263,7 @@ public class EnrichProcessorFactoryTests extends ESTestCase {
             final var client = new NoOpClient(threadPool) {
                 @Override
                 @SuppressWarnings("unchecked")
-                protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+                protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                     ActionType<Response> action,
                     Request request,
                     ActionListener<Response> listener

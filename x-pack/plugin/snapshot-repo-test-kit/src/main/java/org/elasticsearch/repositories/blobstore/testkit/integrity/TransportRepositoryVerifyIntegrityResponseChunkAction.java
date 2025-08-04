@@ -8,7 +8,7 @@
 package org.elasticsearch.repositories.blobstore.testkit.integrity;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionFilters;
@@ -43,7 +43,7 @@ class TransportRepositoryVerifyIntegrityResponseChunkAction extends HandledTrans
         this.activeRepositoryVerifyIntegrityTasks = activeRepositoryVerifyIntegrityTasks;
     }
 
-    static class Request extends ActionRequest {
+    static class Request extends AbstractActionRequest {
         private final long coordinatingTaskId;
         private final RepositoryVerifyIntegrityResponseChunk chunkContents;
 

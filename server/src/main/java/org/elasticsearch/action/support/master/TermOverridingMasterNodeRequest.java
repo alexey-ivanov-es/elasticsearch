@@ -15,7 +15,7 @@ import org.elasticsearch.logging.LogManager;
 import org.elasticsearch.logging.Logger;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskId;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -32,7 +32,7 @@ import java.util.Map;
  * which it may be necessary to use the test utility {@code MasterNodeRequestHelper#unwrapTermOverride} to remove the wrapper and access the
  * inner request.
  */
-class TermOverridingMasterNodeRequest extends TransportRequest {
+class TermOverridingMasterNodeRequest extends AbstractTransportRequest {
 
     private static final Logger logger = LogManager.getLogger(TermOverridingMasterNodeRequest.class);
 

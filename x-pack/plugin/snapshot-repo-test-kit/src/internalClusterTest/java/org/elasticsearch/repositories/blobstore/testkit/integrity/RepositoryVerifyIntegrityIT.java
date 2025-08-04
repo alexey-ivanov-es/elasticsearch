@@ -46,7 +46,7 @@ import org.elasticsearch.test.transport.MockTransportService;
 import org.elasticsearch.test.transport.StubbableTransport;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportChannel;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.xcontent.XContentFactory;
@@ -390,8 +390,8 @@ public class RepositoryVerifyIntegrityIT extends AbstractSnapshotIntegTestCase {
 
             @Override
             public void messageReceived(
-                TransportRequestHandler<TransportRequest> handler,
-                TransportRequest request,
+                TransportRequestHandler<AbstractTransportRequest> handler,
+                AbstractTransportRequest request,
                 TransportChannel channel,
                 Task task
             ) throws Exception {

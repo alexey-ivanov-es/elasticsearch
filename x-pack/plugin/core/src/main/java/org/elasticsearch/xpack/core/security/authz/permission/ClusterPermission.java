@@ -7,6 +7,7 @@
 package org.elasticsearch.xpack.core.security.authz.permission;
 
 import org.apache.lucene.util.automaton.Automaton;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequest;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authz.RestrictedIndices;
@@ -39,7 +40,7 @@ public class ClusterPermission {
      * authentication.
      *
      * @param action  cluster action
-     * @param request {@link TransportRequest}
+     * @param request {@link AbstractTransportRequest}
      * @param authentication {@link Authentication}
      * @return {@code true} if the access is allowed else returns {@code false}
      */
@@ -171,7 +172,7 @@ public class ClusterPermission {
          * authentication.
          *
          * @param action  action name
-         * @param request {@link TransportRequest}
+         * @param request {@link AbstractTransportRequest}
          * @param authentication {@link Authentication}
          * @return {@code true} if the specified action for given request is allowed else returns {@code false}
          */
@@ -193,7 +194,7 @@ public class ClusterPermission {
     /**
      * Base for implementing cluster action based {@link PermissionCheck}.
      * It enforces the checks at cluster action level and then hands it off to the implementations
-     * to enforce checks based on {@link TransportRequest} and/or {@link Authentication}.
+     * to enforce checks based on {@link AbstractTransportRequest} and/or {@link Authentication}.
      */
     public abstract static class ActionBasedPermissionCheck implements PermissionCheck {
         private final Automaton automaton;

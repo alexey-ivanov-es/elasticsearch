@@ -11,7 +11,7 @@ package org.elasticsearch.tasks;
 
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.admin.cluster.node.tasks.TransportTasksActionTests;
@@ -37,6 +37,7 @@ import org.elasticsearch.transport.TcpTransportChannel;
 import org.elasticsearch.transport.TestTransportChannels;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportException;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequest;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportService;
@@ -337,21 +338,21 @@ public class TaskManagerTests extends ESTestCase {
 
         final Task task = taskManager.registerAndExecute(
             "testType",
-            new TransportAction<ActionRequest, ActionResponse>(
+            new TransportAction<AbstractActionRequest, ActionResponse>(
                 "actionName",
                 new ActionFilters(Set.of()),
                 taskManager,
                 EsExecutors.DIRECT_EXECUTOR_SERVICE
             ) {
                 @Override
-                protected void doExecute(Task task, ActionRequest request, ActionListener<ActionResponse> listener) {
+                protected void doExecute(Task task, AbstractActionRequest request, ActionListener<ActionResponse> listener) {
                     listener.onResponse(new ActionResponse() {
                         @Override
                         public void writeTo(StreamOutput out) {}
                     });
                 }
             },
-            new ActionRequest() {
+            new AbstractActionRequest() {
                 @Override
                 public ActionRequestValidationException validate() {
                     return null;
@@ -390,7 +391,7 @@ public class TaskManagerTests extends ESTestCase {
         verify(taskManager, times(1)).startTrace(any(), any());
     }
 
-    static class CancellableRequest extends TransportRequest {
+    static class CancellableRequest extends AbstractTransportRequest {
         private final String requestId;
 
         CancellableRequest(String requestId) {

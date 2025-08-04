@@ -83,7 +83,7 @@ import org.elasticsearch.test.ESIntegTestCase.ClusterScope;
 import org.elasticsearch.test.ESIntegTestCase.Scope;
 import org.elasticsearch.transport.TransportChannel;
 import org.elasticsearch.transport.TransportInterceptor;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.junit.After;
 import org.junit.Before;
@@ -603,11 +603,11 @@ public class IndicesRequestIT extends ESIntegTestCase {
 
     private static void assertSameIndices(IndicesRequest originalRequest, boolean optional, String... actions) {
         for (String action : actions) {
-            List<TransportRequest> requests = consumeTransportRequests(action);
+            List<AbstractTransportRequest> requests = consumeTransportRequests(action);
             if (optional == false) {
                 assertThat("no internal requests intercepted for action [" + action + "]", requests.size(), greaterThan(0));
             }
-            for (TransportRequest internalRequest : requests) {
+            for (AbstractTransportRequest internalRequest : requests) {
                 IndicesRequest indicesRequest = convertRequest(internalRequest);
                 assertThat(internalRequest.getClass().getName(), indicesRequest.indices(), equalTo(originalRequest.indices()));
                 assertThat(indicesRequest.indicesOptions(), equalTo(originalRequest.indicesOptions()));
@@ -626,11 +626,11 @@ public class IndicesRequestIT extends ESIntegTestCase {
     private static void assertIndicesSubset(List<String> indices, boolean optional, String... actions) {
         // indices returned by each bulk shard request need to be a subset of the original indices
         for (String action : actions) {
-            List<TransportRequest> requests = consumeTransportRequests(action);
+            List<AbstractTransportRequest> requests = consumeTransportRequests(action);
             if (optional == false) {
                 assertThat("no internal requests intercepted for action [" + action + "]", requests.size(), greaterThan(0));
             }
-            for (TransportRequest internalRequest : requests) {
+            for (AbstractTransportRequest internalRequest : requests) {
                 IndicesRequest indicesRequest = convertRequest(internalRequest);
                 for (String index : indicesRequest.indices()) {
                     assertThat(indices, hasItem(index));
@@ -639,7 +639,7 @@ public class IndicesRequestIT extends ESIntegTestCase {
         }
     }
 
-    static IndicesRequest convertRequest(TransportRequest request) {
+    static IndicesRequest convertRequest(AbstractTransportRequest request) {
         return request instanceof IndicesRequest indicesRequest ? indicesRequest : TransportReplicationActionTests.resolveRequest(request);
     }
 
@@ -683,7 +683,7 @@ public class IndicesRequestIT extends ESIntegTestCase {
     private static void assertAllRequestsHaveBeenConsumed() {
         Iterable<PluginsService> pluginsServices = internalCluster().getInstances(PluginsService.class);
         for (PluginsService pluginsService : pluginsServices) {
-            Set<Map.Entry<String, List<TransportRequest>>> entries = pluginsService.filterPlugins(
+            Set<Map.Entry<String, List<AbstractTransportRequest>>> entries = pluginsService.filterPlugins(
                 InterceptingTransportService.TestPlugin.class
             ).findFirst().get().instance.requests.entrySet();
             assertThat(entries, emptyIterable());
@@ -707,12 +707,12 @@ public class IndicesRequestIT extends ESIntegTestCase {
         }
     }
 
-    private static List<TransportRequest> consumeTransportRequests(String action) {
-        List<TransportRequest> requests = new ArrayList<>();
+    private static List<AbstractTransportRequest> consumeTransportRequests(String action) {
+        List<AbstractTransportRequest> requests = new ArrayList<>();
 
         Iterable<PluginsService> pluginsServices = internalCluster().getInstances(PluginsService.class);
         for (PluginsService pluginsService : pluginsServices) {
-            List<TransportRequest> transportRequests = pluginsService.filterPlugins(InterceptingTransportService.TestPlugin.class)
+            List<AbstractTransportRequest> transportRequests = pluginsService.filterPlugins(InterceptingTransportService.TestPlugin.class)
                 .findFirst()
                 .get().instance.consumeRequests(action);
             if (transportRequests != null) {
@@ -738,10 +738,10 @@ public class IndicesRequestIT extends ESIntegTestCase {
 
         private final Set<String> actions = new HashSet<>();
 
-        private final Map<String, List<TransportRequest>> requests = new HashMap<>();
+        private final Map<String, List<AbstractTransportRequest>> requests = new HashMap<>();
 
         @Override
-        public <T extends TransportRequest> TransportRequestHandler<T> interceptHandler(
+        public <T extends AbstractTransportRequest> TransportRequestHandler<T> interceptHandler(
             String action,
             Executor executor,
             boolean forceExecution,
@@ -750,7 +750,7 @@ public class IndicesRequestIT extends ESIntegTestCase {
             return new InterceptingRequestHandler<>(action, actualHandler);
         }
 
-        synchronized List<TransportRequest> consumeRequests(String action) {
+        synchronized List<AbstractTransportRequest> consumeRequests(String action) {
             return requests.remove(action);
         }
 
@@ -762,7 +762,7 @@ public class IndicesRequestIT extends ESIntegTestCase {
             actions.clear();
         }
 
-        private class InterceptingRequestHandler<T extends TransportRequest> implements TransportRequestHandler<T> {
+        private class InterceptingRequestHandler<T extends AbstractTransportRequest> implements TransportRequestHandler<T> {
 
             private final TransportRequestHandler<T> requestHandler;
             private final String action;
@@ -776,7 +776,7 @@ public class IndicesRequestIT extends ESIntegTestCase {
             public void messageReceived(T request, TransportChannel channel, Task task) throws Exception {
                 synchronized (InterceptingTransportService.this) {
                     if (actions.contains(action)) {
-                        List<TransportRequest> requestList = requests.get(action);
+                        List<AbstractTransportRequest> requestList = requests.get(action);
                         if (requestList == null) {
                             requestList = new ArrayList<>();
                             requestList.add(request);

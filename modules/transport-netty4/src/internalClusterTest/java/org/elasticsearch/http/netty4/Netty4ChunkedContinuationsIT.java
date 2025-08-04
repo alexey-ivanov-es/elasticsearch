@@ -15,6 +15,7 @@ import org.apache.lucene.util.BytesRef;
 import org.elasticsearch.ESNetty4IntegTestCase;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
@@ -340,11 +341,11 @@ public class Netty4ChunkedContinuationsIT extends ESNetty4IntegTestCase {
         private static final ActionType<YieldsContinuationsPlugin.Response> TYPE = new ActionType<>("test:yields_continuations");
 
         @Override
-        public Collection<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            return List.of(new ActionHandler<>(TYPE, TransportYieldsContinuationsAction.class));
+        public Collection<ActionHandler> getActions() {
+            return List.of(new ActionHandler(TYPE, TransportYieldsContinuationsAction.class));
         }
 
-        public static class Request extends ActionRequest {
+        public static class Request extends AbstractActionRequest {
             final int failIndex;
 
             public Request(int failIndex) {
@@ -521,11 +522,11 @@ public class Netty4ChunkedContinuationsIT extends ESNetty4IntegTestCase {
         private static final ActionType<Response> TYPE = new ActionType<>("test:infinite_continuations");
 
         @Override
-        public Collection<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            return List.of(new ActionHandler<>(TYPE, TransportInfiniteContinuationsAction.class));
+        public Collection<ActionHandler> getActions() {
+            return List.of(new ActionHandler(TYPE, TransportInfiniteContinuationsAction.class));
         }
 
-        public static class Request extends ActionRequest {
+        public static class Request extends AbstractActionRequest {
             @Override
             public ActionRequestValidationException validate() {
                 return null;

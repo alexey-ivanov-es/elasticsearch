@@ -8,7 +8,7 @@
  */
 package org.elasticsearch.action.support;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.common.io.stream.Writeable;
 import org.elasticsearch.transport.TransportService;
@@ -18,7 +18,7 @@ import java.util.concurrent.Executor;
 /**
  * A {@link TransportAction} which, on creation, registers a handler for its own {@link #actionName} with the transport service.
  */
-public abstract class HandledTransportAction<Request extends ActionRequest, Response extends ActionResponse> extends TransportAction<
+public abstract class HandledTransportAction<Request extends AbstractActionRequest, Response extends ActionResponse> extends TransportAction<
     Request,
     Response> {
 

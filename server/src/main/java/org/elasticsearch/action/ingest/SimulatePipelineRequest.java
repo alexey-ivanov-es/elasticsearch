@@ -9,7 +9,7 @@
 
 package org.elasticsearch.action.ingest;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.cluster.metadata.ProjectId;
 import org.elasticsearch.common.bytes.BytesReference;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class SimulatePipelineRequest extends ActionRequest implements ToXContentObject {
+public class SimulatePipelineRequest extends AbstractActionRequest implements ToXContentObject {
     private static final DeprecationLogger deprecationLogger = DeprecationLogger.getLogger(SimulatePipelineRequest.class);
     private String id;
     private boolean verbose;

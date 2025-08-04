@@ -9,7 +9,7 @@
 
 package org.elasticsearch.reindex;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.index.reindex.AbstractAsyncBulkByScrollActionTestCase;
@@ -46,7 +46,7 @@ public abstract class AbstractAsyncBulkByScrollActionScriptTestCase<
     }
 
     @SuppressWarnings("unchecked")
-    protected <T extends ActionRequest> T applyScript(Consumer<Map<String, Object>> scriptBody) {
+    protected <T extends AbstractActionRequest> T applyScript(Consumer<Map<String, Object>> scriptBody) {
         IndexRequest index = new IndexRequest("index").id("1").source(singletonMap("foo", "bar"));
         ScrollableHitSource.Hit doc = new ScrollableHitSource.BasicHit("test", "id", 0);
         when(scriptService.compile(any(), eq(UpdateScript.CONTEXT))).thenReturn(

@@ -25,6 +25,7 @@ import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -49,7 +50,7 @@ public class MainRestPlugin extends Plugin implements ActionPlugin {
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-        return List.of(new ActionHandler<>(MAIN_ACTION, TransportMainAction.class));
+    public Collection<ActionHandler> getActions() {
+        return List.of(new ActionHandler(MAIN_ACTION, TransportMainAction.class));
     }
 }

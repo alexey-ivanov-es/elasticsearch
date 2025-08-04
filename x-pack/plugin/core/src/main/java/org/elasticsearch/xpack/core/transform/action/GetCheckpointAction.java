@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.core.transform.action;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -47,7 +47,7 @@ public class GetCheckpointAction extends ActionType<GetCheckpointAction.Response
         super(NAME);
     }
 
-    public static class Request extends ActionRequest implements IndicesRequest.Replaceable {
+    public static class Request extends AbstractActionRequest implements IndicesRequest.Replaceable {
 
         private String[] indices;
         private final IndicesOptions indicesOptions;

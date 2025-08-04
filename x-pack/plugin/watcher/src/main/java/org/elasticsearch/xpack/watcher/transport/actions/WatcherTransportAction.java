@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.watcher.transport.actions;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.action.support.HandledTransportAction;
@@ -21,7 +21,7 @@ import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.xpack.core.XPackField;
 import org.elasticsearch.xpack.core.watcher.WatcherField;
 
-abstract class WatcherTransportAction<Request extends ActionRequest, Response extends ActionResponse> extends HandledTransportAction<
+abstract class WatcherTransportAction<Request extends AbstractActionRequest, Response extends ActionResponse> extends HandledTransportAction<
     Request,
     Response> {
 

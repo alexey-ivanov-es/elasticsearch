@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.slm;
 
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.snapshots.delete.DeleteSnapshotRequest;
@@ -237,7 +237,7 @@ public class SnapshotRetentionTaskTests extends ESTestCase {
 
                 @Override
                 @SuppressWarnings("unchecked")
-                protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+                protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                     ActionType<Response> action,
                     Request request,
                     ActionListener<Response> listener
@@ -312,7 +312,7 @@ public class SnapshotRetentionTaskTests extends ESTestCase {
             final var noOpClient = new NoOpClient(clientThreadPool) {
                 @Override
                 @SuppressWarnings("unchecked")
-                protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+                protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                     ActionType<Response> action,
                     Request request,
                     ActionListener<Response> listener

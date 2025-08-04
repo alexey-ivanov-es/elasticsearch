@@ -12,7 +12,7 @@ package org.elasticsearch.action.admin.cluster.remote;
 import org.elasticsearch.Build;
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
@@ -112,7 +112,7 @@ public class RemoteClusterNodesActionTests extends ESTestCase {
             new AbstractClient(Settings.EMPTY, threadPool) {
                 @SuppressWarnings("unchecked")
                 @Override
-                protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+                protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                     ActionType<Response> action,
                     Request request,
                     ActionListener<Response> listener
@@ -190,7 +190,7 @@ public class RemoteClusterNodesActionTests extends ESTestCase {
             new AbstractClient(Settings.EMPTY, threadPool) {
                 @SuppressWarnings("unchecked")
                 @Override
-                protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+                protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                     ActionType<Response> action,
                     Request request,
                     ActionListener<Response> listener

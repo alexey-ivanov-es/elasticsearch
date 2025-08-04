@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.core.security.action.realm;
 import org.elasticsearch.action.support.nodes.BaseNodesRequest;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 
 import java.io.IOException;
 
@@ -72,7 +72,7 @@ public class ClearRealmCacheRequest extends BaseNodesRequest {
         return this;
     }
 
-    public static class Node extends TransportRequest {
+    public static class Node extends AbstractTransportRequest {
 
         private String[] realms;
         private String[] usernames;

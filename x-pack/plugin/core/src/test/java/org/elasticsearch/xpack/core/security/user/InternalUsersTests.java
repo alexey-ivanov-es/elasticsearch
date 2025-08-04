@@ -40,7 +40,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.IndexVersion;
 import org.elasticsearch.index.reindex.ReindexAction;
 import org.elasticsearch.test.ESTestCase;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.XPackPlugin;
 import org.elasticsearch.xpack.core.ml.action.UpdateJobAction;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
@@ -353,7 +353,7 @@ public class InternalUsersTests extends ESTestCase {
         Authentication authentication = AuthenticationTestHelper.builder().internal(user).build();
         assertThat(
             "Role [" + role + "] for user [" + user + "] should grant " + action,
-            role.cluster().check(action, mock(TransportRequest.class), authentication),
+            role.cluster().check(action, mock(AbstractTransportRequest.class), authentication),
             is(expectedValue)
         );
 

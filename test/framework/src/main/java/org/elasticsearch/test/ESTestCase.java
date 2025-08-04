@@ -46,7 +46,7 @@ import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.RequestBuilder;
@@ -2494,11 +2494,11 @@ public abstract class ESTestCase extends LuceneTestCase {
     }
 
     /**
-     * Execute the given {@link ActionRequest} using the given {@link ActionType} and the given {@link ElasticsearchClient}, wait for
+     * Execute the given {@link AbstractActionRequest} using the given {@link ActionType} and the given {@link ElasticsearchClient}, wait for
      * it to complete with a timeout of {@link #SAFE_AWAIT_TIMEOUT}, and then return the result. An exceptional response, timeout or
      * interrupt triggers a test failure.
      */
-    public static <T extends ActionResponse> T safeExecute(ElasticsearchClient client, ActionType<T> action, ActionRequest request) {
+    public static <T extends ActionResponse> T safeExecute(ElasticsearchClient client, ActionType<T> action, AbstractActionRequest request) {
         return safeAwait(l -> client.execute(action, request, l));
     }
 

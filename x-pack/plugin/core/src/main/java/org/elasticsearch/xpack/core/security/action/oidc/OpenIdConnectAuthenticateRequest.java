@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.oidc;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -19,7 +19,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Represents a request for authentication using OpenID Connect
  */
-public class OpenIdConnectAuthenticateRequest extends ActionRequest {
+public class OpenIdConnectAuthenticateRequest extends AbstractActionRequest {
 
     /**
      * The URI where the OP redirected the browser after the authentication attempt. This is passed as is from the

@@ -12,7 +12,7 @@ package org.elasticsearch.action.bulk;
 import org.apache.lucene.util.Accountable;
 import org.apache.lucene.util.RamUsageEstimator;
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.CompositeIndicesRequest;
 import org.elasticsearch.action.DocWriteRequest;
@@ -56,7 +56,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
  * Note that we only support refresh on the bulk request not per item.
  * @see org.elasticsearch.client.internal.Client#bulk(BulkRequest)
  */
-public class BulkRequest extends ActionRequest
+public class BulkRequest extends AbstractActionRequest
     implements
         CompositeIndicesRequest,
         WriteRequest<BulkRequest>,
@@ -68,7 +68,7 @@ public class BulkRequest extends ActionRequest
     private static final int REQUEST_OVERHEAD = 50;
 
     /**
-     * Requests that are part of this request. It is only possible to add things that are both {@link ActionRequest}s and
+     * Requests that are part of this request. It is only possible to add things that are both {@link AbstractActionRequest}s and
      * {@link WriteRequest}s to this but java doesn't support syntax to declare that everything in the array has both types so we declare
      * the one with the least casts.
      */

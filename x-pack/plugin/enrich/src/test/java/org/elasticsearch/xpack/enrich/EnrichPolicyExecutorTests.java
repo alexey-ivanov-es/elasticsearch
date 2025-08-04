@@ -11,7 +11,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.ResourceNotFoundException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.LatchedActionListener;
@@ -214,7 +214,7 @@ public class EnrichPolicyExecutorTests extends ESTestCase {
         // Create the async testing client
         Client client = new NoOpClient(testThreadPool) {
             @Override
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -416,7 +416,7 @@ public class EnrichPolicyExecutorTests extends ESTestCase {
     private Client getClient(CountDownLatch latch) {
         return new NoOpClient(testThreadPool) {
             @Override
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

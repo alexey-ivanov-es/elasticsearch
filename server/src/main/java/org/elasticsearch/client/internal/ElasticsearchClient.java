@@ -12,6 +12,7 @@ package org.elasticsearch.client.internal;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.threadpool.ThreadPool;
@@ -32,6 +33,10 @@ public interface ElasticsearchClient {
         Request request
     );
 
+    <Request extends ActionRequest2<Response>, Response extends ActionResponse> ActionFuture<Response> execute(
+        Request request
+    );
+
     /**
      * Executes a generic action, denoted by an {@link ActionType}.
      *
@@ -43,6 +48,11 @@ public interface ElasticsearchClient {
      */
     <Request extends ActionRequest, Response extends ActionResponse> void execute(
         ActionType<Response> action,
+        Request request,
+        ActionListener<Response> listener
+    );
+
+    <Request extends ActionRequest2<Response>, Response extends ActionResponse> void execute(
         Request request,
         ActionListener<Response> listener
     );

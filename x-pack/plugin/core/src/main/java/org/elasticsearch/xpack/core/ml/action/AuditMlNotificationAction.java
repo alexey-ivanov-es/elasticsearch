@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -40,7 +40,7 @@ public class AuditMlNotificationAction extends ActionType<AcknowledgedResponse> 
         SYSTEM
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
         private final AuditType auditType;
         private final String id;
         private final String message;

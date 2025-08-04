@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.core.ml.action;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -33,7 +33,7 @@ public class CoordinatedInferenceAction extends ActionType<InferModelAction.Resp
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         public enum RequestModelType {
             INFERENCE_SERVICE_MODEL,

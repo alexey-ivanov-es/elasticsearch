@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.application.rules.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -40,7 +40,7 @@ public class PutQueryRulesetAction {
 
     private PutQueryRulesetAction() {/* no instances */}
 
-    public static class Request extends ActionRequest implements ToXContentObject {
+    public static class Request extends AbstractActionRequest implements ToXContentObject {
 
         private final QueryRuleset queryRuleset;
         private static final ParseField QUERY_RULESET_FIELD = new ParseField("queryRuleset");

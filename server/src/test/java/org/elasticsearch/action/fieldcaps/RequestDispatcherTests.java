@@ -64,7 +64,7 @@ import org.elasticsearch.transport.TcpTransport;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportException;
 import org.elasticsearch.transport.TransportInterceptor;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportResponseHandler;
@@ -230,7 +230,7 @@ public class RequestDispatcherTests extends ESAllocationTestCase {
                 public <T extends TransportResponse> void sendRequest(
                     Transport.Connection connection,
                     String action,
-                    TransportRequest request,
+                    AbstractTransportRequest request,
                     TransportRequestOptions options,
                     TransportResponseHandler<T> handler
                 ) {
@@ -349,7 +349,7 @@ public class RequestDispatcherTests extends ESAllocationTestCase {
                 public <T extends TransportResponse> void sendRequest(
                     Transport.Connection connection,
                     String action,
-                    TransportRequest request,
+                    AbstractTransportRequest request,
                     TransportRequestOptions options,
                     TransportResponseHandler<T> handler
                 ) {
@@ -478,7 +478,7 @@ public class RequestDispatcherTests extends ESAllocationTestCase {
                 public <T extends TransportResponse> void sendRequest(
                     Transport.Connection connection,
                     String action,
-                    TransportRequest request,
+                    AbstractTransportRequest request,
                     TransportRequestOptions options,
                     TransportResponseHandler<T> handler
                 ) {
@@ -568,7 +568,7 @@ public class RequestDispatcherTests extends ESAllocationTestCase {
                 public <T extends TransportResponse> void sendRequest(
                     Transport.Connection connection,
                     String action,
-                    TransportRequest request,
+                    AbstractTransportRequest request,
                     TransportRequestOptions options,
                     TransportResponseHandler<T> handler
                 ) {
@@ -661,7 +661,7 @@ public class RequestDispatcherTests extends ESAllocationTestCase {
                 public <T extends TransportResponse> void sendRequest(
                     Transport.Connection connection,
                     String action,
-                    TransportRequest request,
+                    AbstractTransportRequest request,
                     TransportRequestOptions options,
                     TransportResponseHandler<T> handler
                 ) {
@@ -762,7 +762,7 @@ public class RequestDispatcherTests extends ESAllocationTestCase {
             }
         }
 
-        void verifyAndTrackRequest(Transport.Connection connection, String action, TransportRequest request) {
+        void verifyAndTrackRequest(Transport.Connection connection, String action, AbstractTransportRequest request) {
             final int requestRound = dispatcher.executionRound();
             final DiscoveryNode node = connection.getNode();
             if (action.equals(TransportFieldCapabilitiesAction.ACTION_NODE_NAME)) {
@@ -822,7 +822,7 @@ public class RequestDispatcherTests extends ESAllocationTestCase {
                 public <T extends TransportResponse> void sendRequest(
                     Transport.Connection connection,
                     String action,
-                    TransportRequest request,
+                    AbstractTransportRequest request,
                     TransportRequestOptions options,
                     TransportResponseHandler<T> handler
                 ) {
@@ -836,7 +836,7 @@ public class RequestDispatcherTests extends ESAllocationTestCase {
                 public <T extends TransportResponse> void sendRequest(
                     Transport.Connection connection,
                     String action,
-                    TransportRequest request,
+                    AbstractTransportRequest request,
                     TransportRequestOptions options,
                     TransportResponseHandler<T> handler
                 ) {

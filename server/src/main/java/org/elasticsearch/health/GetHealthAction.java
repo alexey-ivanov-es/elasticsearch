@@ -10,7 +10,7 @@
 package org.elasticsearch.health;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -150,7 +150,7 @@ public class GetHealthAction extends ActionType<GetHealthAction.Response> {
         }
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
         private final String indicatorName;
         private final boolean verbose;
         private final int size;

@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.searchablesnapshots.allocation;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.client.internal.Client;
@@ -92,7 +92,7 @@ public class SearchableSnapshotAllocatorTests extends ESAllocationTestCase {
 
             @SuppressWarnings("unchecked")
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -167,7 +167,7 @@ public class SearchableSnapshotAllocatorTests extends ESAllocationTestCase {
 
         final Client client = new NoOpNodeClient(deterministicTaskQueue.getThreadPool()) {
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -206,7 +206,7 @@ public class SearchableSnapshotAllocatorTests extends ESAllocationTestCase {
 
         final Client client = new NoOpNodeClient(deterministicTaskQueue.getThreadPool()) {
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

@@ -9,7 +9,7 @@
 
 package org.elasticsearch.index.reindex;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.support.ActiveShardCount;
@@ -30,7 +30,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 import static org.elasticsearch.core.TimeValue.timeValueMillis;
 import static org.elasticsearch.core.TimeValue.timeValueMinutes;
 
-public abstract class AbstractBulkByScrollRequest<Self extends AbstractBulkByScrollRequest<Self>> extends ActionRequest {
+public abstract class AbstractBulkByScrollRequest<Self extends AbstractBulkByScrollRequest<Self>> extends AbstractActionRequest {
 
     public static final int MAX_DOCS_ALL_MATCHES = -1;
     public static final TimeValue DEFAULT_SCROLL_TIMEOUT = timeValueMinutes(5);

@@ -11,11 +11,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.BytesRef;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.IndicesRequest;
+import org.elasticsearch.action.downsample.DownsampleAction;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.action.support.IndicesOptions;
@@ -270,7 +271,7 @@ public class DownsampleShardPersistentTaskExecutor extends InjectablePersistentT
             super(NAME);
         }
 
-        public static class Request extends ActionRequest implements IndicesRequest.RemoteClusterShardRequest {
+        public static class Request extends AbstractActionRequest implements IndicesRequest.RemoteClusterShardRequest {
 
             private final DownsampleShardTask task;
             private final BytesRef lastDownsampleTsid;
@@ -308,6 +309,7 @@ public class DownsampleShardPersistentTaskExecutor extends InjectablePersistentT
             }
         }
 
+        @NamedComponent("indices:data/read/downsample_delegate")
         public static class TA extends TransportAction<Request, ActionResponse.Empty> {
 
             private final Client client;
@@ -318,7 +320,7 @@ public class DownsampleShardPersistentTaskExecutor extends InjectablePersistentT
             public TA(
                 TransportService transportService,
                 ActionFilters actionFilters,
-                Client client,
+                NodeClient client,
                 IndicesService indicesService,
                 DownsampleMetrics downsampleMetrics
             ) {
@@ -327,6 +329,11 @@ public class DownsampleShardPersistentTaskExecutor extends InjectablePersistentT
                 this.client = client;
                 this.indicesService = indicesService;
                 this.downsampleMetrics = downsampleMetrics;
+            }
+
+            @Override
+            public Class<Request> getRequestClass() {
+                return Request.class;
             }
 
             @Override

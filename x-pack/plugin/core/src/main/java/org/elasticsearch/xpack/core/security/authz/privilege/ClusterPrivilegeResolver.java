@@ -534,7 +534,7 @@ public class ClusterPrivilegeResolver {
      * @return A collection of names, ordered (to the extent possible) from least privileged (e.g. {@link #MONITOR})
      * to most privileged (e.g. {@link #ALL})
      * @see #sortByAccessLevel(Collection)
-     * @see org.elasticsearch.xpack.core.security.authz.permission.ClusterPermission#check(String, TransportRequest, Authentication)
+     * @see org.elasticsearch.xpack.core.security.authz.permission.ClusterPermission#check(String, org.elasticsearch.transport.TransportRequest, Authentication)
      */
     public static Collection<String> findPrivilegesThatGrant(String action, TransportRequest request, Authentication authentication) {
         return VALUES.entrySet()

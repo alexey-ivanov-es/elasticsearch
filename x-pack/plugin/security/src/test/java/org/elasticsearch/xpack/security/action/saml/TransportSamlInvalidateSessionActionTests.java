@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.security.action.saml;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteRequest;
@@ -171,7 +171,7 @@ public class TransportSamlInvalidateSessionActionTests extends SamlTestCase {
         final Client client = new NoOpClient(threadPool) {
             @Override
             @SuppressWarnings("unchecked")
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

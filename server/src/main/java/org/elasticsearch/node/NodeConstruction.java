@@ -16,8 +16,6 @@ import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionModule;
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.repositories.reservedstate.ReservedRepositoryAction;
 import org.elasticsearch.action.admin.indices.template.reservedstate.ReservedComposableIndexTemplateAction;
@@ -245,6 +243,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -259,8 +259,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.invoke.MethodHandles.lookup;
-import static java.util.Collections.newSetFromMap;
-import static java.util.function.Predicate.not;
 import static org.elasticsearch.core.Types.forciblyCast;
 
 /**
@@ -350,6 +348,7 @@ class NodeConstruction {
     private final DeprecationLogger deprecationLogger = DeprecationLogger.getLogger(Node.class);
 
     private final List<Closeable> resourcesToClose;
+    private final Collection<LifecycleComponent> pluginLifecycleComponents = new HashSet<>();
     private final ModulesBuilder modules = new ModulesBuilder();
     /*
      * References for storing in a Node
@@ -359,12 +358,12 @@ class NodeConstruction {
     private NodeEnvironment nodeEnvironment;
     private PluginsService pluginsService;
     private NodeClient client;
-    private Collection<LifecycleComponent> pluginLifecycleComponents;
     private Node.LocalNodeFactory localNodeFactory;
     private NodeService nodeService;
     private TerminationHandler terminationHandler;
     private NamedWriteableRegistry namedWriteableRegistry;
     private NamedXContentRegistry xContentRegistry;
+    private PersistentTasksService persistentTasksService;
 
     private NodeConstruction(List<Closeable> resourcesToClose) {
         this.resourcesToClose = resourcesToClose;
@@ -1069,11 +1068,12 @@ class NodeConstruction {
             slowLogFieldProvider
         );
 
-        Collection<?> pluginComponents = pluginsService.flatMapBundle(bundle -> {
+        Map<Plugin, Collection<?>> pluginComponents = new HashMap<>();
+        pluginsService.forEachBundle(bundle -> {
             Plugin plugin = bundle.instance();
-            Collection<?> allItems = plugin.createComponents(pluginServices);
-            List<?> componentObjects = allItems.stream().filter(not(x -> x instanceof Class<?>)).toList();
+            pluginComponents.put(plugin, plugin.createComponents(pluginServices));
 
+            /*
             ClassLoader loader = plugin.getClass().getClassLoader();
             List<Class<?>> classes = new ArrayList<>();
             for (String componentClassname : bundle.manifest().componentClasses()) {
@@ -1099,11 +1099,8 @@ class NodeConstruction {
                 var distinctObjects = newSetFromMap(new IdentityHashMap<>());
                 distinctObjects.addAll(resultMap.values());
                 componentsFromInjector = distinctObjects;
-            }
-
-            // Return both
-            return Stream.of(componentObjects, componentsFromInjector).flatMap(Collection::stream).toList();
-        }).toList();
+            }*/
+        });
 
         var terminationHandlers = pluginsService.loadServiceProviders(TerminationHandlerProvider.class)
             .stream()
@@ -1357,7 +1354,10 @@ class NodeConstruction {
                 );
         });
 
-        modules.add(loadPluginComponents(pluginComponents));
+        List<ReloadablePlugin> reloadablePlugins = pluginsService.filterPlugins(ReloadablePlugin.class).toList();
+        pluginsService.filterPlugins(ReloadAwarePlugin.class).forEach(p -> p.setReloadCallback(wrapPlugins(reloadablePlugins)));
+
+        pluginComponents.values().forEach(c -> modules.add(loadPluginComponents(c)));
 
         DataStreamAutoShardingService dataStreamAutoShardingService = new DataStreamAutoShardingService(
             settings,
@@ -1413,9 +1413,69 @@ class NodeConstruction {
             );
         }
 
+        // TODO: do plugin injection here
+        // 1. inject
+        // 2. extract lifecycle/closeable
+        // 3. add objects to legacy injector
+        List<TransportAction<?, ?>> newTransportActions = new ArrayList<>();
+        pluginsService.forEachBundle(bundle -> {
+            Plugin plugin = bundle.instance();
+            ClassLoader loader = plugin.getClass().getClassLoader();
+            List<Class<?>> classes = new ArrayList<>();
+            for (String componentClassname : bundle.manifest().componentClasses()) {
+                try {
+                    classes.add(loader.loadClass(componentClassname));
+                } catch (ClassNotFoundException e) {
+                    // should not be possible, all classes were discovered within the bundle
+                    throw new AssertionError(e);
+                }
+            }
+            for (var componentInfos : bundle.manifest().namedComponents().values()) {
+                for (var componentInfo : componentInfos) {
+                    try {
+                        classes.add(loader.loadClass(componentInfo.implementationClass()));
+                    } catch (ClassNotFoundException e) {
+                        // should not be possible, all classes were discovered within the bundle
+                        throw new AssertionError(e);
+                    }
+                }
+            }
+            if (classes.isEmpty()) {
+                return; // no new style injection
+            }
+
+            var createComponentsObjects = pluginComponents.getOrDefault(plugin, List.of());
+
+            logger.info("Using injector to instantiate classes for {}: {}", plugin.getClass().getSimpleName(), classes);
+            var injector = org.elasticsearch.injection.Injector.create();
+            injector.addInstance(transportService);
+            injector.addInstance(settings);
+            injector.addInstance(client);
+            //injector.addInstance(clusterService);
+            injector.addInstance(metadataCreateIndexService);
+            injector.addInstance(actionModule.getActionFilters());
+            injector.addInstance(projectResolver);
+            injector.addInstance(settingsModule.getIndexScopedSettings());
+            injector.addInstance(persistentTasksService);
+            injector.addInstances(createComponentsObjects);
+            //injector.addInstance(indicesService);
+            addRecordContents(injector, pluginServices);
+            var resultMap = injector.inject(classes);
+
+            Collection<Object> injectedObjects = resultMap.values();
+            for (Object object : injectedObjects) {
+                if (object instanceof TransportAction<?,?> ta) {
+                    newTransportActions.add(ta);
+                }
+            }
+
+            // For now, assume we want all components added to the Guice injector
+            modules.add(loadPluginComponents(injectedObjects));
+        });
+
         injector = modules.createInjector();
 
-        postInjection(clusterModule, actionModule, clusterService, transportService, featureService);
+        postInjection(clusterModule, actionModule, clusterService, transportService, featureService, newTransportActions);
     }
 
     /**
@@ -1552,17 +1612,14 @@ class NodeConstruction {
     }
 
     private Module loadPluginComponents(Collection<?> pluginComponents) {
-        List<LifecycleComponent> pluginLifecycleComponents = pluginComponents.stream().map(p -> {
+        List<LifecycleComponent> lifecycleComponents = pluginComponents.stream().map(p -> {
             if (p instanceof PluginComponentBinding<?, ?> pcb) {
                 return pcb.impl();
             }
             return p;
         }).filter(p -> p instanceof LifecycleComponent).map(p -> (LifecycleComponent) p).toList();
-        resourcesToClose.addAll(pluginLifecycleComponents);
-        this.pluginLifecycleComponents = pluginLifecycleComponents;
-
-        List<ReloadablePlugin> reloadablePlugins = pluginsService.filterPlugins(ReloadablePlugin.class).toList();
-        pluginsService.filterPlugins(ReloadAwarePlugin.class).forEach(p -> p.setReloadCallback(wrapPlugins(reloadablePlugins)));
+        resourcesToClose.addAll(lifecycleComponents);
+        pluginLifecycleComponents.addAll(lifecycleComponents);
 
         return b -> pluginComponents.forEach(p -> {
             if (p instanceof PluginComponentBinding<?, ?> pcb) {
@@ -1582,7 +1639,8 @@ class NodeConstruction {
         ActionModule actionModule,
         ClusterService clusterService,
         TransportService transportService,
-        FeatureService featureService
+        FeatureService featureService,
+        List<TransportAction<?, ?>> newTransportActions
     ) {
         // We allocate copies of existing shards by looking for a viable copy of the shard in the cluster and assigning the shard there.
         // The search for viable copies is triggered by an allocation attempt (i.e. a reroute) and is performed asynchronously. When it
@@ -1594,9 +1652,9 @@ class NodeConstruction {
         // Due to Java's type erasure with generics, the injector can't give us exactly what we need, and we have
         // to resort to some evil casting.
         @SuppressWarnings("rawtypes")
-        Map<ActionType<? extends ActionResponse>, TransportAction<? extends ActionRequest, ? extends ActionResponse>> actions =
-            forciblyCast(injector.getInstance(new Key<Map<ActionType, TransportAction>>() {
-            }));
+        Map<ActionType<?>, TransportAction<?, ?>> actions =
+            new HashMap<>(forciblyCast(injector.getInstance(new Key<Map<ActionType, TransportAction>>() {
+            })));
 
         client.initialize(
             actions,
@@ -1605,6 +1663,8 @@ class NodeConstruction {
             transportService.getLocalNodeConnection(),
             transportService.getRemoteClusterService()
         );
+        logger.info("NEW ACTIONS: " + newTransportActions);
+        client.initialize2(newTransportActions);
 
         logger.debug("initializing HTTP handlers ...");
         actionModule.initRestHandlers(() -> clusterService.state().nodesIfRecovered(), f -> {
@@ -1823,7 +1883,7 @@ class NodeConstruction {
         MetadataUpdateSettingsService metadataUpdateSettingsService,
         MetadataCreateIndexService metadataCreateIndexService
     ) {
-        PersistentTasksService persistentTasksService = new PersistentTasksService(clusterService, threadPool, client);
+        this.persistentTasksService = new PersistentTasksService(clusterService, threadPool, client);
         SystemIndexMigrationExecutor systemIndexMigrationExecutor = new SystemIndexMigrationExecutor(
             client,
             clusterService,

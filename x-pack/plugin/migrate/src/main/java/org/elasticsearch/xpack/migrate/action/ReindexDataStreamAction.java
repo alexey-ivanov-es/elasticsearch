@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.migrate.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.IndicesRequest;
@@ -48,7 +48,7 @@ public class ReindexDataStreamAction extends ActionType<AcknowledgedResponse> {
         UPGRADE
     }
 
-    public static class ReindexDataStreamRequest extends ActionRequest implements IndicesRequest, ToXContent {
+    public static class ReindexDataStreamRequest extends AbstractActionRequest implements IndicesRequest, ToXContent {
         private final Mode mode;
         private final String sourceDataStream;
 

@@ -269,7 +269,7 @@ public class InboundDecoderTests extends ESTestCase {
         Compression.Scheme scheme = randomFrom(Compression.Scheme.DEFLATE, Compression.Scheme.LZ4);
 
         try (RecyclerBytesStreamOutput os = new RecyclerBytesStreamOutput(recycler)) {
-            final TransportMessage transportMessage = isRequest
+            final AbstractTransportMessage transportMessage = isRequest
                 ? new TestRequest(randomAlphaOfLength(100))
                 : new TestResponse(randomAlphaOfLength(100));
             final BytesReference totalBytes = OutboundHandler.serialize(

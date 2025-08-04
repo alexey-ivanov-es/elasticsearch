@@ -42,7 +42,7 @@ import org.elasticsearch.cluster.metadata.IndexAbstraction;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.test.ESTestCase;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.ilm.action.GetLifecycleAction;
 import org.elasticsearch.xpack.core.ilm.action.ILMActions;
 import org.elasticsearch.xpack.core.monitoring.action.MonitoringBulkAction;
@@ -92,7 +92,7 @@ public class ElasticServiceAccountsTests extends ESTestCase {
         );
 
         final Authentication authentication = AuthenticationTestHelper.builder().serviceAccount().build();
-        final TransportRequest request = mock(TransportRequest.class);
+        final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
 
         // monitor
         assertThat(role.cluster().check(GetComponentTemplateAction.NAME, request, authentication), is(true));
@@ -304,7 +304,7 @@ public class ElasticServiceAccountsTests extends ESTestCase {
         assertThat(role.indices().allowedIndicesMatcher(TransportUpdateSettingsAction.TYPE.name()).test(dotFleetSecretsIndex), is(false));
         assertThat(role.indices().allowedIndicesMatcher("indices:foo").test(dotFleetSecretsIndex), is(false));
 
-        final TransportRequest request = mock(TransportRequest.class);
+        final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         assertThat(role.cluster().check("cluster:admin/fleet/secrets/get", request, authentication), is(true));
         assertThat(role.cluster().check("cluster:admin/fleet/secrets/post", request, authentication), is(false));
         assertThat(role.cluster().check("cluster:admin/fleet/secrets/delete", request, authentication), is(false));
@@ -401,7 +401,7 @@ public class ElasticServiceAccountsTests extends ESTestCase {
         );
 
         final Authentication authentication = AuthenticationTestHelper.builder().serviceAccount().build();
-        final TransportRequest request = mock(TransportRequest.class);
+        final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
 
         // manage
         assertThat(role.cluster().check(ClusterUpdateSettingsAction.NAME, request, authentication), is(true));

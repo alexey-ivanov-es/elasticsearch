@@ -17,7 +17,7 @@ import org.elasticsearch.common.util.set.Sets;
 import org.elasticsearch.common.xcontent.LoggingDeprecationHandler;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.EqualsHashCodeTestUtils;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.ToXContent;
 import org.elasticsearch.xcontent.XContent;
@@ -143,7 +143,7 @@ public class WriteProfileDataPrivilegesTests extends ESTestCase {
                 : newUpdateProfileDataRequest(Set.of(), randomBoolean() ? Set.of(name, other) : Set.of(other));
             assertFalse(writeProfileDataPermission.check(UpdateProfileDataAction.NAME, updateProfileDataRequest, authentication));
         }
-        assertFalse(writeProfileDataPermission.check(UpdateProfileDataAction.NAME, mock(TransportRequest.class), authentication));
+        assertFalse(writeProfileDataPermission.check(UpdateProfileDataAction.NAME, mock(AbstractTransportRequest.class), authentication));
     }
 
     public void testParseAbnormals() throws Exception {

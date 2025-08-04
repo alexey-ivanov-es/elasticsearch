@@ -12,7 +12,7 @@ package org.elasticsearch.action.admin.cluster.node.tasks;
 import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.ResourceNotFoundException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.node.tasks.get.GetTaskRequest;
@@ -76,7 +76,7 @@ public class TransportGetTaskActionTests extends ESTestCase {
         NodeClient client = new NodeClient(Settings.EMPTY, threadPool) {
             @Override
             @SuppressWarnings("unchecked")
-            public <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

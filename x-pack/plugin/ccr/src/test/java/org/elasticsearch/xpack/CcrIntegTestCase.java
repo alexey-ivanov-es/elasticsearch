@@ -80,7 +80,7 @@ import org.elasticsearch.test.NodeConfigurationSource;
 import org.elasticsearch.test.TestCluster;
 import org.elasticsearch.test.transport.MockTransportService;
 import org.elasticsearch.transport.RemoteConnectionStrategy;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xpack.ccr.CcrSettings;
@@ -244,7 +244,7 @@ public abstract class CcrIntegTestCase extends ESTestCase {
         }
     }
 
-    private static boolean isCcrAdminRequest(TransportRequest request) {
+    private static boolean isCcrAdminRequest(AbstractTransportRequest request) {
         return request instanceof PutFollowAction.Request
             || request instanceof ResumeFollowAction.Request
             || request instanceof PauseFollowAction.Request

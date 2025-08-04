@@ -9,7 +9,7 @@
 
 package org.elasticsearch.action.search;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.support.IndicesOptions;
@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * A request to find the list of target shards that might match the query for the given target indices.
  */
-public final class SearchShardsRequest extends ActionRequest implements IndicesRequest.Replaceable {
+public final class SearchShardsRequest extends AbstractActionRequest implements IndicesRequest.Replaceable {
     private String[] indices;
     private final IndicesOptions indicesOptions;
     @Nullable

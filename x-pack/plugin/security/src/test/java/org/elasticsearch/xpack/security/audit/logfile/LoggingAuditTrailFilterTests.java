@@ -32,7 +32,7 @@ import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.rest.FakeRestRequest;
 import org.elasticsearch.test.rest.FakeRestRequest.Builder;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.XContentType;
 import org.elasticsearch.xpack.core.security.audit.logfile.CapturingLogger;
@@ -866,7 +866,7 @@ public class LoggingAuditTrailFilterTests extends ESTestCase {
         if (randomBoolean()) {
             unfilteredAuthentication = createApiKeyAuthentication(apiKeyService, unfilteredAuthentication);
         }
-        final TransportRequest request = randomBoolean()
+        final AbstractTransportRequest request = randomBoolean()
             ? new MockRequest(threadContext)
             : new MockIndicesRequest(threadContext, new String[] { "idx1", "idx2" });
         final MockToken filteredToken = new MockToken(randomFrom(allFilteredUsers));
@@ -1220,7 +1220,7 @@ public class LoggingAuditTrailFilterTests extends ESTestCase {
             user = new User("user1", "r1");
             authUser = null;
         }
-        final TransportRequest request = randomBoolean()
+        final AbstractTransportRequest request = randomBoolean()
             ? new MockRequest(threadContext)
             : new MockIndicesRequest(threadContext, new String[] { "idx1", "idx2" });
         final MockToken authToken = new MockToken("token1");
@@ -1727,7 +1727,7 @@ public class LoggingAuditTrailFilterTests extends ESTestCase {
         if (randomBoolean()) {
             authentication = createApiKeyAuthentication(apiKeyService, authentication);
         }
-        final TransportRequest request = randomBoolean()
+        final AbstractTransportRequest request = randomBoolean()
             ? new MockRequest(threadContext)
             : new MockIndicesRequest(threadContext, new String[] { "idx1", "idx2" });
         final MockToken authToken = new MockToken("token1");
@@ -2047,7 +2047,7 @@ public class LoggingAuditTrailFilterTests extends ESTestCase {
             authentication = createApiKeyAuthentication(apiKeyService, authentication);
         }
         final MockToken authToken = new MockToken("token1");
-        final TransportRequest noIndexRequest = new MockRequest(threadContext);
+        final AbstractTransportRequest noIndexRequest = new MockRequest(threadContext);
 
         final LoggingAuditTrail auditTrail = new LoggingAuditTrail(settingsBuilder.build(), clusterService, logger, threadContext);
         final List<String> logOutput = CapturingLogger.output(logger.getName(), Level.INFO);
@@ -2515,7 +2515,7 @@ public class LoggingAuditTrailFilterTests extends ESTestCase {
             user = new User("user1", "r1");
             authUser = null;
         }
-        final TransportRequest request = randomBoolean()
+        final AbstractTransportRequest request = randomBoolean()
             ? new MockRequest(threadContext)
             : new MockIndicesRequest(threadContext, new String[] { "idx1", "idx2" });
         final MockToken authToken = new MockToken("token1");

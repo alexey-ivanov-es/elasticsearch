@@ -21,7 +21,7 @@ import org.elasticsearch.index.Index;
 import org.elasticsearch.index.IndexVersion;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.transport.EmptyRequest;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationTestHelper;
 import org.elasticsearch.xpack.core.security.authz.AuthorizationEngine;
@@ -462,7 +462,7 @@ public class AuthorizedIndicesTests extends ESTestCase {
             future
         );
         Role roles = future.actionGet();
-        TransportRequest request = new ResolveIndexAction.Request(new String[] { "a*" });
+        AbstractTransportRequest request = new ResolveIndexAction.Request(new String[] { "a*" });
         AuthorizationEngine.RequestInfo requestInfo = getRequestInfo(request, TransportSearchAction.TYPE.name());
         AuthorizedIndices authorizedIndices = RBACEngine.resolveAuthorizedIndicesFromRole(
             roles,
@@ -547,7 +547,7 @@ public class AuthorizedIndicesTests extends ESTestCase {
             future
         );
         Role roles = future.actionGet();
-        TransportRequest request = new ResolveIndexAction.Request(new String[] { "a*" });
+        AbstractTransportRequest request = new ResolveIndexAction.Request(new String[] { "a*" });
         AuthorizationEngine.RequestInfo requestInfo = getRequestInfo(request, TransportSearchAction.TYPE.name());
         AuthorizedIndices authorizedIndices = RBACEngine.resolveAuthorizedIndicesFromRole(
             roles,
@@ -709,7 +709,7 @@ public class AuthorizedIndicesTests extends ESTestCase {
             future
         );
         Role roles = future.actionGet();
-        TransportRequest request = new ResolveIndexAction.Request(new String[] { "a*" });
+        AbstractTransportRequest request = new ResolveIndexAction.Request(new String[] { "a*" });
         AuthorizationEngine.RequestInfo requestInfo = getRequestInfo(request, TransportSearchAction.TYPE.name());
         AuthorizedIndices authorizedIndices = RBACEngine.resolveAuthorizedIndicesFromRole(
             roles,
@@ -735,7 +735,7 @@ public class AuthorizedIndicesTests extends ESTestCase {
         return getRequestInfo(new EmptyRequest(), action);
     }
 
-    public static AuthorizationEngine.RequestInfo getRequestInfo(TransportRequest request, String action) {
+    public static AuthorizationEngine.RequestInfo getRequestInfo(AbstractTransportRequest request, String action) {
         final Authentication.RealmRef realm = new Authentication.RealmRef(
             randomAlphaOfLength(6),
             randomAlphaOfLength(4),

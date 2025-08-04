@@ -28,6 +28,7 @@ import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -81,8 +82,8 @@ public class IngestCommonPlugin extends Plugin implements ActionPlugin, IngestPl
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-        return List.of(new ActionHandler<>(GrokProcessorGetAction.INSTANCE, GrokProcessorGetAction.TransportAction.class));
+    public Collection<ActionHandler> getActions() {
+        return List.of(new ActionHandler(GrokProcessorGetAction.INSTANCE, GrokProcessorGetAction.TransportAction.class));
     }
 
     @Override

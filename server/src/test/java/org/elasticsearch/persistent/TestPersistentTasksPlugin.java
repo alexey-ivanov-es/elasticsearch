@@ -87,8 +87,8 @@ public class TestPersistentTasksPlugin extends Plugin implements ActionPlugin, P
     );
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-        return Collections.singletonList(new ActionHandler<>(TEST_ACTION, TransportTestTaskAction.class));
+    public Collection<ActionHandler> getActions() {
+        return Collections.singletonList(new ActionHandler(TEST_ACTION, TransportTestTaskAction.class));
     }
 
     @Override

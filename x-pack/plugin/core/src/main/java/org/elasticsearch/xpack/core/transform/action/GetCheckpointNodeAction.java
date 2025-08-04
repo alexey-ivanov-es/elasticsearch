@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.core.transform.action;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -88,7 +88,7 @@ public class GetCheckpointNodeAction extends ActionType<GetCheckpointNodeAction.
         }
     }
 
-    public static class Request extends ActionRequest implements IndicesRequest {
+    public static class Request extends AbstractActionRequest implements IndicesRequest {
 
         private final Set<ShardId> shards;
         private final OriginalIndices originalIndices;

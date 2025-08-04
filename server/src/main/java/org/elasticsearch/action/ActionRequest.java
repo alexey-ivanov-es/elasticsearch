@@ -9,33 +9,16 @@
 
 package org.elasticsearch.action;
 
-import org.elasticsearch.common.io.stream.StreamInput;
-import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.transport.TransportRequest;
 
-import java.io.IOException;
+public interface ActionRequest extends TransportRequest {
 
-public abstract class ActionRequest extends TransportRequest {
-
-    public ActionRequest() {
-        super();
-    }
-
-    public ActionRequest(StreamInput in) throws IOException {
-        super(in);
-    }
-
-    public abstract ActionRequestValidationException validate();
+    ActionRequestValidationException validate();
 
     /**
      * Should this task store its result after it has finished?
      */
-    public boolean getShouldStoreResult() {
+    default boolean getShouldStoreResult() {
         return false;
-    }
-
-    @Override
-    public void writeTo(StreamOutput out) throws IOException {
-        super.writeTo(out);
     }
 }

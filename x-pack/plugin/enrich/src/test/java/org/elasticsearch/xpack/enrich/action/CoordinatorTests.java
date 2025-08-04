@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.enrich.action;
 import org.apache.logging.log4j.util.BiConsumer;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.search.MultiSearchRequest;
@@ -278,7 +278,7 @@ public class CoordinatorTests extends ESTestCase {
         ElasticsearchClient client = new ElasticsearchClient() {
 
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> ActionFuture<Response> execute(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> ActionFuture<Response> execute(
                 ActionType<Response> action,
                 Request request
             ) {
@@ -286,7 +286,7 @@ public class CoordinatorTests extends ESTestCase {
             }
 
             @Override
-            public <Request extends ActionRequest, Response extends ActionResponse> void execute(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void execute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

@@ -10,7 +10,7 @@
 package org.elasticsearch.action.fieldcaps;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.OriginalIndices;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-class FieldCapabilitiesNodeRequest extends ActionRequest implements IndicesRequest {
+class FieldCapabilitiesNodeRequest extends AbstractActionRequest implements IndicesRequest {
 
     private final List<ShardId> shardIds;
     private final String[] fields;

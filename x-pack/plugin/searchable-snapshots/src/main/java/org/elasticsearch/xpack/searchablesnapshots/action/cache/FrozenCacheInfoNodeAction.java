@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.searchablesnapshots.action.cache;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.ActionFilters;
@@ -33,7 +33,7 @@ public class FrozenCacheInfoNodeAction extends ActionType<FrozenCacheInfoRespons
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         public Request() {}
 

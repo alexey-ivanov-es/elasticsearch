@@ -43,8 +43,8 @@ public class NodeClientHeadersTests extends AbstractClientHeadersTestCase {
     }
 
     private static class Actions extends HashMap<
-        ActionType<? extends ActionResponse>,
-        TransportAction<? extends ActionRequest, ? extends ActionResponse>> {
+        ActionType<?>,
+        TransportAction<?, ?>> {
 
         private Actions(ActionType<?>[] actions, TaskManager taskManager) {
             for (ActionType<?> action : actions) {

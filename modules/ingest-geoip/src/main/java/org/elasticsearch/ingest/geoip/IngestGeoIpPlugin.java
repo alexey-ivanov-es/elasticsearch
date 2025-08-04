@@ -182,12 +182,12 @@ public class IngestGeoIpPlugin extends Plugin
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionHandler<>(GeoIpStatsAction.INSTANCE, GeoIpStatsTransportAction.class),
-            new ActionHandler<>(GetDatabaseConfigurationAction.INSTANCE, TransportGetDatabaseConfigurationAction.class),
-            new ActionHandler<>(DeleteDatabaseConfigurationAction.INSTANCE, TransportDeleteDatabaseConfigurationAction.class),
-            new ActionHandler<>(PutDatabaseConfigurationAction.INSTANCE, TransportPutDatabaseConfigurationAction.class)
+            new ActionHandler(GeoIpStatsAction.INSTANCE, GeoIpStatsTransportAction.class),
+            new ActionHandler(GetDatabaseConfigurationAction.INSTANCE, TransportGetDatabaseConfigurationAction.class),
+            new ActionHandler(DeleteDatabaseConfigurationAction.INSTANCE, TransportDeleteDatabaseConfigurationAction.class),
+            new ActionHandler(PutDatabaseConfigurationAction.INSTANCE, TransportPutDatabaseConfigurationAction.class)
         );
     }
 

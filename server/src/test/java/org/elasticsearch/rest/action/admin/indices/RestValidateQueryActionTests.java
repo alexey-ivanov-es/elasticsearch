@@ -9,6 +9,7 @@
 package org.elasticsearch.rest.action.admin.indices;
 
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -69,7 +70,7 @@ public class RestValidateQueryActionTests extends AbstractSearchTestCase {
     public void stubValidateQueryAction() {
         final TaskManager taskManager = new TaskManager(Settings.EMPTY, threadPool, Collections.emptySet());
 
-        final TransportAction<? extends ActionRequest, ? extends ActionResponse> transportAction = new TransportAction<>(
+        final TransportAction<?, ?> transportAction = new TransportAction<>(
             ValidateQueryAction.NAME,
             new ActionFilters(Collections.emptySet()),
             taskManager,
@@ -79,7 +80,7 @@ public class RestValidateQueryActionTests extends AbstractSearchTestCase {
             protected void doExecute(Task task, ActionRequest request, ActionListener<ActionResponse> listener) {}
         };
 
-        final Map<ActionType<? extends ActionResponse>, TransportAction<? extends ActionRequest, ? extends ActionResponse>> actions =
+        final Map<ActionType<?>, TransportAction<?, ?>> actions =
             new HashMap<>();
         actions.put(ValidateQueryAction.INSTANCE, transportAction);
 

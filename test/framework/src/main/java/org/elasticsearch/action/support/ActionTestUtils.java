@@ -10,7 +10,7 @@
 package org.elasticsearch.action.support;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseListener;
@@ -30,7 +30,7 @@ public class ActionTestUtils {
 
     private ActionTestUtils() { /* no construction */ }
 
-    public static <Request extends ActionRequest, Response extends ActionResponse> Response executeBlocking(
+    public static <Request extends AbstractActionRequest, Response extends ActionResponse> Response executeBlocking(
         TransportAction<Request, Response> action,
         Request request
     ) {
@@ -39,7 +39,7 @@ public class ActionTestUtils {
         );
     }
 
-    public static <Request extends ActionRequest, Response extends ActionResponse> Response executeBlockingWithTask(
+    public static <Request extends AbstractActionRequest, Response extends ActionResponse> Response executeBlockingWithTask(
         TaskManager taskManager,
         Transport.Connection localConnection,
         TransportAction<Request, Response> action,
@@ -53,7 +53,7 @@ public class ActionTestUtils {
      *
      * This is a shim method to make execution publicly available in tests.
      */
-    public static <Request extends ActionRequest, Response extends ActionResponse> void execute(
+    public static <Request extends AbstractActionRequest, Response extends ActionResponse> void execute(
         TransportAction<Request, Response> action,
         Task task,
         Request request,
@@ -62,7 +62,7 @@ public class ActionTestUtils {
         action.execute(task, request, listener);
     }
 
-    public static <Request extends ActionRequest, Response extends ActionResponse> void execute(
+    public static <Request extends AbstractActionRequest, Response extends ActionResponse> void execute(
         TransportAction<Request, Response> action,
         Request request,
         ActionListener<Response> listener

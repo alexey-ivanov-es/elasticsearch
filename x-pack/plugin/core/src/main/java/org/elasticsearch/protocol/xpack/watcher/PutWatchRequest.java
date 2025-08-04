@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.protocol.xpack.watcher;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.bytes.BytesReference;
@@ -28,7 +28,7 @@ import static org.elasticsearch.index.seqno.SequenceNumbers.UNASSIGNED_SEQ_NO;
  * This request class contains the data needed to create a watch along with the name of the watch.
  * The name of the watch will become the ID of the indexed document.
  */
-public final class PutWatchRequest extends ActionRequest {
+public final class PutWatchRequest extends AbstractActionRequest {
 
     private static final Pattern NO_WS_PATTERN = Pattern.compile("\\S+");
 

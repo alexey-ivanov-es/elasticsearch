@@ -11,7 +11,7 @@ package org.elasticsearch.action.get;
 
 import org.elasticsearch.ElasticsearchParseException;
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.CompositeIndicesRequest;
 import org.elasticsearch.action.IndicesRequest;
@@ -45,7 +45,7 @@ import java.util.Locale;
 
 // It's not possible to suppress teh warning at #realtime(boolean) at a method-level.
 @SuppressWarnings("unchecked")
-public class MultiGetRequest extends ActionRequest
+public class MultiGetRequest extends AbstractActionRequest
     implements
         Iterable<MultiGetRequest.Item>,
         CompositeIndicesRequest,

@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.security.action.user;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.common.bytes.BytesArray;
@@ -26,7 +26,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Request object to put a native user.
  */
-public class PutUserRequest extends ActionRequest implements UserRequest, WriteRequest<PutUserRequest> {
+public class PutUserRequest extends AbstractActionRequest implements UserRequest, WriteRequest<PutUserRequest> {
 
     private String username;
     private String[] roles;

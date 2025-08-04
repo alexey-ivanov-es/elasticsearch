@@ -45,7 +45,7 @@ import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportException;
 import org.elasticsearch.transport.TransportInterceptor;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportResponseHandler;
@@ -77,10 +77,10 @@ public class TestTaskPlugin extends Plugin implements ActionPlugin, NetworkPlugi
     public static final ActionType<UnblockTestTasksResponse> UNBLOCK_TASK_ACTION = new ActionType<>("cluster:admin/tasks/testunblock");
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Arrays.asList(
-            new ActionHandler<>(TEST_TASK_ACTION, TransportTestTaskAction.class),
-            new ActionHandler<>(UNBLOCK_TASK_ACTION, TransportUnblockTestTasksAction.class)
+            new ActionHandler(TEST_TASK_ACTION, TransportTestTaskAction.class),
+            new ActionHandler(UNBLOCK_TASK_ACTION, TransportUnblockTestTasksAction.class)
         );
     }
 
@@ -163,7 +163,7 @@ public class TestTaskPlugin extends Plugin implements ActionPlugin, NetworkPlugi
         }
     }
 
-    public static class NodeRequest extends TransportRequest {
+    public static class NodeRequest extends AbstractTransportRequest {
         protected final String requestName;
         protected final boolean shouldBlock;
 
@@ -412,7 +412,7 @@ public class TestTaskPlugin extends Plugin implements ActionPlugin, NetworkPlugi
                 public <T extends TransportResponse> void sendRequest(
                     Transport.Connection connection,
                     String action,
-                    TransportRequest request,
+                    AbstractTransportRequest request,
                     TransportRequestOptions options,
                     TransportResponseHandler<T> handler
                 ) {
@@ -452,7 +452,7 @@ public class TestTaskPlugin extends Plugin implements ActionPlugin, NetworkPlugi
             };
         }
 
-        private boolean shouldHaveOrigin(String action, TransportRequest request) {
+        private boolean shouldHaveOrigin(String action, AbstractTransportRequest request) {
             if (false == action.startsWith("indices:")) {
                 /*
                  * The Tasks API never uses origin with non-indices actions.

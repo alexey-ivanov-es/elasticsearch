@@ -32,7 +32,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 /**
- * Handles inbound messages by first deserializing a {@link TransportMessage} from an {@link InboundMessage} and then passing
+ * Handles inbound messages by first deserializing a {@link AbstractTransportMessage} from an {@link InboundMessage} and then passing
  * it to the appropriate handler.
  */
 public class InboundHandler {
@@ -220,7 +220,7 @@ public class InboundHandler {
         }
     }
 
-    private <T extends TransportRequest> void handleRequest(TcpChannel channel, InboundMessage message) throws IOException {
+    private <T extends AbstractTransportRequest> void handleRequest(TcpChannel channel, InboundMessage message) throws IOException {
         final Header header = message.getHeader();
         if (header.isHandshake()) {
             handleHandshakeRequest(channel, message);
@@ -284,7 +284,7 @@ public class InboundHandler {
         }
     }
 
-    private static <T extends TransportRequest> void doHandleRequest(RequestHandlerRegistry<T> reg, T request, TransportChannel channel) {
+    private static <T extends AbstractTransportRequest> void doHandleRequest(RequestHandlerRegistry<T> reg, T request, TransportChannel channel) {
         try {
             reg.processMessageReceived(request, channel);
         } catch (Exception e) {
@@ -292,7 +292,7 @@ public class InboundHandler {
         }
     }
 
-    private <T extends TransportRequest> void handleRequestForking(T request, RequestHandlerRegistry<T> reg, TransportChannel channel) {
+    private <T extends AbstractTransportRequest> void handleRequestForking(T request, RequestHandlerRegistry<T> reg, TransportChannel channel) {
         boolean success = false;
         request.mustIncRef();
         try {

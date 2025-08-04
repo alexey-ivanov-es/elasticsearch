@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.application.rules.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -33,7 +33,7 @@ public class DeleteQueryRuleAction {
 
     private DeleteQueryRuleAction() {/* no instances */}
 
-    public static class Request extends ActionRequest implements ToXContentObject {
+    public static class Request extends AbstractActionRequest implements ToXContentObject {
         private final String rulesetId;
         private final String ruleId;
 

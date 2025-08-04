@@ -10,7 +10,7 @@
 package org.elasticsearch.action.admin.indices.resolve;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -75,7 +75,7 @@ public class ResolveIndexAction extends ActionType<ResolveIndexAction.Response> 
         super(NAME);
     }
 
-    public static class Request extends ActionRequest implements IndicesRequest.Replaceable {
+    public static class Request extends AbstractActionRequest implements IndicesRequest.Replaceable {
 
         public static final IndicesOptions DEFAULT_INDICES_OPTIONS = IndicesOptions.strictExpandOpen();
 

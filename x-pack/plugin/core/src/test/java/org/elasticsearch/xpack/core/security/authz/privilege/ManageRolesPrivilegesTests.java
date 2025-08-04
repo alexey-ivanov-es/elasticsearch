@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.security.authz.privilege;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
 import org.elasticsearch.test.AbstractNamedWriteableTestCase;
 import org.elasticsearch.xcontent.ToXContent;
@@ -257,7 +257,7 @@ public class ManageRolesPrivilegesTests extends AbstractNamedWriteableTestCase<C
         assertThat(permissionCheck(permission, "cluster:admin/xpack/security/role/put", putRoleRequest), is(false));
     }
 
-    private static boolean permissionCheck(ClusterPermission permission, String action, ActionRequest request) {
+    private static boolean permissionCheck(ClusterPermission permission, String action, AbstractActionRequest request) {
         final Authentication authentication = AuthenticationTestHelper.builder().build();
         assertThat(request.validate(), nullValue());
         return permission.check(action, request, authentication);

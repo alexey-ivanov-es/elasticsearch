@@ -68,13 +68,13 @@ public class Logstash extends Plugin implements SystemIndexPlugin {
     public Logstash() {}
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionHandler<>(XPackUsageFeatureAction.LOGSTASH, LogstashUsageTransportAction.class),
-            new ActionHandler<>(XPackInfoFeatureAction.LOGSTASH, LogstashInfoTransportAction.class),
-            new ActionHandler<>(PutPipelineAction.INSTANCE, TransportPutPipelineAction.class),
-            new ActionHandler<>(GetPipelineAction.INSTANCE, TransportGetPipelineAction.class),
-            new ActionHandler<>(DeletePipelineAction.INSTANCE, TransportDeletePipelineAction.class)
+            new ActionHandler(XPackUsageFeatureAction.LOGSTASH, LogstashUsageTransportAction.class),
+            new ActionHandler(XPackInfoFeatureAction.LOGSTASH, LogstashInfoTransportAction.class),
+            new ActionHandler(PutPipelineAction.INSTANCE, TransportPutPipelineAction.class),
+            new ActionHandler(GetPipelineAction.INSTANCE, TransportGetPipelineAction.class),
+            new ActionHandler(DeletePipelineAction.INSTANCE, TransportDeletePipelineAction.class)
         );
     }
 

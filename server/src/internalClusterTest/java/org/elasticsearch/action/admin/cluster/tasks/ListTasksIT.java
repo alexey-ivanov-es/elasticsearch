@@ -10,6 +10,7 @@
 package org.elasticsearch.action.admin.cluster.tasks;
 
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
@@ -137,12 +138,12 @@ public class ListTasksIT extends ESSingleNodeTestCase {
         volatile CyclicBarrier barrier;
 
         @Override
-        public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            return List.of(new ActionHandler<>(TEST_ACTION, TestTransportAction.class));
+        public Collection<ActionHandler> getActions() {
+            return List.of(new ActionHandler(TEST_ACTION, TestTransportAction.class));
         }
     }
 
-    public static class TestRequest extends ActionRequest {
+    public static class TestRequest extends AbstractActionRequest {
         @Override
         public ActionRequestValidationException validate() {
             return null;

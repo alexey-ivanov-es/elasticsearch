@@ -19,7 +19,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.persistent.PersistentTasksCustomMetadata;
 import org.elasticsearch.persistent.PersistentTasksCustomMetadata.Assignment;
 import org.elasticsearch.persistent.PersistentTasksCustomMetadata.PersistentTask;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportResponseHandler;
 import org.elasticsearch.transport.TransportService;
@@ -155,7 +155,7 @@ public final class TransformNodes {
         }
     }
 
-    public static <Request extends TransportRequest, Response extends TransportResponse> boolean redirectToAnotherNodeIfNeeded(
+    public static <Request extends AbstractTransportRequest, Response extends TransportResponse> boolean redirectToAnotherNodeIfNeeded(
         ClusterState clusterState,
         Settings nodeSettings,
         boolean requiresRemote,

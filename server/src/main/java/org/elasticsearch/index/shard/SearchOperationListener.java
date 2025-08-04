@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.search.internal.ReaderContext;
 import org.elasticsearch.search.internal.SearchContext;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 
 import java.util.List;
 
@@ -102,7 +102,7 @@ public interface SearchOperationListener {
      * @param readerContext The reader context used by this request.
      * @param transportRequest the request that is going to use the search context
      */
-    default void validateReaderContext(ReaderContext readerContext, TransportRequest transportRequest) {}
+    default void validateReaderContext(ReaderContext readerContext, AbstractTransportRequest transportRequest) {}
 
     /**
      * A Composite listener that multiplexes calls to each of the listeners methods.
@@ -227,7 +227,7 @@ public interface SearchOperationListener {
         }
 
         @Override
-        public void validateReaderContext(ReaderContext readerContext, TransportRequest request) {
+        public void validateReaderContext(ReaderContext readerContext, AbstractTransportRequest request) {
             Exception exception = null;
             for (SearchOperationListener listener : listeners) {
                 try {

@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.core.security.action.profile;
 
 import org.elasticsearch.ElasticsearchParseException;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -30,7 +30,7 @@ import java.util.Set;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
 
-public class SuggestProfilesRequest extends ActionRequest {
+public class SuggestProfilesRequest extends AbstractActionRequest {
 
     private final Set<String> dataKeys;
     /**

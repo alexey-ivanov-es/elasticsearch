@@ -28,6 +28,7 @@ import org.elasticsearch.xcontent.NamedXContentRegistry.Entry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -38,8 +39,8 @@ public class RankEvalPlugin extends Plugin implements ActionPlugin {
     public static final ActionType<RankEvalResponse> ACTION = new ActionType<>("indices:data/read/rank_eval");
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-        return Arrays.asList(new ActionHandler<>(ACTION, TransportRankEvalAction.class));
+    public Collection<ActionHandler> getActions() {
+        return Arrays.asList(new ActionHandler(ACTION, TransportRankEvalAction.class));
     }
 
     @Override

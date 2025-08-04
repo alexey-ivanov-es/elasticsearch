@@ -82,10 +82,10 @@ public class VotingOnlyNodePlugin extends Plugin implements ClusterCoordinationP
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Arrays.asList(
-            new ActionHandler<>(XPackUsageFeatureAction.VOTING_ONLY, VotingOnlyUsageTransportAction.class),
-            new ActionHandler<>(XPackInfoFeatureAction.VOTING_ONLY, VotingOnlyInfoTransportAction.class)
+            new ActionHandler(XPackUsageFeatureAction.VOTING_ONLY, VotingOnlyUsageTransportAction.class),
+            new ActionHandler(XPackInfoFeatureAction.VOTING_ONLY, VotingOnlyInfoTransportAction.class)
         );
     }
 

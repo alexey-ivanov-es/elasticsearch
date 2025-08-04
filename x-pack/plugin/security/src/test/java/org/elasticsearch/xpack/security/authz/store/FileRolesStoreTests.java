@@ -20,7 +20,7 @@ import org.elasticsearch.license.TestUtils;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.threadpool.TestThreadPool;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.watcher.ResourceWatcherService;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.ParseField;
@@ -565,7 +565,7 @@ public class FileRolesStoreTests extends ESTestCase {
 
             assertEquals(1, modifiedRoles.size());
             assertTrue(modifiedRoles.contains("role5"));
-            final TransportRequest request = mock(TransportRequest.class);
+            final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
             final Authentication authentication = AuthenticationTestHelper.builder().build();
             descriptors = store.roleDescriptors(Collections.singleton("role5"));
             assertThat(descriptors, notNullValue());

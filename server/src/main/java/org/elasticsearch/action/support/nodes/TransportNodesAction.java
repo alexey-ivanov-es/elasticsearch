@@ -32,7 +32,7 @@ import org.elasticsearch.core.Releasables;
 import org.elasticsearch.tasks.CancellableTask;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.transport.TransportChannel;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportService;
@@ -48,7 +48,7 @@ import static org.elasticsearch.core.Strings.format;
 public abstract class TransportNodesAction<
     NodesRequest extends BaseNodesRequest,
     NodesResponse extends BaseNodesResponse<?>,
-    NodeRequest extends TransportRequest,
+    NodeRequest extends AbstractTransportRequest,
     NodeResponse extends BaseNodeResponse,
     ActionContext> extends TransportAction<NodesRequest, NodesResponse> {
 
@@ -233,7 +233,7 @@ public abstract class TransportNodesAction<
 
     /**
      * Implements the request recipient logic.
-     * If access to the request listener is needed, override {@link #nodeOperationAsync(TransportRequest, Task, ActionListener)}.
+     * If access to the request listener is needed, override {@link #nodeOperationAsync(AbstractTransportRequest, Task, ActionListener)}.
      */
     protected abstract NodeResponse nodeOperation(NodeRequest request, Task task);
 

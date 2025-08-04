@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.apmdata;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.common.TriFunction;
@@ -21,7 +21,7 @@ import org.junit.Assert;
  */
 public class VerifyingClient extends NoOpClient {
 
-    private TriFunction<ActionType<?>, ActionRequest, ActionListener<?>, ActionResponse> verifier = (a, r, l) -> {
+    private TriFunction<ActionType<?>, AbstractActionRequest, ActionListener<?>, ActionResponse> verifier = (a, r, l) -> {
         Assert.fail("verifier not set");
         return null;
     };
@@ -32,7 +32,7 @@ public class VerifyingClient extends NoOpClient {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+    protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
         ActionType<Response> action,
         Request request,
         ActionListener<Response> listener
@@ -44,7 +44,7 @@ public class VerifyingClient extends NoOpClient {
         }
     }
 
-    public VerifyingClient setVerifier(TriFunction<ActionType<?>, ActionRequest, ActionListener<?>, ActionResponse> verifier) {
+    public VerifyingClient setVerifier(TriFunction<ActionType<?>, AbstractActionRequest, ActionListener<?>, ActionResponse> verifier) {
         this.verifier = verifier;
         return this;
     }

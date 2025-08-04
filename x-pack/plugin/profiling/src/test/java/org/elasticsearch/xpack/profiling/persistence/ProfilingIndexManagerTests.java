@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.profiling.persistence;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -394,7 +394,7 @@ public class ProfilingIndexManagerTests extends ESTestCase {
     private ActionResponse verifyIndexInstalled(
         AtomicInteger calledTimes,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action == TransportCreateIndexAction.TYPE) {
@@ -412,7 +412,7 @@ public class ProfilingIndexManagerTests extends ESTestCase {
         AtomicInteger indicesCreated,
         AtomicInteger indicesDeleted,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action == TransportCreateIndexAction.TYPE) {
@@ -436,7 +436,7 @@ public class ProfilingIndexManagerTests extends ESTestCase {
         AtomicInteger mappingUpdates,
         AtomicInteger settingsUpdates,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action == TransportPutMappingAction.TYPE) {

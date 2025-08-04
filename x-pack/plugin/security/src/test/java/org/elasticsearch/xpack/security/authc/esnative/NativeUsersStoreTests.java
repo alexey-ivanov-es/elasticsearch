@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.security.authc.esnative;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteRequest;
@@ -73,7 +73,7 @@ public class NativeUsersStoreTests extends ESTestCase {
     private static final String BLANK_PASSWORD = "";
 
     private Client client;
-    private final List<Tuple<ActionRequest, ActionListener<? extends ActionResponse>>> requests = new CopyOnWriteArrayList<>();
+    private final List<Tuple<AbstractActionRequest, ActionListener<? extends ActionResponse>>> requests = new CopyOnWriteArrayList<>();
 
     @Before
     public void setupMocks() {
@@ -85,7 +85,7 @@ public class NativeUsersStoreTests extends ESTestCase {
         client = new FilterClient(mockClient) {
 
             @Override
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -273,7 +273,7 @@ public class NativeUsersStoreTests extends ESTestCase {
     }
 
     @SuppressWarnings("unchecked")
-    private <ARequest extends ActionRequest, AResponse extends ActionResponse> ARequest actionRespond(
+    private <ARequest extends AbstractActionRequest, AResponse extends ActionResponse> ARequest actionRespond(
         Class<ARequest> requestClass,
         AResponse response
     ) {
@@ -282,7 +282,7 @@ public class NativeUsersStoreTests extends ESTestCase {
         return tuple.v1();
     }
 
-    private <ARequest extends ActionRequest> Tuple<ARequest, ActionListener<?>> findRequest(Class<ARequest> requestClass) {
+    private <ARequest extends AbstractActionRequest> Tuple<ARequest, ActionListener<?>> findRequest(Class<ARequest> requestClass) {
         return this.requests.stream()
             .filter(t -> requestClass.isInstance(t.v1()))
             .map(t -> new Tuple<ARequest, ActionListener<?>>(requestClass.cast(t.v1()), t.v2()))

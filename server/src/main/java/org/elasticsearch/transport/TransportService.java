@@ -641,7 +641,7 @@ public class TransportService extends AbstractLifecycleComponent
         return transport.newNetworkBytesStream();
     }
 
-    static class HandshakeRequest extends TransportRequest {
+    static class HandshakeRequest extends AbstractTransportRequest {
 
         public static final HandshakeRequest INSTANCE = new HandshakeRequest();
 

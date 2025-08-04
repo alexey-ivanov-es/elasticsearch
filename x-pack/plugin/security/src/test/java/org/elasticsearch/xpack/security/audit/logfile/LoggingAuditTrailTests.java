@@ -42,7 +42,7 @@ import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.rest.FakeRestRequest;
 import org.elasticsearch.test.rest.FakeRestRequest.Builder;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentType;
@@ -1683,7 +1683,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testAnonymousAccessDeniedTransport() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
 
         final String requestId = randomRequestId();
         auditTrail.anonymousAccessDenied(requestId, "_action", request);
@@ -1744,7 +1744,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
 
     public void testAuthenticationFailed() throws Exception {
         final AuthenticationToken authToken = createAuthenticationToken();
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
 
         final String requestId = randomRequestId();
         auditTrail.authenticationFailed(requestId, authToken, "_action", request);
@@ -1776,7 +1776,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testAuthenticationFailedNoToken() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
 
         final String requestId = randomRequestId();
         auditTrail.authenticationFailed(requestId, "_action", request);
@@ -1890,7 +1890,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
 
     public void testAuthenticationFailedRealm() throws Exception {
         final AuthenticationToken authToken = mockToken();
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String realm = randomAlphaOfLengthBetween(1, 6);
         final String requestId = randomRequestId();
         auditTrail.authenticationFailed(requestId, realm, authToken, "_action", request);
@@ -1961,7 +1961,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testAccessGranted() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String[] expectedRoles = randomArray(0, 4, String[]::new, () -> randomBoolean() ? null : randomAlphaOfLengthBetween(1, 4));
         final AuthorizationInfo authorizationInfo = () -> Collections.singletonMap(PRINCIPAL_ROLES_FIELD_NAME, expectedRoles);
         final String requestId = randomRequestId();
@@ -2021,7 +2021,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
         final String namespace = randomAlphaOfLengthBetween(3, 8);
         final String serviceName = randomAlphaOfLengthBetween(3, 8);
         final String tokenName = randomAlphaOfLengthBetween(3, 8);
-        Tuple<String, TransportRequest> actionAndRequest = randomFrom(
+        Tuple<String, AbstractTransportRequest> actionAndRequest = randomFrom(
             new Tuple<>(PutUserAction.NAME, new PutUserRequest()),
             new Tuple<>(PutRoleAction.NAME, new PutRoleRequest()),
             new Tuple<>(
@@ -2080,7 +2080,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testSystemAccessGranted() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String[] expectedRoles = randomArray(0, 4, String[]::new, () -> randomBoolean() ? null : randomAlphaOfLengthBetween(1, 4));
         final AuthorizationInfo authorizationInfo = () -> Collections.singletonMap(PRINCIPAL_ROLES_FIELD_NAME, expectedRoles);
         final InternalUser systemUser = AuthenticationTestHelper.randomInternalUser();
@@ -2157,7 +2157,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testAccessGrantedInternalSystemAction() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String[] expectedRoles = randomArray(0, 4, String[]::new, () -> randomBoolean() ? null : randomAlphaOfLengthBetween(1, 4));
         final AuthorizationInfo authorizationInfo = () -> Collections.singletonMap(PRINCIPAL_ROLES_FIELD_NAME, expectedRoles);
         final InternalUser systemUser = AuthenticationTestHelper.randomInternalUser();
@@ -2191,7 +2191,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testAccessGrantedInternalSystemActionNonSystemUser() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String[] expectedRoles = randomArray(0, 4, String[]::new, () -> randomBoolean() ? null : randomAlphaOfLengthBetween(1, 4));
         final AuthorizationInfo authorizationInfo = () -> Collections.singletonMap(PRINCIPAL_ROLES_FIELD_NAME, expectedRoles);
         final String requestId = randomRequestId();
@@ -2243,7 +2243,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testAccessDenied() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String[] expectedRoles = randomArray(0, 4, String[]::new, () -> randomBoolean() ? null : randomAlphaOfLengthBetween(1, 4));
         final AuthorizationInfo authorizationInfo = () -> Collections.singletonMap(PRINCIPAL_ROLES_FIELD_NAME, expectedRoles);
         final String requestId = randomRequestId();
@@ -2344,7 +2344,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testTamperedRequest() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
 
         final String requestId = randomRequestId();
         auditTrail.tamperedRequest(requestId, "_action", request);
@@ -2372,7 +2372,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testTamperedRequestWithUser() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String requestId = randomRequestId();
         Map<String, String> checkedFields = new HashMap<>(commonFields);
         Map<String, String[]> checkedArrayFields = new HashMap<>();
@@ -2485,7 +2485,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testRunAsGranted() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String[] expectedRoles = randomArray(0, 4, String[]::new, () -> randomBoolean() ? null : randomAlphaOfLengthBetween(1, 4));
         final AuthorizationInfo authorizationInfo = () -> Collections.singletonMap(PRINCIPAL_ROLES_FIELD_NAME, expectedRoles);
         final RealmRef authRealmRef = AuthenticationTestHelper.randomRealmRef();
@@ -2533,7 +2533,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testRunAsDenied() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String[] expectedRoles = randomArray(0, 4, String[]::new, () -> randomBoolean() ? null : randomAlphaOfLengthBetween(1, 4));
         final AuthorizationInfo authorizationInfo = () -> Collections.singletonMap(PRINCIPAL_ROLES_FIELD_NAME, expectedRoles);
         final RealmRef authRealmRef = AuthenticationTestHelper.randomRealmRef();
@@ -2688,7 +2688,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testAuthenticationSuccessTransport() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String requestId = randomRequestId();
         Map<String, String> checkedFields = new HashMap<>(commonFields);
         Map<String, String[]> checkedArrayFields = new HashMap<>();
@@ -2737,7 +2737,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     public void testCrossClusterAccessAuthenticationSuccessTransport() throws Exception {
-        final TransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
+        final AbstractTransportRequest request = randomBoolean() ? new MockRequest(threadContext) : new MockIndicesRequest(threadContext);
         final String requestId = randomRequestId();
         final Authentication remoteAuthentication = randomFrom(
             AuthenticationTestHelper.builder().realm(false),
@@ -2783,13 +2783,13 @@ public class LoggingAuditTrailTests extends ESTestCase {
         );
         final String realm = randomAlphaOfLengthBetween(1, 6);
         // transport messages without indices
-        final TransportRequest[] requests = new TransportRequest[] {
+        final AbstractTransportRequest[] requests = new AbstractTransportRequest[] {
             new MockRequest(threadContext),
             new org.elasticsearch.action.MockIndicesRequest(IndicesOptions.strictExpandOpenAndForbidClosed(), new String[0]),
             new org.elasticsearch.action.MockIndicesRequest(IndicesOptions.strictExpandOpenAndForbidClosed(), (String[]) null) };
         final List<String> output = CapturingLogger.output(logger.getName(), Level.INFO);
         int logEntriesCount = 1;
-        for (final TransportRequest request : requests) {
+        for (final AbstractTransportRequest request : requests) {
             auditTrail.anonymousAccessDenied("_req_id", "_action", request);
             assertThat(output.size(), is(logEntriesCount++));
             assertThat(output.get(logEntriesCount - 2), not(containsString("indices=")));
@@ -3054,7 +3054,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
         return authentication;
     }
 
-    static class MockRequest extends TransportRequest {
+    static class MockRequest extends AbstractTransportRequest {
 
         MockRequest(ThreadContext threadContext) throws IOException {
             if (randomBoolean()) {
@@ -3105,7 +3105,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
         return randomBoolean() ? randomAlphaOfLengthBetween(8, 24) : AuditUtil.generateRequestId(threadContext);
     }
 
-    private static void restOrTransportOrigin(TransportRequest request, ThreadContext threadContext, Map<String, String> checkedFields) {
+    private static void restOrTransportOrigin(AbstractTransportRequest request, ThreadContext threadContext, Map<String, String> checkedFields) {
         final InetSocketAddress restAddress = RemoteHostHeader.restRemoteAddress(threadContext);
         if (restAddress != null) {
             checkedFields.put(LoggingAuditTrail.ORIGIN_TYPE_FIELD_NAME, LoggingAuditTrail.REST_ORIGIN_FIELD_VALUE);
@@ -3253,7 +3253,7 @@ public class LoggingAuditTrailTests extends ESTestCase {
     }
 
     private static void indicesRequest(
-        TransportRequest request,
+        AbstractTransportRequest request,
         Map<String, String> checkedFields,
         Map<String, String[]> checkedArrayFields
     ) {

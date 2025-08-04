@@ -11,6 +11,7 @@ package org.elasticsearch.ingest.geoip;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteRequest.OpType;
@@ -558,6 +559,21 @@ public class EnterpriseGeoIpDownloaderTests extends ESTestCase {
             } else {
                 throw new IllegalStateException("unexpected action called [" + action.name() + "]");
             }
+        }
+
+        @Override
+        protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+            Request request,
+            ActionListener<Response> listener
+        ) {
+            /*if (handlers.containsKey(action)) {
+                BiConsumer<AbstractActionRequest, ActionListener<?>> biConsumer = (BiConsumer<AbstractActionRequest, ActionListener<?>>) handlers.get(
+                    action
+                );
+                biConsumer.accept(request, listener);
+            } else {*/
+                throw new IllegalStateException("unexpected action called [" + request.getClass().getName() + "]");
+            //}
         }
     }
 }

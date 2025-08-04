@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.profiling.persistence;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.template.put.PutComponentTemplateAction;
@@ -394,7 +394,7 @@ public class ProfilingIndexTemplateRegistryTests extends ESTestCase {
     private ActionResponse verifyComposableTemplateInstalled(
         AtomicInteger calledTimes,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action instanceof PutComponentTemplateAction) {

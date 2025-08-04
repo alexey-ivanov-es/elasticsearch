@@ -64,7 +64,7 @@ import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.EmptyRequest;
 import org.elasticsearch.transport.NoSuchRemoteClusterException;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.graph.action.GraphExploreAction;
 import org.elasticsearch.xpack.core.security.authc.Authentication.RealmRef;
 import org.elasticsearch.xpack.core.security.authc.Subject;
@@ -1667,18 +1667,18 @@ public class IndicesAndAliasesResolverTests extends ESTestCase {
      */
     public void testRemotableRequestsAllowRemoteIndices() {
         IndicesOptions options = IndicesOptions.fromOptions(true, false, false, false);
-        Tuple<TransportRequest, String> tuple = randomFrom(
-            new Tuple<TransportRequest, String>(new SearchRequest("remote:foo").indicesOptions(options), TransportSearchAction.TYPE.name()),
-            new Tuple<TransportRequest, String>(
+        Tuple<AbstractTransportRequest, String> tuple = randomFrom(
+            new Tuple<AbstractTransportRequest, String>(new SearchRequest("remote:foo").indicesOptions(options), TransportSearchAction.TYPE.name()),
+            new Tuple<AbstractTransportRequest, String>(
                 new FieldCapabilitiesRequest().indices("remote:foo").indicesOptions(options),
                 TransportFieldCapabilitiesAction.NAME
             ),
-            new Tuple<TransportRequest, String>(
+            new Tuple<AbstractTransportRequest, String>(
                 new GraphExploreRequest().indices("remote:foo").indicesOptions(options),
                 GraphExploreAction.NAME
             )
         );
-        final TransportRequest request = tuple.v1();
+        final AbstractTransportRequest request = tuple.v1();
         ResolvedIndices resolved = resolveIndices(request, buildAuthorizedIndices(user, tuple.v2()));
         assertThat(resolved.getRemote(), containsInAnyOrder("remote:foo"));
         assertThat(resolved.getLocal(), emptyIterable());
@@ -1690,16 +1690,16 @@ public class IndicesAndAliasesResolverTests extends ESTestCase {
      */
     public void testNonRemotableRequestDoesNotAllowRemoteIndices() {
         IndicesOptions options = IndicesOptions.fromOptions(true, false, false, false);
-        Tuple<TransportRequest, String> tuple = randomFrom(
-            new Tuple<TransportRequest, String>(
+        Tuple<AbstractTransportRequest, String> tuple = randomFrom(
+            new Tuple<AbstractTransportRequest, String>(
                 new CloseIndexRequest("remote:foo").indicesOptions(options),
                 TransportCloseIndexAction.NAME
             ),
-            new Tuple<TransportRequest, String>(
+            new Tuple<AbstractTransportRequest, String>(
                 new DeleteIndexRequest("remote:foo").indicesOptions(options),
                 TransportDeleteIndexAction.TYPE.name()
             ),
-            new Tuple<TransportRequest, String>(
+            new Tuple<AbstractTransportRequest, String>(
                 new PutMappingRequest("remote:foo").indicesOptions(options),
                 TransportPutMappingAction.TYPE.name()
             )
@@ -1713,20 +1713,20 @@ public class IndicesAndAliasesResolverTests extends ESTestCase {
 
     public void testNonRemotableRequestDoesNotAllowRemoteWildcardIndices() {
         IndicesOptions options = IndicesOptions.fromOptions(randomBoolean(), true, true, true);
-        Tuple<TransportRequest, String> tuple = randomFrom(
-            new Tuple<TransportRequest, String>(new CloseIndexRequest("*:*").indicesOptions(options), TransportCloseIndexAction.NAME),
-            new Tuple<TransportRequest, String>(
+        Tuple<AbstractTransportRequest, String> tuple = randomFrom(
+            new Tuple<AbstractTransportRequest, String>(new CloseIndexRequest("*:*").indicesOptions(options), TransportCloseIndexAction.NAME),
+            new Tuple<AbstractTransportRequest, String>(
                 new DeleteIndexRequest("*:*").indicesOptions(options),
                 TransportDeleteIndexAction.TYPE.name()
             ),
-            new Tuple<TransportRequest, String>(new PutMappingRequest("*:*").indicesOptions(options), TransportPutMappingAction.TYPE.name())
+            new Tuple<AbstractTransportRequest, String>(new PutMappingRequest("*:*").indicesOptions(options), TransportPutMappingAction.TYPE.name())
         );
         final ResolvedIndices resolved = resolveIndices(tuple.v1(), buildAuthorizedIndices(user, tuple.v2()));
         assertNoIndices((IndicesRequest.Replaceable) tuple.v1(), resolved);
     }
 
     public void testCompositeIndicesRequestIsNotSupported() {
-        TransportRequest request = randomFrom(
+        AbstractTransportRequest request = randomFrom(
             new MultiSearchRequest(),
             new MultiGetRequest(),
             new MultiTermVectorsRequest(),
@@ -2643,7 +2643,7 @@ public class IndicesAndAliasesResolverTests extends ESTestCase {
         return buildAuthorizedIndices(user, action, new EmptyRequest());
     }
 
-    private AuthorizedIndices buildAuthorizedIndices(User user, String action, TransportRequest request) {
+    private AuthorizedIndices buildAuthorizedIndices(User user, String action, AbstractTransportRequest request) {
         PlainActionFuture<Role> rolesListener = new PlainActionFuture<>();
         final Subject subject = new Subject(user, new RealmRef("test", "indices-aliases-resolver-tests", "node"));
         rolesStore.getRole(subject, rolesListener);
@@ -2659,11 +2659,11 @@ public class IndicesAndAliasesResolverTests extends ESTestCase {
         return IndexMetadata.builder(index).settings(indexSettings(1, 0));
     }
 
-    private ResolvedIndices resolveIndices(TransportRequest request, AuthorizedIndices authorizedIndices) {
+    private ResolvedIndices resolveIndices(AbstractTransportRequest request, AuthorizedIndices authorizedIndices) {
         return resolveIndices("indices:/" + randomAlphaOfLength(8), request, authorizedIndices);
     }
 
-    private ResolvedIndices resolveIndices(String action, TransportRequest request, AuthorizedIndices authorizedIndices) {
+    private ResolvedIndices resolveIndices(String action, AbstractTransportRequest request, AuthorizedIndices authorizedIndices) {
         return defaultIndicesResolver.resolve(action, request, this.projectMetadata, authorizedIndices);
     }
 

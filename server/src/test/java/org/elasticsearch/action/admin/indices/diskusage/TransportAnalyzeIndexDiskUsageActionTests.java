@@ -39,7 +39,7 @@ import org.elasticsearch.threadpool.TestThreadPool;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.NodeDisconnectedException;
 import org.elasticsearch.transport.TransportException;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportResponseHandler;
 import org.elasticsearch.transport.TransportService;
@@ -375,7 +375,7 @@ public class TransportAnalyzeIndexDiskUsageActionTests extends ESTestCase {
         public <T extends TransportResponse> void sendRequest(
             DiscoveryNode node,
             String action,
-            TransportRequest request,
+            AbstractTransportRequest request,
             TransportResponseHandler<T> handler
         ) {
             CapturingRequest capturingRequest = new CapturingRequest(

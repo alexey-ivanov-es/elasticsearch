@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.sql.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -24,7 +24,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
  * <p>
  * Contains information about the client mode that can be used to generate different responses based on the caller type.
  */
-public abstract class AbstractSqlRequest extends ActionRequest {
+public abstract class AbstractSqlRequest extends AbstractActionRequest {
 
     private RequestInfo requestInfo;
 

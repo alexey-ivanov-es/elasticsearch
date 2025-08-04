@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.security.action.saml;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
 
-public class SamlSpMetadataRequest extends ActionRequest {
+public class SamlSpMetadataRequest extends AbstractActionRequest {
 
     private String realmName;
 

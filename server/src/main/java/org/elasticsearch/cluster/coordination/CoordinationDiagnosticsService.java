@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionListenerResponseHandler;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.admin.cluster.coordination.ClusterFormationInfoAction;
 import org.elasticsearch.action.admin.cluster.coordination.CoordinationDiagnosticsAction;
@@ -1094,7 +1094,7 @@ public class CoordinationDiagnosticsService implements ClusterStateListener {
         Consumer<T> responseConsumer,
         String actionName,
         Writeable.Reader<R> responseReader,
-        ActionRequest transportActionRequest,
+        AbstractActionRequest transportActionRequest,
         BiFunction<R, Exception, T> responseTransformationFunction
     ) {
         ListenableFuture<Releasable> connectionListener = new ListenableFuture<>();

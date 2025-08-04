@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.internal.Client;
@@ -127,7 +127,7 @@ public class TrainedModelAssignmentService {
     protected void waitForNewMasterAndRetry(
         ClusterStateObserver observer,
         ActionType<AcknowledgedResponse> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<AcknowledgedResponse> listener
     ) {
         observer.waitForNextChange(new ClusterStateObserver.Listener() {

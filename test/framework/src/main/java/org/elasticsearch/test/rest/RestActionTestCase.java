@@ -123,7 +123,7 @@ public abstract class RestActionTestCase extends ESTestCase {
             @SuppressWarnings("unchecked")
             BiFunction<ActionType<?>, ActionRequest, ActionResponse> pasteGenerics = (BiFunction<
                 ActionType<?>,
-                ActionRequest,
+                    ActionRequest,
                 ActionResponse>) dropTypeInfo;
             executeVerifier.set(pasteGenerics);
         }

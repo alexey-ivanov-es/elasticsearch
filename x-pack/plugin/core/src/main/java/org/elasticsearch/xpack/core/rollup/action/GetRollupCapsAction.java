@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.rollup.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -37,7 +37,7 @@ public class GetRollupCapsAction extends ActionType<GetRollupCapsAction.Response
         super(NAME);
     }
 
-    public static class Request extends ActionRequest implements ToXContentFragment {
+    public static class Request extends AbstractActionRequest implements ToXContentFragment {
         private String indexPattern;
 
         public Request(String indexPattern) {

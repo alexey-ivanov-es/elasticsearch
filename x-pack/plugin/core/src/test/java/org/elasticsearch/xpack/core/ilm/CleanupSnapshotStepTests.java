@@ -7,7 +7,9 @@
 package org.elasticsearch.xpack.core.ilm;
 
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.snapshots.delete.DeleteSnapshotRequest;
@@ -123,6 +125,16 @@ public class CleanupSnapshotStepTests extends AbstractStepTestCase<CleanupSnapsh
                 ActionListener<Response> listener
             ) {
                 assertThat(action.name(), is(TransportDeleteSnapshotAction.TYPE.name()));
+                assertTrue(request instanceof DeleteSnapshotRequest);
+                assertThat(((DeleteSnapshotRequest) request).snapshots(), arrayContaining(expectedSnapshotName));
+            }
+
+            @Override
+            protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+                Request request,
+                ActionListener<Response> listener
+            ) {
+                //assertThat(action.name(), is(TransportDeleteSnapshotAction.TYPE.name()));
                 assertTrue(request instanceof DeleteSnapshotRequest);
                 assertThat(((DeleteSnapshotRequest) request).snapshots(), arrayContaining(expectedSnapshotName));
             }

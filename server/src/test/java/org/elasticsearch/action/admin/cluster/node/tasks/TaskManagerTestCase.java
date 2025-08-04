@@ -43,7 +43,7 @@ import org.elasticsearch.test.tasks.MockTaskManager;
 import org.elasticsearch.threadpool.TestThreadPool;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.AbstractSimpleTransportTestCase;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.transport.TransportSettings;
 import org.elasticsearch.transport.netty4.Netty4Transport;
@@ -137,7 +137,7 @@ public abstract class TaskManagerTestCase extends ESTestCase {
     /**
      * Simulates node-based task that can be used to block node tasks so they are guaranteed to be registered by task manager
      */
-    abstract class AbstractTestNodesAction<NodesRequest extends BaseNodesRequest, NodeRequest extends TransportRequest> extends
+    abstract class AbstractTestNodesAction<NodesRequest extends BaseNodesRequest, NodeRequest extends AbstractTransportRequest> extends
         TransportNodesAction<NodesRequest, NodesResponse, NodeRequest, NodeResponse, Void> {
 
         AbstractTestNodesAction(

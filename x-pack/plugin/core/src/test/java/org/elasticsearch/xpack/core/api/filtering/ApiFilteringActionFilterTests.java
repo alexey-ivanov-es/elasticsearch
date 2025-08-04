@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.core.api.filtering;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionFilterChain;
@@ -127,7 +127,7 @@ public class ApiFilteringActionFilterTests extends ESTestCase {
         return new ThreadContext(settings);
     }
 
-    private static class TestRequest extends ActionRequest {
+    private static class TestRequest extends AbstractActionRequest {
         @Override
         public ActionRequestValidationException validate() {
             return null;

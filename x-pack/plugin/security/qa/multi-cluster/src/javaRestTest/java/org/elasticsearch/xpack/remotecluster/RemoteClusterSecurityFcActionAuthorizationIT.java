@@ -10,7 +10,7 @@ package org.elasticsearch.xpack.remotecluster;
 import org.elasticsearch.ElasticsearchSecurityException;
 import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.TransportVersion;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.RemoteClusterActionType;
@@ -122,7 +122,7 @@ public class RemoteClusterSecurityFcActionAuthorizationIT extends ESRestTestCase
         ThreadPool.terminate(threadPool, 10, TimeUnit.SECONDS);
     }
 
-    private static <Request extends ActionRequest, Response extends ActionResponse> Response executeRemote(
+    private static <Request extends AbstractActionRequest, Response extends ActionResponse> Response executeRemote(
         RemoteClusterClient client,
         RemoteClusterActionType<Response> action,
         Request request
@@ -633,7 +633,7 @@ public class RemoteClusterSecurityFcActionAuthorizationIT extends ESRestTestCase
         return service;
     }
 
-    private static class MalformedGetRequest extends ActionRequest {
+    private static class MalformedGetRequest extends AbstractActionRequest {
         private final String otherIndexId;
 
         MalformedGetRequest(String otherIndexId) {

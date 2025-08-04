@@ -16,7 +16,7 @@ import org.elasticsearch.common.UUIDs;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.concurrent.ThreadContext;
 import org.elasticsearch.test.ESTestCase;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.action.apikey.ApiKey;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationResult;
@@ -97,7 +97,7 @@ public class CrossClusterAccessAuthenticationServiceTests extends ESTestCase {
         doAnswer(i -> null).when(authenticationService).authenticate(any(Authenticator.Context.class), listenerCaptor.capture());
 
         final PlainActionFuture<Authentication> future = new PlainActionFuture<>();
-        crossClusterAccessAuthenticationService.authenticate("action", mock(TransportRequest.class), future);
+        crossClusterAccessAuthenticationService.authenticate("action", mock(AbstractTransportRequest.class), future);
         final Authentication apiKeyAuthentication = AuthenticationTestHelper.builder().apiKey().build(false);
         listenerCaptor.getValue().onResponse(apiKeyAuthentication);
         future.get();
@@ -143,7 +143,7 @@ public class CrossClusterAccessAuthenticationServiceTests extends ESTestCase {
         doAnswer(i -> null).when(authenticationService).authenticate(any(Authenticator.Context.class), listenerCaptor.capture());
 
         final PlainActionFuture<Authentication> future = new PlainActionFuture<>();
-        crossClusterAccessAuthenticationService.authenticate("action", mock(TransportRequest.class), future);
+        crossClusterAccessAuthenticationService.authenticate("action", mock(AbstractTransportRequest.class), future);
         final Authentication apiKeyAuthentication = AuthenticationTestHelper.builder().apiKey().build(false);
         listenerCaptor.getValue().onResponse(apiKeyAuthentication);
 
@@ -184,7 +184,7 @@ public class CrossClusterAccessAuthenticationServiceTests extends ESTestCase {
         doAnswer(i -> null).when(authenticationService).authenticate(any(Authenticator.Context.class), listenerCaptor.capture());
 
         final PlainActionFuture<Authentication> future = new PlainActionFuture<>();
-        crossClusterAccessAuthenticationService.authenticate("action", mock(TransportRequest.class), future);
+        crossClusterAccessAuthenticationService.authenticate("action", mock(AbstractTransportRequest.class), future);
         final ElasticsearchSecurityException authenticationFailure = new ElasticsearchSecurityException("authentication failure");
         listenerCaptor.getValue().onFailure(authenticationFailure);
 

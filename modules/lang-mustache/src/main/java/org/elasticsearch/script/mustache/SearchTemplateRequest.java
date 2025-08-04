@@ -9,7 +9,7 @@
 
 package org.elasticsearch.script.mustache;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.CompositeIndicesRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -34,7 +34,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * A request to execute a search based on a search template.
  */
-public class SearchTemplateRequest extends ActionRequest implements CompositeIndicesRequest, ToXContentObject {
+public class SearchTemplateRequest extends AbstractActionRequest implements CompositeIndicesRequest, ToXContentObject {
 
     private SearchRequest request;
     private boolean simulate = false;

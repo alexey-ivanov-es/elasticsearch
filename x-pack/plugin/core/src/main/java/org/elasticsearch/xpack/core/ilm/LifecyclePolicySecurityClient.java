@@ -9,6 +9,7 @@ package org.elasticsearch.xpack.core.ilm;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.client.internal.Client;
@@ -46,6 +47,14 @@ public class LifecyclePolicySecurityClient extends AbstractClient {
         ActionListener<Response> listener
     ) {
         ClientHelper.executeWithHeadersAsync(headers, origin, client, action, request, listener);
+    }
+
+    @Override
+    protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+        Request request,
+        ActionListener<Response> listener
+    ) {
+        ClientHelper.executeWithHeadersAsync(headers, origin, client, request, listener);
     }
 
 }

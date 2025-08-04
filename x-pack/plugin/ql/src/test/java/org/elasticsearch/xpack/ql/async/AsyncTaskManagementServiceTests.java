@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.ql.async;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionTestUtils;
@@ -50,7 +50,7 @@ public class AsyncTaskManagementServiceTests extends ESSingleNodeTestCase {
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    public static class TestRequest extends ActionRequest {
+    public static class TestRequest extends AbstractActionRequest {
         private final String string;
 
         public TestRequest(String string) {

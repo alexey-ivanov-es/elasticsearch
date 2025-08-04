@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionListenerResponseHandler;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.ActionFilters;
@@ -637,7 +637,7 @@ class BlobAnalyzeAction extends HandledTransportAction<BlobAnalyzeAction.Request
         }
     }
 
-    static class Request extends ActionRequest {
+    static class Request extends AbstractActionRequest {
         private final String repositoryName;
         private final String blobPath;
         private final String blobName;

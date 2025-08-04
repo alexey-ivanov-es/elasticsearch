@@ -10,7 +10,7 @@
 package org.elasticsearch.action.admin.cluster.remote;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -46,7 +46,7 @@ public class RemoteClusterNodesAction {
         RemoteClusterNodesAction.Response::new
     );
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
         public static final Request ALL_NODES = new Request(false);
         public static final Request REMOTE_CLUSTER_SERVER_NODES = new Request(true);
         private final boolean remoteClusterServer;

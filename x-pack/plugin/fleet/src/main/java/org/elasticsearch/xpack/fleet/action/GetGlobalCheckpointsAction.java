@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.fleet.action;
 
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionRunnable;
@@ -90,7 +90,7 @@ public class GetGlobalCheckpointsAction extends ActionType<GetGlobalCheckpointsA
         }
     }
 
-    public static class Request extends ActionRequest implements IndicesRequest {
+    public static class Request extends AbstractActionRequest implements IndicesRequest {
 
         private final String index;
         private final boolean waitForAdvance;

@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.core.termsenum.action;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.ActionFilters;
@@ -69,18 +69,17 @@ public class RestTermsEnumActionTests extends ESTestCase {
     public static void stubTermEnumAction() {
         final TaskManager taskManager = new TaskManager(Settings.EMPTY, threadPool, Collections.emptySet());
 
-        final TransportAction<? extends ActionRequest, ? extends ActionResponse> transportAction = new TransportAction<>(
+        final TransportAction<? extends AbstractActionRequest, ? extends ActionResponse> transportAction = new TransportAction<>(
             TermsEnumAction.NAME,
             new ActionFilters(Collections.emptySet()),
             taskManager,
             EsExecutors.DIRECT_EXECUTOR_SERVICE
         ) {
             @Override
-            protected void doExecute(Task task, ActionRequest request, ActionListener<ActionResponse> listener) {}
+            protected void doExecute(Task task, AbstractActionRequest request, ActionListener<ActionResponse> listener) {}
         };
 
-        final Map<ActionType<? extends ActionResponse>, TransportAction<? extends ActionRequest, ? extends ActionResponse>> actions =
-            new HashMap<>();
+        final Map<ActionType<?>, TransportAction<?, ?>> actions = new HashMap<>();
         actions.put(TermsEnumAction.INSTANCE, transportAction);
 
         client.initialize(actions, taskManager, () -> "local", mock(Transport.Connection.class), null);

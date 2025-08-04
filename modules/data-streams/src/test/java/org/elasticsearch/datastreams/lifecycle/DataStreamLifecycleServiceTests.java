@@ -11,7 +11,9 @@ package org.elasticsearch.datastreams.lifecycle;
 
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -80,6 +82,7 @@ import org.elasticsearch.test.client.NoOpClient;
 import org.elasticsearch.test.gateway.TestGatewayAllocator;
 import org.elasticsearch.threadpool.TestThreadPool;
 import org.elasticsearch.threadpool.ThreadPool;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -1777,6 +1780,17 @@ public class DataStreamLifecycleServiceTests extends ESTestCase {
                 clientSeenRequests.add(request);
                 if (clientDelegate != null) {
                     clientDelegate.doExecute(action, request, listener);
+                }
+            }
+
+            @Override
+            protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+                Request request,
+                ActionListener<Response> listener
+            ) {
+                clientSeenRequests.add(request);
+                if (clientDelegate != null) {
+                    //clientDelegate.doExecute(action, request, listener);
                 }
             }
         };

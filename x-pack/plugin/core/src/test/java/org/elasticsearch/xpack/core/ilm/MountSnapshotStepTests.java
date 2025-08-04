@@ -7,7 +7,9 @@
 package org.elasticsearch.xpack.core.ilm;
 
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.snapshots.restore.RestoreSnapshotResponse;
@@ -456,6 +458,14 @@ public class MountSnapshotStepTests extends AbstractStepTestCase<MountSnapshotSt
             ) {
                 listener.onResponse((Response) response);
             }
+
+            @Override
+            protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+                Request request,
+                ActionListener<Response> listener
+            ) {
+                listener.onResponse((Response) response);
+            }
         };
     }
 
@@ -479,6 +489,54 @@ public class MountSnapshotStepTests extends AbstractStepTestCase<MountSnapshotSt
                 ActionListener<Response> listener
             ) {
                 assertThat(action.name(), is(MountSearchableSnapshotAction.NAME));
+                assertTrue(request instanceof MountSearchableSnapshotRequest);
+                MountSearchableSnapshotRequest mountSearchableSnapshotRequest = (MountSearchableSnapshotRequest) request;
+                assertThat(mountSearchableSnapshotRequest.repositoryName(), is(expectedRepoName));
+                assertThat(mountSearchableSnapshotRequest.snapshotName(), is(expectedSnapshotName));
+                assertThat(
+                    "another ILM step will wait for the restore to complete. the " + MountSnapshotStep.NAME + " step should not",
+                    mountSearchableSnapshotRequest.waitForCompletion(),
+                    is(false)
+                );
+                assertThat(mountSearchableSnapshotRequest.ignoreIndexSettings(), is(expectedIgnoredIndexSettings));
+                assertThat(mountSearchableSnapshotRequest.mountedIndexName(), is(restoredIndexPrefix + indexName));
+                assertThat(mountSearchableSnapshotRequest.snapshotIndexName(), is(expectedSnapshotIndexName));
+
+                if (totalShardsPerNode != null) {
+                    Integer totalShardsPerNodeSettingValue = ShardsLimitAllocationDecider.INDEX_TOTAL_SHARDS_PER_NODE_SETTING.get(
+                        mountSearchableSnapshotRequest.indexSettings()
+                    );
+                    assertThat(totalShardsPerNodeSettingValue, is(totalShardsPerNode));
+                } else {
+                    assertThat(
+                        mountSearchableSnapshotRequest.indexSettings()
+                            .hasValue(ShardsLimitAllocationDecider.INDEX_TOTAL_SHARDS_PER_NODE_SETTING.getKey()),
+                        is(false)
+                    );
+                }
+
+                if (replicas > 0) {
+                    Integer numberOfReplicasSettingValue = IndexMetadata.INDEX_NUMBER_OF_REPLICAS_SETTING.get(
+                        mountSearchableSnapshotRequest.indexSettings()
+                    );
+                    assertThat(numberOfReplicasSettingValue, is(replicas));
+                } else {
+                    assertThat(
+                        mountSearchableSnapshotRequest.indexSettings().hasValue(IndexMetadata.INDEX_NUMBER_OF_REPLICAS_SETTING.getKey()),
+                        is(false)
+                    );
+                }
+
+                // invoke the awaiting listener with a very generic 'response', just to fulfill the contract
+                listener.onResponse((Response) new RestoreSnapshotResponse((RestoreInfo) null));
+            }
+
+            @Override
+            protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+                Request request,
+                ActionListener<Response> listener
+            ) {
+                //assertThat(action.name(), is(MountSearchableSnapshotAction.NAME));
                 assertTrue(request instanceof MountSearchableSnapshotRequest);
                 MountSearchableSnapshotRequest mountSearchableSnapshotRequest = (MountSearchableSnapshotRequest) request;
                 assertThat(mountSearchableSnapshotRequest.repositoryName(), is(expectedRepoName));

@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.core.action;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.client.internal.node.NodeClient;
@@ -54,7 +54,7 @@ public class TransportXPackInfoActionTests extends ESTestCase {
         for (ActionType<XPackInfoFeatureResponse> infoAction : randomSubsetOf(featureSetCount, XPackInfoFeatureAction.ALL)) {
             FeatureSet featureSet = new FeatureSet(randomAlphaOfLength(5), randomBoolean(), randomBoolean());
             featureSets.put(infoAction, featureSet);
-            when(client.executeLocally(eq(infoAction), any(ActionRequest.class), any(ActionListener.class))).thenAnswer(answer -> {
+            when(client.executeLocally(eq(infoAction), any(AbstractActionRequest.class), any(ActionListener.class))).thenAnswer(answer -> {
                 var listener = (ActionListener<XPackInfoFeatureResponse>) answer.getArguments()[2];
                 listener.onResponse(new XPackInfoFeatureResponse(featureSet));
                 return null;

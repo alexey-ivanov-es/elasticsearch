@@ -9,7 +9,7 @@
 
 package org.elasticsearch.action.support.single.shard;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.ValidateActions;
@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class SingleShardRequest<Request extends SingleShardRequest<Request>> extends ActionRequest
+public abstract class SingleShardRequest<Request extends SingleShardRequest<Request>> extends AbstractActionRequest
     implements
         IndicesRequest.RemoteClusterShardRequest {
 

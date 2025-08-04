@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.core.security.action.user;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -20,7 +20,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Request to retrieve a native user.
  */
-public class GetUsersRequest extends ActionRequest implements UserRequest {
+public class GetUsersRequest extends AbstractActionRequest implements UserRequest {
 
     private String[] usernames;
     private boolean withProfileUid;

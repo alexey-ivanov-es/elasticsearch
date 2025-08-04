@@ -18,7 +18,7 @@ import org.elasticsearch.index.engine.Engine;
 import org.elasticsearch.index.shard.IndexShard;
 import org.elasticsearch.search.RescoreDocIds;
 import org.elasticsearch.search.dfs.AggregatedDfs;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +73,7 @@ public class ReaderContext implements Releasable {
         this.refCounted = AbstractRefCounted.of(this::doClose);
     }
 
-    public void validate(TransportRequest request) {
+    public void validate(AbstractTransportRequest request) {
         indexShard.getSearchOperationListener().validateReaderContext(this, request);
     }
 

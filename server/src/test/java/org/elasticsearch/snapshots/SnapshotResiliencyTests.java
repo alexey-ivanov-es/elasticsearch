@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionRunnable;
 import org.elasticsearch.action.ActionType;
@@ -194,6 +194,7 @@ import org.elasticsearch.transport.BytesRefRecycler;
 import org.elasticsearch.transport.DisruptableMockTransport;
 import org.elasticsearch.transport.TestTransportChannel;
 import org.elasticsearch.transport.TransportInterceptor;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportService;
@@ -2264,7 +2265,7 @@ public class SnapshotResiliencyTests extends ESTestCase {
                     threadPool
                 );
                 nodeConnectionsService = new NodeConnectionsService(clusterService.getSettings(), threadPool, transportService);
-                Map<ActionType<? extends ActionResponse>, TransportAction<? extends ActionRequest, ? extends ActionResponse>> actions =
+                Map<ActionType<?>, TransportAction<?, ?>> actions =
                     new HashMap<>();
                 actions.put(
                     GlobalCheckpointSyncAction.TYPE,

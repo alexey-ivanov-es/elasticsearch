@@ -7,7 +7,9 @@
 package org.elasticsearch.xpack.core.ilm;
 
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.snapshots.create.CreateSnapshotRequest;
@@ -231,6 +233,30 @@ public class CreateSnapshotStepTests extends AbstractStepTestCase<CreateSnapshot
                 ActionListener<Response> listener
             ) {
                 assertThat(action.name(), is(TransportCreateSnapshotAction.TYPE.name()));
+                assertTrue(request instanceof CreateSnapshotRequest);
+                CreateSnapshotRequest createSnapshotRequest = (CreateSnapshotRequest) request;
+                assertThat(createSnapshotRequest.indices().length, is(1));
+                assertThat(createSnapshotRequest.indices()[0], is(indexName));
+                assertThat(createSnapshotRequest.repository(), is(expectedRepoName));
+                assertThat(createSnapshotRequest.snapshot(), is(expectedSnapshotName));
+                assertThat(
+                    CreateSnapshotStep.NAME + " waits for the create snapshot request to complete",
+                    createSnapshotRequest.waitForCompletion(),
+                    is(true)
+                );
+                assertThat(
+                    "ILM generated snapshots should not include global state",
+                    createSnapshotRequest.includeGlobalState(),
+                    is(false)
+                );
+            }
+
+            @Override
+            protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+                Request request,
+                ActionListener<Response> listener
+            ) {
+                //assertThat(action.name(), is(TransportCreateSnapshotAction.TYPE.name()));
                 assertTrue(request instanceof CreateSnapshotRequest);
                 CreateSnapshotRequest createSnapshotRequest = (CreateSnapshotRequest) request;
                 assertThat(createSnapshotRequest.indices().length, is(1));

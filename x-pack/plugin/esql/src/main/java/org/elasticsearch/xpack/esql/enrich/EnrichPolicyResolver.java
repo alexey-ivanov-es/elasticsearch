@@ -29,7 +29,7 @@ import org.elasticsearch.transport.RemoteClusterAware;
 import org.elasticsearch.transport.RemoteClusterService;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportChannel;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponse;
@@ -332,7 +332,7 @@ public class EnrichPolicyResolver {
         }
     }
 
-    private static class LookupRequest extends TransportRequest {
+    private static class LookupRequest extends AbstractTransportRequest {
         private final String clusterAlias;
         private final Collection<String> policyNames;
 

@@ -10,7 +10,7 @@
 package org.elasticsearch.action.bulk;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteRequest;
@@ -1068,7 +1068,7 @@ public class BulkOperationTests extends ESTestCase {
         return new NoOpNodeClient(threadPool) {
             @Override
             @SuppressWarnings("unchecked")
-            public <Request extends ActionRequest, Response extends ActionResponse> Task executeLocally(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> Task executeLocally(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -1090,7 +1090,7 @@ public class BulkOperationTests extends ESTestCase {
 
             @Override
             @SuppressWarnings("unchecked")
-            public <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            public <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

@@ -10,7 +10,7 @@
 package org.elasticsearch.action.termvectors;
 
 import org.elasticsearch.ElasticsearchParseException;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.CompositeIndicesRequest;
 import org.elasticsearch.action.RealtimeRequest;
@@ -30,7 +30,7 @@ import java.util.Set;
 
 // It's not possible to suppress teh warning at #realtime(boolean) at a method-level.
 @SuppressWarnings("unchecked")
-public class MultiTermVectorsRequest extends ActionRequest
+public class MultiTermVectorsRequest extends AbstractActionRequest
     implements
         Iterable<TermVectorsRequest>,
         CompositeIndicesRequest,

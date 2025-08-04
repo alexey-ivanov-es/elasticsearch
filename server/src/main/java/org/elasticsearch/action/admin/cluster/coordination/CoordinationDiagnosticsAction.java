@@ -10,7 +10,7 @@
 package org.elasticsearch.action.admin.cluster.coordination;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -42,7 +42,7 @@ public class CoordinationDiagnosticsAction extends ActionType<CoordinationDiagno
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
         final boolean explain; // Non-private for testing
 
         public Request(boolean explain) {

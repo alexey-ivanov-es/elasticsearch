@@ -15,7 +15,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.RequestBuilder;
@@ -412,12 +412,12 @@ public class ElasticsearchAssertions {
         assertThat(searchResponse.getHits().getAt(number - 1), matcher);
     }
 
-    public static void assertNoFailures(RequestBuilder<? extends ActionRequest, SearchResponse> searchRequestBuilder) {
+    public static void assertNoFailures(RequestBuilder<? extends AbstractActionRequest, SearchResponse> searchRequestBuilder) {
         assertNoFailuresAndResponse(searchRequestBuilder, r -> {});
     }
 
     public static void assertNoFailuresAndResponse(
-        RequestBuilder<? extends ActionRequest, SearchResponse> searchRequestBuilder,
+        RequestBuilder<? extends AbstractActionRequest, SearchResponse> searchRequestBuilder,
         Consumer<SearchResponse> consumer
     ) {
         assertResponse(searchRequestBuilder, res -> {
@@ -442,7 +442,7 @@ public class ElasticsearchAssertions {
      * concurrently.
      */
     @SafeVarargs
-    public static <Q extends ActionRequest, R extends ActionResponse> void assertResponses(
+    public static <Q extends AbstractActionRequest, R extends ActionResponse> void assertResponses(
         Consumer<R> consumer,
         RequestBuilder<Q, R>... searchRequestBuilder
     ) {
@@ -468,7 +468,7 @@ public class ElasticsearchAssertions {
         }
     }
 
-    public static <Q extends ActionRequest, R extends ActionResponse> void assertResponse(
+    public static <Q extends AbstractActionRequest, R extends ActionResponse> void assertResponse(
         RequestBuilder<Q, R> searchRequestBuilder,
         Consumer<R> consumer
     ) {

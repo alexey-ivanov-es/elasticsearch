@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.eql.action;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.support.IndicesOptions;
@@ -42,7 +42,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 import static org.elasticsearch.xpack.eql.action.RequestDefaults.FIELD_EVENT_CATEGORY;
 import static org.elasticsearch.xpack.eql.action.RequestDefaults.FIELD_TIMESTAMP;
 
-public class EqlSearchRequest extends ActionRequest implements IndicesRequest.Replaceable, ToXContent {
+public class EqlSearchRequest extends AbstractActionRequest implements IndicesRequest.Replaceable, ToXContent {
 
     public static final long MIN_KEEP_ALIVE = TimeValue.timeValueMinutes(1).millis();
     public static final TimeValue DEFAULT_KEEP_ALIVE = TimeValue.timeValueDays(5);

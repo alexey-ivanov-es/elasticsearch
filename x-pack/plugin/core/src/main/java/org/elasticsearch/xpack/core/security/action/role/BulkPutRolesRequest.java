@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.security.action.role;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.TransportAction;
 import org.elasticsearch.action.support.WriteRequest;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-public class BulkPutRolesRequest extends ActionRequest {
+public class BulkPutRolesRequest extends AbstractActionRequest {
 
     private List<RoleDescriptor> roles;
 

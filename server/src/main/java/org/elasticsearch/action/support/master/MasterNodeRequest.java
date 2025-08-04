@@ -10,7 +10,7 @@
 package org.elasticsearch.action.support.master;
 
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.core.TimeValue;
@@ -21,7 +21,7 @@ import java.util.Objects;
 /**
  * A based request for master based operation.
  */
-public abstract class MasterNodeRequest<Request extends MasterNodeRequest<Request>> extends ActionRequest {
+public abstract class MasterNodeRequest<Request extends MasterNodeRequest<Request>> extends AbstractActionRequest {
 
     /**
      * The default timeout for master-node requests. It's super-trappy to have such a default, because it makes it all too easy to forget

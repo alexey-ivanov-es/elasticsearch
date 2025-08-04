@@ -21,8 +21,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TotalHits;
 import org.apache.lucene.tests.util.LuceneTestCase;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteResponse;
@@ -667,11 +667,11 @@ public abstract class ESIntegTestCase extends ESTestCase {
     }
 
     /**
-     * Execute the given {@link ActionRequest} using the given {@link ActionType} and a default node client, wait for it to complete with
+     * Execute the given {@link AbstractActionRequest} using the given {@link ActionType} and a default node client, wait for it to complete with
      * a timeout of {@link #SAFE_AWAIT_TIMEOUT}, and then return the result. An exceptional response, timeout or interrupt triggers a test
      * failure.
      */
-    public static <T extends ActionResponse> T safeExecute(ActionType<T> action, ActionRequest request) {
+    public static <T extends ActionResponse> T safeExecute(ActionType<T> action, AbstractActionRequest request) {
         return safeExecute(client(), action, request);
     }
 

@@ -11,6 +11,7 @@ package org.elasticsearch.action.support;
 
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
@@ -73,8 +74,8 @@ public class TransportActionFilterChainRefCountingTests extends ESSingleNodeTest
         }
 
         @Override
-        public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            return List.of(new ActionHandler<>(TYPE, TestAction.class));
+        public Collection<ActionHandler> getActions() {
+            return List.of(new ActionHandler(TYPE, TestAction.class));
         }
 
         @Override
@@ -167,7 +168,7 @@ public class TransportActionFilterChainRefCountingTests extends ESSingleNodeTest
         }
     }
 
-    private static class Request extends ActionRequest {
+    private static class Request extends AbstractActionRequest {
         private final SubscribableListener<Void> closeListeners = new SubscribableListener<>();
         private final RefCounted refs = LeakTracker.wrap(AbstractRefCounted.of(() -> closeListeners.onResponse(null)));
 

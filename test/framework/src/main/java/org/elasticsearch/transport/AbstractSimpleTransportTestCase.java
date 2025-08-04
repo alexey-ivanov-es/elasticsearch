@@ -1471,7 +1471,7 @@ public abstract class AbstractSimpleTransportTestCase extends ESTestCase {
         }
     }
 
-    public static class StringMessageRequest extends TransportRequest implements RawIndexingDataTransportRequest {
+    public static class StringMessageRequest extends AbstractTransportRequest implements RawIndexingDataTransportRequest {
 
         private String message;
         private long timeout;
@@ -1532,7 +1532,7 @@ public abstract class AbstractSimpleTransportTestCase extends ESTestCase {
         }
     }
 
-    public static class Version0Request extends TransportRequest {
+    public static class Version0Request extends AbstractTransportRequest {
 
         int value1;
 
@@ -2052,7 +2052,7 @@ public abstract class AbstractSimpleTransportTestCase extends ESTestCase {
         }
     }
 
-    public static class TestRequest extends TransportRequest {
+    public static class TestRequest extends AbstractTransportRequest {
 
         String info;
         int resendCount;
@@ -3227,7 +3227,7 @@ public abstract class AbstractSimpleTransportTestCase extends ESTestCase {
     public void testActionStats() throws Exception {
         final String ACTION = "internal:action";
 
-        class Request extends TransportRequest {
+        class Request extends AbstractTransportRequest {
             final int refSize;
 
             Request(int refSize) {

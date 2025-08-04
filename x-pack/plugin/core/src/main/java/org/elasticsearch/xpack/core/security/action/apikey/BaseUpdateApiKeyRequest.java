@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.core.security.action.apikey;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.TransportAction;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
 
-public abstract class BaseUpdateApiKeyRequest extends ActionRequest {
+public abstract class BaseUpdateApiKeyRequest extends AbstractActionRequest {
 
     @Nullable
     protected final List<RoleDescriptor> roleDescriptors;

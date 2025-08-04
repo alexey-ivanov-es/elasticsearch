@@ -16,7 +16,7 @@ import org.elasticsearch.index.shard.ShardId;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.MockUtils;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.xpack.ccr.repository.CcrRestoreSourceService;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationTestHelper;
@@ -46,7 +46,7 @@ public class ClearCcrRestoreSessionActionTests extends ESTestCase {
             ClusterPrivilegeResolver.ALL.permission()
                 .check(
                     ClearCcrRestoreSessionAction.INTERNAL_NAME,
-                    mock(TransportRequest.class),
+                    mock(AbstractTransportRequest.class),
                     AuthenticationTestHelper.builder().build()
                 ),
             is(false)

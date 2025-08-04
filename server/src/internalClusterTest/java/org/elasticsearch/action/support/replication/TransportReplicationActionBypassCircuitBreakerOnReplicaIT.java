@@ -128,8 +128,8 @@ public class TransportReplicationActionBypassCircuitBreakerOnReplicaIT extends E
         public TestPlugin() {}
 
         @Override
-        public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            return List.of(new ActionHandler<>(TestAction.TYPE, TestAction.class));
+        public Collection<ActionHandler> getActions() {
+            return List.of(new ActionHandler(TestAction.TYPE, TestAction.class));
         }
     }
 

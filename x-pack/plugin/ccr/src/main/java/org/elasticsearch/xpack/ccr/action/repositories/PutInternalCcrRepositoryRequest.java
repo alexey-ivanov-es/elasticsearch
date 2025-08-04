@@ -7,7 +7,7 @@
 
 package org.elasticsearch.xpack.ccr.action.repositories;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.TransportAction;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -15,7 +15,7 @@ import org.elasticsearch.common.io.stream.StreamOutput;
 import java.io.IOException;
 import java.util.Objects;
 
-public class PutInternalCcrRepositoryRequest extends ActionRequest {
+public class PutInternalCcrRepositoryRequest extends AbstractActionRequest {
 
     private final String name;
     private final String type;

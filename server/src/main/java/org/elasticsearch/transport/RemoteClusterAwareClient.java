@@ -10,6 +10,7 @@ package org.elasticsearch.transport;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionListenerResponseHandler;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.RemoteClusterActionType;
 import org.elasticsearch.action.support.SubscribableListener;

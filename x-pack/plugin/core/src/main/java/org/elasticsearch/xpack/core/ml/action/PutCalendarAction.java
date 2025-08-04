@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -34,7 +34,7 @@ public class PutCalendarAction extends ActionType<PutCalendarAction.Response> {
         super(NAME);
     }
 
-    public static class Request extends ActionRequest implements ToXContentObject {
+    public static class Request extends AbstractActionRequest implements ToXContentObject {
 
         public static Request parseRequest(String calendarId, XContentParser parser) {
             Calendar.Builder builder = Calendar.STRICT_PARSER.apply(parser, null);

@@ -8,7 +8,9 @@ package org.elasticsearch.xpack.core.common.validation;
 
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -189,6 +191,25 @@ public class SourceDestValidatorTests extends ESTestCase {
                 return;
             }
             super.doExecute(action, request, listener);
+        }
+
+        @Override
+        protected <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+            Request request,
+            ActionListener<Response> listener
+        ) {
+            if (request instanceof XPackInfoRequest) {
+                XPackInfoResponse response = new XPackInfoResponse(
+                    null,
+                    new LicenseInfo("uid", license, license, licenseStatus, randomNonNegativeLong()),
+                    null
+                );
+                @SuppressWarnings("unchecked")
+                Response r = (Response) response;
+                listener.onResponse(r);
+                return;
+            }
+            super.doExecute(request, listener);
         }
     }
 

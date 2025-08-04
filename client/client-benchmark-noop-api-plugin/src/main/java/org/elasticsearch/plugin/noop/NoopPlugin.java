@@ -31,6 +31,7 @@ import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -41,10 +42,10 @@ public class NoopPlugin extends Plugin implements ActionPlugin {
     public static final ActionType<BulkResponse> NOOP_BULK_ACTION = new ActionType<>("mock:data/write/bulk");
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Arrays.asList(
-            new ActionHandler<>(NOOP_BULK_ACTION, TransportNoopBulkAction.class),
-            new ActionHandler<>(NOOP_SEARCH_ACTION, TransportNoopSearchAction.class)
+            new ActionHandler(NOOP_BULK_ACTION, TransportNoopBulkAction.class),
+            new ActionHandler(NOOP_SEARCH_ACTION, TransportNoopSearchAction.class)
         );
     }
 

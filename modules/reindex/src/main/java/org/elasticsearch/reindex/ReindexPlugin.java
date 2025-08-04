@@ -47,12 +47,12 @@ public class ReindexPlugin extends Plugin implements ActionPlugin {
     public static final ActionType<ListTasksResponse> RETHROTTLE_ACTION = new ActionType<>("cluster:admin/reindex/rethrottle");
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return Arrays.asList(
-            new ActionHandler<>(ReindexAction.INSTANCE, TransportReindexAction.class),
-            new ActionHandler<>(UpdateByQueryAction.INSTANCE, TransportUpdateByQueryAction.class),
-            new ActionHandler<>(DeleteByQueryAction.INSTANCE, TransportDeleteByQueryAction.class),
-            new ActionHandler<>(RETHROTTLE_ACTION, TransportRethrottleAction.class)
+            new ActionHandler(ReindexAction.INSTANCE, TransportReindexAction.class),
+            new ActionHandler(UpdateByQueryAction.INSTANCE, TransportUpdateByQueryAction.class),
+            new ActionHandler(DeleteByQueryAction.INSTANCE, TransportDeleteByQueryAction.class),
+            new ActionHandler(RETHROTTLE_ACTION, TransportRethrottleAction.class)
         );
     }
 

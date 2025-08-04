@@ -21,7 +21,7 @@ import org.elasticsearch.search.internal.ShardSearchContextId;
 import org.elasticsearch.search.internal.ShardSearchRequest;
 import org.elasticsearch.test.ESSingleNodeTestCase;
 import org.elasticsearch.transport.EmptyRequest;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.SecurityContext;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.Authentication.RealmRef;
@@ -262,7 +262,7 @@ public class SecuritySearchOperationListenerTests extends ESSingleNodeTestCase {
             final AuditTrailService auditTrailService = new AuditTrailService(auditTrail, licenseState);
 
             final SecuritySearchOperationListener listener = new SecuritySearchOperationListener(securityContext, auditTrailService);
-            final TransportRequest request = mock(TransportRequest.class);
+            final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
 
             // same user
             try (ThreadContext.StoredContext ignore = securityContext.getThreadContext().stashContext()) {

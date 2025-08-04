@@ -25,7 +25,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.BigArrays;
 import org.elasticsearch.common.util.PageCacheRecycler;
 import org.elasticsearch.common.util.concurrent.ThreadContext;
-import org.elasticsearch.core.CheckedFunction;
 import org.elasticsearch.http.HttpPreRequest;
 import org.elasticsearch.http.HttpServerTransport;
 import org.elasticsearch.index.shard.PrimaryReplicaSyncer.ResyncTask;
@@ -42,10 +41,8 @@ import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.xcontent.ContextParser;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.ParseField;
-import org.elasticsearch.xcontent.XContentParser;
 import org.elasticsearch.xcontent.XContentValueParser;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

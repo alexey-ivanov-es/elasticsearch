@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.privilege;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.common.Strings;
@@ -27,7 +27,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Request object to put a one or more application privileges.
  */
-public final class PutPrivilegesRequest extends ActionRequest implements ApplicationPrivilegesRequest, WriteRequest<PutPrivilegesRequest> {
+public final class PutPrivilegesRequest extends AbstractActionRequest implements ApplicationPrivilegesRequest, WriteRequest<PutPrivilegesRequest> {
 
     private List<ApplicationPrivilegeDescriptor> privileges;
     private RefreshPolicy refreshPolicy = RefreshPolicy.IMMEDIATE;

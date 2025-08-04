@@ -11,7 +11,9 @@ package org.elasticsearch.reindex;
 
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.ActionRequest2;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.search.SearchRequest;
@@ -228,6 +230,16 @@ public class ClientScrollableHitSourceTests extends ESTestCase {
             this.notifyAll();
         }
 
+        @Override
+        protected synchronized <Request extends ActionRequest2<Response>, Response extends ActionResponse> void doExecute(
+            Request request,
+            ActionListener<Response> listener
+        ) {
+
+            this.executeRequest = null;//new ExecuteRequest<>(action, request, listener);
+            this.notifyAll();
+        }
+
         @SuppressWarnings("unchecked")
         public <Request extends ActionRequest, Response extends ActionResponse> void respondx(
             ActionType<Response> action,
@@ -256,7 +268,7 @@ public class ClientScrollableHitSourceTests extends ESTestCase {
         }
 
         @SuppressWarnings("unchecked")
-        public <Request extends ActionRequest, Response extends ActionResponse> void validateRequest(
+        public <Request extends AbstractActionRequest, Response extends ActionResponse> void validateRequest(
             ActionType<Response> action,
             Consumer<? super Request> validator
         ) {

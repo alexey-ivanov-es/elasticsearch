@@ -34,7 +34,7 @@ import org.elasticsearch.test.transport.MockTransportService;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportInterceptor;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequestOptions;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportResponseHandler;
@@ -141,8 +141,8 @@ public class TransportReplicationActionRetryOnClosedNodeIT extends ESIntegTestCa
         public TestPlugin() {}
 
         @Override
-        public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            return List.of(new ActionHandler<>(TestAction.TYPE, TestAction.class));
+        public Collection<ActionHandler> getActions() {
+            return List.of(new ActionHandler(TestAction.TYPE, TestAction.class));
         }
 
         @Override
@@ -158,7 +158,7 @@ public class TransportReplicationActionRetryOnClosedNodeIT extends ESIntegTestCa
                         public <T extends TransportResponse> void sendRequest(
                             Transport.Connection connection,
                             String action,
-                            TransportRequest request,
+                            AbstractTransportRequest request,
                             TransportRequestOptions options,
                             TransportResponseHandler<T> handler
                         ) {

@@ -30,7 +30,7 @@ import org.elasticsearch.test.TestMatchers;
 import org.elasticsearch.test.rest.FakeRestRequest;
 import org.elasticsearch.threadpool.TestThreadPool;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.SecurityContext;
 import org.elasticsearch.xpack.core.security.action.user.AuthenticateAction;
 import org.elasticsearch.xpack.core.security.action.user.AuthenticateRequest;
@@ -171,7 +171,7 @@ public class SecondaryAuthenticatorTests extends ESTestCase {
     }
 
     public void testAuthenticateTransportRequestIsANoOpIfHeaderIsMissing() throws Exception {
-        final TransportRequest request = AuthenticateRequest.INSTANCE;
+        final AbstractTransportRequest request = AuthenticateRequest.INSTANCE;
         final PlainActionFuture<SecondaryAuthentication> future = new PlainActionFuture<>();
         authenticator.authenticate(AuthenticateAction.NAME, request, future);
 
@@ -189,7 +189,7 @@ public class SecondaryAuthenticatorTests extends ESTestCase {
 
     public void testAuthenticateTransportRequestFailsIfHeaderHasUnrecognizedCredentials() throws Exception {
         threadPool.getThreadContext().putHeader(SECONDARY_AUTH_HEADER_NAME, "Fake " + randomAlphaOfLengthBetween(5, 30));
-        final TransportRequest request = AuthenticateRequest.INSTANCE;
+        final AbstractTransportRequest request = AuthenticateRequest.INSTANCE;
         final PlainActionFuture<SecondaryAuthentication> future = new PlainActionFuture<>();
         authenticator.authenticate(AuthenticateAction.NAME, request, future);
 
@@ -221,7 +221,7 @@ public class SecondaryAuthenticatorTests extends ESTestCase {
 
     public void testAuthenticateTransportRequestSucceedsWithBasicAuthentication() throws Exception {
         assertAuthenticateWithBasicAuthentication(listener -> {
-            final TransportRequest request = AuthenticateRequest.INSTANCE;
+            final AbstractTransportRequest request = AuthenticateRequest.INSTANCE;
             authenticator.authenticate(AuthenticateAction.NAME, request, listener);
         });
     }
@@ -265,7 +265,7 @@ public class SecondaryAuthenticatorTests extends ESTestCase {
 
     public void testAuthenticateTransportRequestFailsWithIncorrectPassword() throws Exception {
         assertAuthenticateWithIncorrectPassword(listener -> {
-            final TransportRequest request = AuthenticateRequest.INSTANCE;
+            final AbstractTransportRequest request = AuthenticateRequest.INSTANCE;
             authenticator.authenticate(AuthenticateAction.NAME, request, listener);
         });
     }
@@ -330,7 +330,7 @@ public class SecondaryAuthenticatorTests extends ESTestCase {
 
         SecurityMocks.mockGetRequest(client, SecuritySystemIndices.SECURITY_TOKENS_ALIAS, tokenDocId.get(), tokenSource.get());
 
-        final TransportRequest request = AuthenticateRequest.INSTANCE;
+        final AbstractTransportRequest request = AuthenticateRequest.INSTANCE;
         final PlainActionFuture<SecondaryAuthentication> future = new PlainActionFuture<>();
         authenticator.authenticate(AuthenticateAction.NAME, request, future);
 

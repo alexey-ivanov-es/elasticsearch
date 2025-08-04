@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.oidc;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -19,7 +19,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Represents a request to prepare an OAuth 2.0 authorization request
  */
-public class OpenIdConnectPrepareAuthenticationRequest extends ActionRequest {
+public class OpenIdConnectPrepareAuthenticationRequest extends AbstractActionRequest {
 
     /**
      * The name of the OpenID Connect realm in the configuration that should be used for authentication

@@ -8,7 +8,7 @@
 package org.elasticsearch.xpack.profiling.persistence;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -370,7 +370,7 @@ public class ProfilingDataStreamManagerTests extends ESTestCase {
     private ActionResponse verifyDataStreamInstalled(
         AtomicInteger calledTimes,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action instanceof CreateDataStreamAction) {
@@ -388,7 +388,7 @@ public class ProfilingDataStreamManagerTests extends ESTestCase {
     private ActionResponse verifyDataStreamRolledOver(
         AtomicInteger calledTimes,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action instanceof RolloverAction) {
@@ -418,7 +418,7 @@ public class ProfilingDataStreamManagerTests extends ESTestCase {
         AtomicInteger mappingUpdates,
         AtomicInteger settingsUpdates,
         ActionType<?> action,
-        ActionRequest request,
+        AbstractActionRequest request,
         ActionListener<?> listener
     ) {
         if (action == TransportPutMappingAction.TYPE) {

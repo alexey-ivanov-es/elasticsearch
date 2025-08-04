@@ -231,8 +231,8 @@ public class TransportMasterNodeActionIT extends ESIntegTestCase {
 
     public static final class TestActionPlugin extends Plugin implements ActionPlugin {
         @Override
-        public Collection<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-            return List.of(new ActionHandler<>(TEST_ACTION_TYPE, TestTransportAction.class));
+        public Collection<ActionHandler> getActions() {
+            return List.of(new ActionHandler(TEST_ACTION_TYPE, TestTransportAction.class));
         }
     }
 

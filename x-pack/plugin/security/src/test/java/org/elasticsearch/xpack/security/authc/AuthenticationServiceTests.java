@@ -60,7 +60,7 @@ import org.elasticsearch.threadpool.DefaultBuiltInExecutorBuilders;
 import org.elasticsearch.threadpool.FixedExecutorBuilder;
 import org.elasticsearch.threadpool.TestThreadPool;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.json.JsonXContent;
 import org.elasticsearch.xpack.core.XPackField;
@@ -172,7 +172,7 @@ public class AuthenticationServiceTests extends ESTestCase {
     private static final String FIRST_REALM_NAME = "file_realm";
     private static final String FIRST_REALM_TYPE = "file";
     private AuthenticationService service;
-    private TransportRequest transportRequest;
+    private AbstractTransportRequest transportRequest;
     private RestRequest restRequest;
     private Realms realms;
     private RealmDomain firstDomain;
@@ -2372,7 +2372,7 @@ public class AuthenticationServiceTests extends ESTestCase {
         }
     }
 
-    static class InternalRequest extends TransportRequest {
+    static class InternalRequest extends AbstractTransportRequest {
         @Override
         public void writeTo(StreamOutput out) {}
     }
@@ -2451,7 +2451,7 @@ public class AuthenticationServiceTests extends ESTestCase {
 
     private void authenticateBlocking(
         String action,
-        TransportRequest transportRequest,
+        AbstractTransportRequest transportRequest,
         User fallbackUser,
         Consumer<Tuple<Authentication, String>> verifier
     ) {

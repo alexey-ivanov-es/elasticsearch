@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -37,7 +37,7 @@ public class EstimateModelMemoryAction extends ActionType<EstimateModelMemoryAct
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         public static final ParseField ANALYSIS_CONFIG = Job.ANALYSIS_CONFIG;
         public static final ParseField OVERALL_CARDINALITY = new ParseField("overall_cardinality");

@@ -50,6 +50,7 @@ import org.hamcrest.Matchers;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -67,7 +68,7 @@ public class ActionModuleTests extends ESTestCase {
             ActionModule.setupActions(emptyList()),
             hasEntry(
                 TransportNodesInfoAction.TYPE.name(),
-                new ActionHandler<>(TransportNodesInfoAction.TYPE, TransportNodesInfoAction.class)
+                new ActionHandler(TransportNodesInfoAction.TYPE, TransportNodesInfoAction.class)
             )
         );
     }
@@ -75,8 +76,8 @@ public class ActionModuleTests extends ESTestCase {
     public void testPluginCantOverwriteBuiltinAction() {
         ActionPlugin dupsMainAction = new ActionPlugin() {
             @Override
-            public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-                return singletonList(new ActionHandler<>(TransportNodesInfoAction.TYPE, TransportNodesInfoAction.class));
+            public Collection<ActionHandler> getActions() {
+                return singletonList(new ActionHandler(TransportNodesInfoAction.TYPE, TransportNodesInfoAction.class));
             }
         };
         Exception e = expectThrows(IllegalArgumentException.class, () -> ActionModule.setupActions(singletonList(dupsMainAction)));
@@ -84,7 +85,7 @@ public class ActionModuleTests extends ESTestCase {
     }
 
     public void testPluginCanRegisterAction() {
-        class FakeRequest extends ActionRequest {
+        class FakeRequest extends AbstractActionRequest {
             @Override
             public ActionRequestValidationException validate() {
                 return null;
@@ -101,13 +102,13 @@ public class ActionModuleTests extends ESTestCase {
         final var action = new ActionType<>("fake");
         ActionPlugin registersFakeAction = new ActionPlugin() {
             @Override
-            public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-                return singletonList(new ActionHandler<>(action, FakeTransportAction.class));
+            public Collection<ActionHandler> getActions() {
+                return singletonList(new ActionHandler(action, FakeTransportAction.class));
             }
         };
         assertThat(
             ActionModule.setupActions(singletonList(registersFakeAction)),
-            hasEntry("fake", new ActionHandler<>(action, FakeTransportAction.class))
+            hasEntry("fake", new ActionHandler(action, FakeTransportAction.class))
         );
     }
 

@@ -12,7 +12,7 @@ package org.elasticsearch.search.basic;
 import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.Query;
 import org.elasticsearch.TransportVersion;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.OriginalIndices;
@@ -208,7 +208,7 @@ public class QueryRewriteContextIT extends ESIntegTestCase {
         assertThat(response.status(), is(RestStatus.OK));
     }
 
-    private static <Request extends ActionRequest, Response extends ActionResponse> void assertResolvedIndices(
+    private static <Request extends AbstractActionRequest, Response extends ActionResponse> void assertResolvedIndices(
         ActionRequestBuilder<Request, Response> requestBuilder,
         @Nullable Set<String> expectedLocalIndices,
         Set<String> expectedConcreteLocalIndices,
@@ -255,7 +255,7 @@ public class QueryRewriteContextIT extends ESIntegTestCase {
         assertThat(gotQueryRewriteContext.get(), is(true));
     }
 
-    private static <Request extends ActionRequest, Response extends ActionResponse> void setQuery(
+    private static <Request extends AbstractActionRequest, Response extends ActionResponse> void setQuery(
         ActionRequestBuilder<Request, Response> requestBuilder,
         QueryBuilder queryBuilder
     ) {

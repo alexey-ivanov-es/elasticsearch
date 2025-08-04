@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.monitoring.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.bulk.BulkRequestParser;
 import org.elasticsearch.common.bytes.BytesReference;
@@ -30,7 +30,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
  * Every monitoring document added to the request is associated to a {@link MonitoredSystem}. The monitored system is used
  * to resolve the index name in which the document will be indexed into.
  */
-public class MonitoringBulkRequest extends ActionRequest {
+public class MonitoringBulkRequest extends AbstractActionRequest {
 
     private final List<MonitoringBulkDoc> docs = new ArrayList<>();
 

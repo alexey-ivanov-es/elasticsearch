@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ssl.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
@@ -34,7 +34,7 @@ public class GetCertificateInfoAction extends ActionType<GetCertificateInfoActio
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         Request() {}
 

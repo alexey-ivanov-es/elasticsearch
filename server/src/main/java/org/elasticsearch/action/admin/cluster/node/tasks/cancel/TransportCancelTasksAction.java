@@ -22,7 +22,7 @@ import org.elasticsearch.injection.guice.Inject;
 import org.elasticsearch.tasks.CancellableTask;
 import org.elasticsearch.tasks.TaskInfo;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportService;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.List;
  * Transport action that can be used to cancel currently running cancellable tasks.
  * <p>
  * For a task to be cancellable it has to return an instance of
- * {@link CancellableTask} from {@link TransportRequest#createTask}
+ * {@link CancellableTask} from {@link AbstractTransportRequest#createTask}
  */
 public class TransportCancelTasksAction extends TransportTasksAction<CancellableTask, CancelTasksRequest, ListTasksResponse, TaskInfo> {
 

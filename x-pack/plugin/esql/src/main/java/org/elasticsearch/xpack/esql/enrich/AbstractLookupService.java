@@ -59,6 +59,7 @@ import org.elasticsearch.tasks.CancellableTask;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskId;
 import org.elasticsearch.threadpool.ThreadPool;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportChannel;
 import org.elasticsearch.transport.TransportRequestHandler;
 import org.elasticsearch.transport.TransportRequestOptions;
@@ -478,7 +479,7 @@ public abstract class AbstractLookupService<R extends AbstractLookupService.Requ
         }
     }
 
-    abstract static class TransportRequest extends org.elasticsearch.transport.TransportRequest implements IndicesRequest {
+    abstract static class TransportRequest extends AbstractTransportRequest implements IndicesRequest {
         final String sessionId;
         final ShardId shardId;
         /**

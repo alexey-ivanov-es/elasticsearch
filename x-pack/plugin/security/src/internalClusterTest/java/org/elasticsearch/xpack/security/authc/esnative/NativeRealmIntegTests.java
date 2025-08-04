@@ -28,7 +28,7 @@ import org.elasticsearch.snapshots.SnapshotState;
 import org.elasticsearch.test.NativeRealmIntegTestCase;
 import org.elasticsearch.test.SecuritySettingsSource;
 import org.elasticsearch.test.SecuritySettingsSourceField;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.XContentType;
 import org.elasticsearch.xpack.core.XPackFeatureUsage;
 import org.elasticsearch.xpack.core.action.XPackUsageAction;
@@ -455,7 +455,7 @@ public class NativeRealmIntegTests extends NativeRealmIntegTestCase {
                 .get();
             assertClusterHealthOnlyAuthorizesWhenAnonymousRoleActive(token);
         } else {
-            final TransportRequest request = mock(TransportRequest.class);
+            final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
             final Authentication authentication = AuthenticationTestHelper.builder().build();
             GetRolesResponse getRolesResponse = new GetRolesRequestBuilder(client()).names("test_role").get();
             assertTrue("test_role does not exist!", getRolesResponse.hasRoles());

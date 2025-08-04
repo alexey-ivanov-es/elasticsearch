@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.cluster.ClusterState;
@@ -57,7 +57,7 @@ public class GetDatafeedsStatsAction extends ActionType<GetDatafeedsStatsAction.
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         public static final String ALLOW_NO_MATCH = "allow_no_match";
 

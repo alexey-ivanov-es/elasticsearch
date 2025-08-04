@@ -28,6 +28,7 @@ import org.elasticsearch.xpack.repositories.metering.action.TransportRepositorie
 import org.elasticsearch.xpack.repositories.metering.rest.RestClearRepositoriesMeteringArchiveAction;
 import org.elasticsearch.xpack.repositories.metering.rest.RestGetRepositoriesMeteringAction;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -35,10 +36,10 @@ import java.util.function.Supplier;
 public final class RepositoriesMeteringPlugin extends Plugin implements ActionPlugin {
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionHandler<>(RepositoriesMeteringAction.INSTANCE, TransportRepositoriesStatsAction.class),
-            new ActionHandler<>(ClearRepositoriesMeteringArchiveAction.INSTANCE, TransportClearRepositoriesStatsArchiveAction.class)
+            new ActionHandler(RepositoriesMeteringAction.INSTANCE, TransportRepositoriesStatsAction.class),
+            new ActionHandler(ClearRepositoriesMeteringArchiveAction.INSTANCE, TransportClearRepositoriesStatsArchiveAction.class)
         );
     }
 

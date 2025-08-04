@@ -10,7 +10,7 @@ package org.elasticsearch.xpack.slm;
 import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.snapshots.create.CreateSnapshotRequest;
@@ -592,16 +592,16 @@ public class SnapshotLifecycleTaskTests extends ESTestCase {
      */
     public static class VerifyingClient extends NoOpClient {
 
-        private final TriFunction<ActionType<?>, ActionRequest, ActionListener<?>, ActionResponse> verifier;
+        private final TriFunction<ActionType<?>, AbstractActionRequest, ActionListener<?>, ActionResponse> verifier;
 
-        VerifyingClient(ThreadPool threadPool, TriFunction<ActionType<?>, ActionRequest, ActionListener<?>, ActionResponse> verifier) {
+        VerifyingClient(ThreadPool threadPool, TriFunction<ActionType<?>, AbstractActionRequest, ActionListener<?>, ActionResponse> verifier) {
             super(threadPool);
             this.verifier = verifier;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+        protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
             ActionType<Response> action,
             Request request,
             ActionListener<Response> listener

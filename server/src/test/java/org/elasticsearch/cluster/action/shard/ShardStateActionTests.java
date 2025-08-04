@@ -42,7 +42,7 @@ import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.NodeDisconnectedException;
 import org.elasticsearch.transport.NodeNotConnectedException;
 import org.elasticsearch.transport.TransportException;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportResponse;
 import org.elasticsearch.transport.TransportService;
 import org.junit.After;
@@ -109,7 +109,7 @@ public class ShardStateActionTests extends ESTestCase {
         protected void waitForNewMasterAndRetry(
             String actionName,
             ClusterStateObserver observer,
-            TransportRequest request,
+            AbstractTransportRequest request,
             ActionListener<Void> listener
         ) {
             onBeforeWaitForNewMasterAndRetry.run();

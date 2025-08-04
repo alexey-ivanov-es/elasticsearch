@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.saml;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.core.Nullable;
@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Represents a request to authenticate using SAML assertions.
  */
-public final class SamlAuthenticateRequest extends ActionRequest {
+public final class SamlAuthenticateRequest extends AbstractActionRequest {
 
     private byte[] saml;
     private List<String> validRequestIds;

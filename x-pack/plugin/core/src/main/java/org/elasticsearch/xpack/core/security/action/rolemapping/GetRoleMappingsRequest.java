@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.rolemapping;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -22,7 +22,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
  *
  * see org.elasticsearch.xpack.security.authc.support.mapper.NativeRoleMappingStore
  */
-public class GetRoleMappingsRequest extends ActionRequest {
+public class GetRoleMappingsRequest extends AbstractActionRequest {
 
     private String[] names = Strings.EMPTY_ARRAY;
 

@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.security.action.token;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -20,7 +20,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * Request for invalidating a token so that it can no longer be used
  */
-public final class InvalidateTokenRequest extends ActionRequest {
+public final class InvalidateTokenRequest extends AbstractActionRequest {
 
     public enum Type {
         ACCESS_TOKEN("token"),

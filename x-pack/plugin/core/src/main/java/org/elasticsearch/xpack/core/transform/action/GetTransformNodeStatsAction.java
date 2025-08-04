@@ -19,7 +19,7 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.ToXContent;
 import org.elasticsearch.xcontent.ToXContentObject;
 import org.elasticsearch.xcontent.XContentBuilder;
@@ -95,7 +95,7 @@ public class GetTransformNodeStatsAction extends ActionType<GetTransformNodeStat
         }
     }
 
-    public static class NodeStatsRequest extends TransportRequest {
+    public static class NodeStatsRequest extends AbstractTransportRequest {
 
         public NodeStatsRequest() {}
 

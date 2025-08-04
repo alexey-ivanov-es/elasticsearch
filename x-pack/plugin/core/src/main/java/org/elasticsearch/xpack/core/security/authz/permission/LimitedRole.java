@@ -14,6 +14,7 @@ import org.elasticsearch.TransportVersion;
 import org.elasticsearch.cluster.metadata.ProjectMetadata;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.core.Nullable;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.TransportRequest;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authz.RoleDescriptor;
@@ -267,7 +268,7 @@ public final class LimitedRole implements Role {
      * authentication.
      *
      * @param action cluster action
-     * @param request {@link TransportRequest}
+     * @param request {@link AbstractTransportRequest}
      * @param authentication {@link Authentication}
      * @return {@code true} if action is allowed else returns {@code false}
      */

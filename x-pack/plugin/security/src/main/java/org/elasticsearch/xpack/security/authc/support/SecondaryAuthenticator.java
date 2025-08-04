@@ -16,7 +16,7 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.concurrent.ThreadContext;
 import org.elasticsearch.rest.RestRequest;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.SecurityContext;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.support.SecondaryAuthentication;
@@ -68,7 +68,7 @@ public class SecondaryAuthenticator {
      *                 If the secondary authentication credentials are found in the thread context, but fail to be authenticated, then
      *                 the failure is returned through {@link ActionListener#onFailure(Exception)}.
      */
-    public void authenticate(String action, TransportRequest request, ActionListener<SecondaryAuthentication> listener) {
+    public void authenticate(String action, AbstractTransportRequest request, ActionListener<SecondaryAuthentication> listener) {
         // We never want the secondary authentication to fallback to anonymous.
         // Use cases for secondary authentication are far more likely to want to fall back to the primary authentication if no secondary
         // auth is provided, so in that case we do no want to set anything in the context

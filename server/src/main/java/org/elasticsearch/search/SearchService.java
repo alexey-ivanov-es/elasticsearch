@@ -133,7 +133,7 @@ import org.elasticsearch.threadpool.Scheduler;
 import org.elasticsearch.threadpool.Scheduler.Cancellable;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.threadpool.ThreadPool.Names;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.transport.Transports;
 
 import java.io.IOException;
@@ -1059,7 +1059,7 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
         }
     }
 
-    private ReaderContext findReaderContext(ShardSearchContextId id, TransportRequest request) throws SearchContextMissingException {
+    private ReaderContext findReaderContext(ShardSearchContextId id, AbstractTransportRequest request) throws SearchContextMissingException {
         if (id.getSessionId().isEmpty()) {
             throw new IllegalArgumentException("Session id must be specified");
         }
@@ -1776,7 +1776,7 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
     static class CanMatchContext {
         private final ShardSearchRequest request;
         private final Function<Index, IndexService> indexServiceLookup;
-        private final BiFunction<ShardSearchContextId, TransportRequest, ReaderContext> findReaderContext;
+        private final BiFunction<ShardSearchContextId, AbstractTransportRequest, ReaderContext> findReaderContext;
         private final long defaultKeepAlive;
         private final long maxKeepAlive;
 
@@ -1785,7 +1785,7 @@ public class SearchService extends AbstractLifecycleComponent implements IndexEv
         CanMatchContext(
             ShardSearchRequest request,
             Function<Index, IndexService> indexServiceLookup,
-            BiFunction<ShardSearchContextId, TransportRequest, ReaderContext> findReaderContext,
+            BiFunction<ShardSearchContextId, AbstractTransportRequest, ReaderContext> findReaderContext,
             long defaultKeepAlive,
             long maxKeepAlive
         ) {

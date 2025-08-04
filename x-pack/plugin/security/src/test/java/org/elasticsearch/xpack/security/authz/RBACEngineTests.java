@@ -38,7 +38,7 @@ import org.elasticsearch.core.Tuple;
 import org.elasticsearch.index.IndexVersion;
 import org.elasticsearch.license.GetLicenseAction;
 import org.elasticsearch.test.ESTestCase;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xcontent.XContentType;
 import org.elasticsearch.xpack.core.XPackPlugin;
 import org.elasticsearch.xpack.core.security.action.apikey.GetApiKeyAction;
@@ -187,7 +187,7 @@ public class RBACEngineTests extends ESTestCase {
         engine.resolveAuthorizationInfo(
             new RequestInfo(
                 AuthenticationTestHelper.builder().build(),
-                mock(TransportRequest.class),
+                mock(AbstractTransportRequest.class),
                 randomAlphaOfLengthBetween(20, 30),
                 null
             ),
@@ -228,7 +228,7 @@ public class RBACEngineTests extends ESTestCase {
         engine.resolveAuthorizationInfo(
             new RequestInfo(
                 AuthenticationTestHelper.builder().build(),
-                mock(TransportRequest.class),
+                mock(AbstractTransportRequest.class),
                 randomAlphaOfLengthBetween(20, 30),
                 null
             ),
@@ -258,7 +258,7 @@ public class RBACEngineTests extends ESTestCase {
     public void testSameUserPermission() {
         final User user = new User("joe");
         final boolean changePasswordRequest = randomBoolean();
-        final TransportRequest request = changePasswordRequest
+        final AbstractTransportRequest request = changePasswordRequest
             ? new ChangePasswordRequestBuilder(mock(Client.class)).username(user.principal()).request()
             : new HasPrivilegesRequestBuilder(mock(Client.class)).username(user.principal()).request();
         final String action = changePasswordRequest ? TransportChangePasswordAction.TYPE.name() : HasPrivilegesAction.NAME;
@@ -278,7 +278,7 @@ public class RBACEngineTests extends ESTestCase {
         final User user = new User("joe");
         final boolean changePasswordRequest = randomBoolean();
         final String username = randomFrom("", "joe" + randomAlphaOfLengthBetween(1, 5), randomAlphaOfLengthBetween(3, 10));
-        final TransportRequest request = changePasswordRequest
+        final AbstractTransportRequest request = changePasswordRequest
             ? new ChangePasswordRequestBuilder(mock(Client.class)).username(username).request()
             : new HasPrivilegesRequestBuilder(mock(Client.class)).username(username).request();
         final String action = changePasswordRequest ? TransportChangePasswordAction.TYPE.name() : HasPrivilegesAction.NAME;
@@ -322,7 +322,7 @@ public class RBACEngineTests extends ESTestCase {
     }
 
     public void testSameUserPermissionDoesNotAllowOtherActions() {
-        final TransportRequest request = mock(TransportRequest.class);
+        final AbstractTransportRequest request = mock(AbstractTransportRequest.class);
         final String action = randomFrom(
             PutUserAction.NAME,
             DeleteUserAction.NAME,
@@ -342,7 +342,7 @@ public class RBACEngineTests extends ESTestCase {
         final String username = "joe";
         final User user = new User(username);
         final boolean changePasswordRequest = randomBoolean();
-        final TransportRequest request = changePasswordRequest
+        final AbstractTransportRequest request = changePasswordRequest
             ? new ChangePasswordRequestBuilder(mock(Client.class)).username(username).request()
             : new HasPrivilegesRequestBuilder(mock(Client.class)).username(username).request();
         final String action = changePasswordRequest ? TransportChangePasswordAction.TYPE.name() : AuthenticateAction.NAME;
@@ -440,7 +440,7 @@ public class RBACEngineTests extends ESTestCase {
         final User user = new User("joe");
         final String apiKeyId = randomAlphaOfLengthBetween(4, 7);
         final Authentication authentication = AuthenticationTests.randomApiKeyAuthentication(user, apiKeyId);
-        final TransportRequest request = GetApiKeyRequest.builder().apiKeyId(apiKeyId).build();
+        final AbstractTransportRequest request = GetApiKeyRequest.builder().apiKeyId(apiKeyId).build();
         assertTrue(RBACEngine.checkSameUserPermissions(GetApiKeyAction.NAME, request, authentication));
     }
 
@@ -448,14 +448,14 @@ public class RBACEngineTests extends ESTestCase {
         final User user = new User("joe");
         final String apiKeyId = randomAlphaOfLengthBetween(4, 7);
         final Authentication authentication = AuthenticationTests.randomApiKeyAuthentication(user, apiKeyId);
-        final TransportRequest request = GetApiKeyRequest.builder().apiKeyId(apiKeyId).withLimitedBy(true).build();
+        final AbstractTransportRequest request = GetApiKeyRequest.builder().apiKeyId(apiKeyId).withLimitedBy(true).build();
         assertFalse(RBACEngine.checkSameUserPermissions(GetApiKeyAction.NAME, request, authentication));
     }
 
     public void testSameUserPermissionDeniesApiKeyInfoRetrievalWhenAuthenticatedByADifferentApiKey() {
         final User user = new User("joe");
         final String apiKeyId = randomAlphaOfLengthBetween(4, 7);
-        final TransportRequest request = GetApiKeyRequest.builder().apiKeyId(apiKeyId).ownedByAuthenticatedUser(false).build();
+        final AbstractTransportRequest request = GetApiKeyRequest.builder().apiKeyId(apiKeyId).ownedByAuthenticatedUser(false).build();
         final Authentication authentication = AuthenticationTests.randomApiKeyAuthentication(user, randomAlphaOfLength(8));
         assertFalse(RBACEngine.checkSameUserPermissions(GetApiKeyAction.NAME, request, authentication));
     }
@@ -463,7 +463,7 @@ public class RBACEngineTests extends ESTestCase {
     public void testSameUserPermissionDeniesApiKeyInfoRetrievalWhenLookedupByIsPresent() {
         final User user = new User("joe");
         final String apiKeyId = randomAlphaOfLengthBetween(4, 7);
-        final TransportRequest request = GetApiKeyRequest.builder().apiKeyId(apiKeyId).ownedByAuthenticatedUser(false).build();
+        final AbstractTransportRequest request = GetApiKeyRequest.builder().apiKeyId(apiKeyId).ownedByAuthenticatedUser(false).build();
         final Authentication authentication = AuthenticationTests.randomApiKeyAuthentication(new User("not-joe"), apiKeyId)
             .runAs(user, new Authentication.RealmRef("name", "type", randomAlphaOfLengthBetween(3, 8)));
         assertFalse(RBACEngine.checkSameUserPermissions(GetApiKeyAction.NAME, request, authentication));
@@ -1986,7 +1986,7 @@ public class RBACEngineTests extends ESTestCase {
 
         final RBACAuthorizationInfo authzInfo = new RBACAuthorizationInfo(role, null);
         final ResolvedIndices resolvedIndices = new ResolvedIndices(List.of(indices), List.of());
-        final TransportRequest searchRequest = new SearchRequest(indices);
+        final AbstractTransportRequest searchRequest = new SearchRequest(indices);
         final RequestInfo requestInfo = createRequestInfo(searchRequest, action, parentAuthorization);
         final AsyncSupplier<ResolvedIndices> indicesAsyncSupplier = () -> SubscribableListener.newSucceeded(resolvedIndices);
 
@@ -2002,7 +2002,7 @@ public class RBACEngineTests extends ESTestCase {
         engine.authorizeIndexAction(requestInfo, authzInfo, indicesAsyncSupplier, metadata.build().getProject()).addListener(listener);
     }
 
-    private static RequestInfo createRequestInfo(TransportRequest request, String action, ParentActionAuthorization parentAuthorization) {
+    private static RequestInfo createRequestInfo(AbstractTransportRequest request, String action, ParentActionAuthorization parentAuthorization) {
         final Authentication.RealmRef realm = new Authentication.RealmRef(
             randomAlphaOfLength(6),
             randomAlphaOfLength(4),

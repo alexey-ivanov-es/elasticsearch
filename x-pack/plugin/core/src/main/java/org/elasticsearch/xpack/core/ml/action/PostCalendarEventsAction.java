@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -38,7 +38,7 @@ public class PostCalendarEventsAction extends ActionType<PostCalendarEventsActio
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         private static final ObjectParser<List<ScheduledEvent.Builder>, Void> PARSER = new ObjectParser<>(NAME, ArrayList::new);
 

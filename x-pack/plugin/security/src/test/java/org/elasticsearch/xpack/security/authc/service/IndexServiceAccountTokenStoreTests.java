@@ -11,7 +11,7 @@ import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.DocWriteRequest.OpType;
@@ -98,8 +98,8 @@ public class IndexServiceAccountTokenStoreTests extends ESTestCase {
     private ClusterService clusterService;
     private CacheInvalidatorRegistry cacheInvalidatorRegistry;
     private IndexServiceAccountTokenStore store;
-    private final AtomicReference<ActionRequest> requestHolder = new AtomicReference<>();
-    private final AtomicReference<BiConsumer<ActionRequest, ActionListener<ActionResponse>>> responseProviderHolder =
+    private final AtomicReference<AbstractActionRequest> requestHolder = new AtomicReference<>();
+    private final AtomicReference<BiConsumer<AbstractActionRequest, ActionListener<ActionResponse>>> responseProviderHolder =
         new AtomicReference<>();
     private SecurityIndexManager securityIndex;
 
@@ -113,7 +113,7 @@ public class IndexServiceAccountTokenStoreTests extends ESTestCase {
         client = new FilterClient(mockClient) {
             @Override
             @SuppressWarnings("unchecked")
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

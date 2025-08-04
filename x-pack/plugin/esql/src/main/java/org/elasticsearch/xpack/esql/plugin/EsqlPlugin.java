@@ -220,16 +220,16 @@ public class EsqlPlugin extends Plugin implements ActionPlugin {
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         return List.of(
-            new ActionHandler<>(EsqlQueryAction.INSTANCE, TransportEsqlQueryAction.class),
-            new ActionHandler<>(EsqlAsyncGetResultAction.INSTANCE, TransportEsqlAsyncGetResultsAction.class),
-            new ActionHandler<>(EsqlStatsAction.INSTANCE, TransportEsqlStatsAction.class),
-            new ActionHandler<>(XPackUsageFeatureAction.ESQL, EsqlUsageTransportAction.class),
-            new ActionHandler<>(XPackInfoFeatureAction.ESQL, EsqlInfoTransportAction.class),
-            new ActionHandler<>(EsqlResolveFieldsAction.TYPE, EsqlResolveFieldsAction.class),
-            new ActionHandler<>(EsqlSearchShardsAction.TYPE, EsqlSearchShardsAction.class),
-            new ActionHandler<>(EsqlAsyncStopAction.INSTANCE, TransportEsqlAsyncStopAction.class)
+            new ActionHandler(EsqlQueryAction.INSTANCE, TransportEsqlQueryAction.class),
+            new ActionHandler(EsqlAsyncGetResultAction.INSTANCE, TransportEsqlAsyncGetResultsAction.class),
+            new ActionHandler(EsqlStatsAction.INSTANCE, TransportEsqlStatsAction.class),
+            new ActionHandler(XPackUsageFeatureAction.ESQL, EsqlUsageTransportAction.class),
+            new ActionHandler(XPackInfoFeatureAction.ESQL, EsqlInfoTransportAction.class),
+            new ActionHandler(EsqlResolveFieldsAction.TYPE, EsqlResolveFieldsAction.class),
+            new ActionHandler(EsqlSearchShardsAction.TYPE, EsqlSearchShardsAction.class),
+            new ActionHandler(EsqlAsyncStopAction.INSTANCE, TransportEsqlAsyncStopAction.class)
         );
     }
 

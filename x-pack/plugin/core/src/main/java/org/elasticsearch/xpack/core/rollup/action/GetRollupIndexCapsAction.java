@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.rollup.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -40,7 +40,7 @@ public class GetRollupIndexCapsAction extends ActionType<GetRollupIndexCapsActio
         super(NAME);
     }
 
-    public static class Request extends ActionRequest implements IndicesRequest.Replaceable, ToXContentFragment {
+    public static class Request extends AbstractActionRequest implements IndicesRequest.Replaceable, ToXContentFragment {
         private String[] indices;
         private IndicesOptions options;
 

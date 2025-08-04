@@ -9,7 +9,7 @@ package org.elasticsearch.xpack.searchablesnapshots;
 import org.apache.lucene.search.TotalHits;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.admin.cluster.snapshots.restore.RestoreSnapshotResponse;
 import org.elasticsearch.action.admin.indices.recovery.RecoveryResponse;
 import org.elasticsearch.action.index.IndexRequestBuilder;
@@ -387,7 +387,7 @@ public abstract class BaseSearchableSnapshotsIntegTestCase extends AbstractSnaps
             final var clusterService = services.clusterService();
             actionFilter = new ActionFilter.Simple() {
                 @Override
-                protected boolean apply(String action, ActionRequest request, ActionListener<?> listener) {
+                protected boolean apply(String action, AbstractActionRequest request, ActionListener<?> listener) {
                     if (action.equals(TransportNodesListShardStoreMetadata.ACTION_NAME)) {
                         final var shardId = asInstanceOf(TransportNodesListShardStoreMetadata.Request.class, request).shardId();
                         final var indexMetadata = clusterService.state().metadata().getProject().index(shardId.getIndex());

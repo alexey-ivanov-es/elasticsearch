@@ -12,7 +12,7 @@ import org.elasticsearch.license.MockLicenseState;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.MockLog;
-import org.elasticsearch.transport.TransportRequest;
+import org.elasticsearch.transport.AbstractTransportRequest;
 import org.elasticsearch.xpack.core.security.authc.Authentication;
 import org.elasticsearch.xpack.core.security.authc.Authentication.RealmRef;
 import org.elasticsearch.xpack.core.security.authc.AuthenticationTestHelper;
@@ -41,7 +41,7 @@ public class AuditTrailServiceTests extends ESTestCase {
     private AuditTrailService service;
 
     private AuthenticationToken token;
-    private TransportRequest request;
+    private AbstractTransportRequest request;
     private RestRequest restRequest;
     private MockLicenseState licenseState;
     private boolean isAuditingAllowed;
@@ -54,7 +54,7 @@ public class AuditTrailServiceTests extends ESTestCase {
         isAuditingAllowed = randomBoolean();
         when(licenseState.isAllowed(Security.AUDITING_FEATURE)).thenReturn(isAuditingAllowed);
         token = mock(AuthenticationToken.class);
-        request = mock(TransportRequest.class);
+        request = mock(AbstractTransportRequest.class);
         restRequest = mock(RestRequest.class);
     }
 

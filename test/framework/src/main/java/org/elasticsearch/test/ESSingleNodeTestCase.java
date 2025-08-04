@@ -10,7 +10,7 @@ package org.elasticsearch.test;
 
 import com.carrotsearch.randomizedtesting.RandomizedContext;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -305,11 +305,11 @@ public abstract class ESSingleNodeTestCase extends ESTestCase {
     }
 
     /**
-     * Execute the given {@link ActionRequest} using the given {@link ActionType} and the default node client, wait for it to complete with
+     * Execute the given {@link AbstractActionRequest} using the given {@link ActionType} and the default node client, wait for it to complete with
      * a timeout of {@link #SAFE_AWAIT_TIMEOUT}, and then return the result. An exceptional response, timeout or interrupt triggers a test
      * failure.
      */
-    public <T extends ActionResponse> T safeExecute(ActionType<T> action, ActionRequest request) {
+    public <T extends ActionResponse> T safeExecute(ActionType<T> action, AbstractActionRequest request) {
         return safeExecute(client(), action, request);
     }
 

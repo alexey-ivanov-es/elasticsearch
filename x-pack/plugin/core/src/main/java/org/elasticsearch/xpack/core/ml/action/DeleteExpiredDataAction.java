@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.core.ml.action;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
@@ -33,7 +33,7 @@ public class DeleteExpiredDataAction extends ActionType<DeleteExpiredDataAction.
         super(NAME);
     }
 
-    public static class Request extends ActionRequest {
+    public static class Request extends AbstractActionRequest {
 
         public static final ParseField REQUESTS_PER_SECOND = new ParseField("requests_per_second");
         public static final ParseField TIMEOUT = new ParseField("timeout");

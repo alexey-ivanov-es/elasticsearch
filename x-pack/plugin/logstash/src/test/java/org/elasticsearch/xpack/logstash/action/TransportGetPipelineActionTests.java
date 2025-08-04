@@ -10,7 +10,7 @@ package org.elasticsearch.xpack.logstash.action;
 import org.apache.logging.log4j.Level;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.get.GetResponse;
@@ -183,7 +183,7 @@ public class TransportGetPipelineActionTests extends ESTestCase {
         return new NoOpClient(threadPool) {
             @Override
             @SuppressWarnings("unchecked")
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener
@@ -196,7 +196,7 @@ public class TransportGetPipelineActionTests extends ESTestCase {
     private Client getFailureClient(ThreadPool threadPool, Exception e) {
         return new NoOpClient(threadPool) {
             @Override
-            protected <Request extends ActionRequest, Response extends ActionResponse> void doExecute(
+            protected <Request extends AbstractActionRequest, Response extends ActionResponse> void doExecute(
                 ActionType<Response> action,
                 Request request,
                 ActionListener<Response> listener

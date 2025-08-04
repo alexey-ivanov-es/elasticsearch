@@ -30,6 +30,7 @@ import org.elasticsearch.xpack.graph.action.TransportGraphExploreAction;
 import org.elasticsearch.xpack.graph.rest.action.RestGraphAction;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -48,13 +49,13 @@ public class Graph extends Plugin implements ActionPlugin {
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
-        var usageAction = new ActionHandler<>(XPackUsageFeatureAction.GRAPH, GraphUsageTransportAction.class);
-        var infoAction = new ActionHandler<>(XPackInfoFeatureAction.GRAPH, GraphInfoTransportAction.class);
+    public Collection<ActionHandler> getActions() {
+        var usageAction = new ActionHandler(XPackUsageFeatureAction.GRAPH, GraphUsageTransportAction.class);
+        var infoAction = new ActionHandler(XPackInfoFeatureAction.GRAPH, GraphInfoTransportAction.class);
         if (false == enabled) {
             return Arrays.asList(usageAction, infoAction);
         }
-        return Arrays.asList(new ActionHandler<>(GraphExploreAction.INSTANCE, TransportGraphExploreAction.class), usageAction, infoAction);
+        return Arrays.asList(new ActionHandler(GraphExploreAction.INSTANCE, TransportGraphExploreAction.class), usageAction, infoAction);
     }
 
     @Override

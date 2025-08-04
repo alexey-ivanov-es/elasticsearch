@@ -10,7 +10,7 @@
 package org.elasticsearch.action.support;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
@@ -124,7 +124,7 @@ public class ReservedStateAwareHandledTransportActionTests extends ESTestCase {
         }
     }
 
-    static class DummyRequest extends ActionRequest {
+    static class DummyRequest extends AbstractActionRequest {
         @Override
         public ActionRequestValidationException validate() {
             return null;

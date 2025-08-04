@@ -9,7 +9,7 @@
 
 package org.elasticsearch.action.support.tasks;
 
-import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.AbstractActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -27,7 +27,7 @@ import static org.elasticsearch.action.ValidateActions.addValidationError;
 /**
  * A base class for task requests
  */
-public class BaseTasksRequest<Request extends BaseTasksRequest<Request>> extends ActionRequest {
+public class BaseTasksRequest<Request extends BaseTasksRequest<Request>> extends AbstractActionRequest {
 
     public static final String[] ALL_ACTIONS = Strings.EMPTY_ARRAY;
 

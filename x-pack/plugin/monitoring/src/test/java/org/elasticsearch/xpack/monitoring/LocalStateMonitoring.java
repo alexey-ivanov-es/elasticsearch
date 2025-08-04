@@ -39,6 +39,7 @@ import org.elasticsearch.xpack.ilm.IndexLifecycle;
 import org.elasticsearch.xpack.watcher.Watcher;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -110,12 +111,12 @@ public class LocalStateMonitoring extends LocalStateCompositeXPackPlugin {
     }
 
     @Override
-    public List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>> getActions() {
+    public Collection<ActionHandler> getActions() {
         var actions = super.getActions();
         // ccr StatsCollector
-        actions.add(new ActionHandler<>(CcrStatsAction.INSTANCE, TransportCcrStatsStubAction.class));
+        actions.add(new ActionHandler(CcrStatsAction.INSTANCE, TransportCcrStatsStubAction.class));
         // For EnrichStatsCollector:
-        actions.add(new ActionHandler<>(EnrichStatsAction.INSTANCE, TransportEnrichStatsStubAction.class));
+        actions.add(new ActionHandler(EnrichStatsAction.INSTANCE, TransportEnrichStatsStubAction.class));
         return actions;
     }
 
