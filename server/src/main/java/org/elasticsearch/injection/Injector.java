@@ -131,8 +131,8 @@ public final class Injector {
         return this;
     }
 
-    public Injector addExtensionsInstances(Map<Class<?>, Collection<?>> objects) {
-        for (Map.Entry<Class<?>, Collection<?>> entry : objects.entrySet()) {
+    public Injector addExtensionsInstances(Map<Class<?>, ? extends Collection<?>> objects) {
+        for (Map.Entry<Class<?>, ? extends Collection<?>> entry : objects.entrySet()) {
             addExtensionInstances(entry.getKey(), entry.getValue());
         }
         return this;

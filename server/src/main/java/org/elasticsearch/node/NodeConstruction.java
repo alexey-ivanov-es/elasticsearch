@@ -245,7 +245,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -292,11 +291,10 @@ class NodeConstruction {
             constructor.loadLoggingDataProviders();
 
             List<org.elasticsearch.injection.Injector> pluginsInjectors = constructor.pluginsService.flatMapBundle(bundle -> {
-                List<Object> extensionsInstancesFromPlugin = loadExtensionsInstancesFromPlugin(bundle);
+                Map<Class<?>, List<?>> extensionsInstancesFromPlugin = loadExtensionsInstancesFromPlugin(bundle);
                 org.elasticsearch.injection.Injector pluginInjector = org.elasticsearch.injection.Injector.create();
 
-                // TODO: build map properly
-                pluginInjector.addExtensionsInstances(Map.of(FixedExecutorBuilderSpec.class, extensionsInstancesFromPlugin));
+                pluginInjector.addExtensionsInstances(extensionsInstancesFromPlugin);
                 return Collections.singleton(pluginInjector);
             }).toList();
 
@@ -432,13 +430,32 @@ class NodeConstruction {
         return Optional.of(plugin);
     }
 
-    private static List<Object> loadExtensionsInstancesFromPlugin(BundleInfo bundle) {
+    private static Map<Class<?>, List<?>> loadExtensionsInstancesFromPlugin(BundleInfo bundle) {
         Plugin plugin = bundle.instance();
         ClassLoader loader = plugin.getClass().getClassLoader();
 
-        List<String> extensionsFields = bundle.manifest().extensionsFields();
+        Map<String, List<String>> extensionsFields = bundle.manifest().extensionsFields();
 
-        return extensionsFields.stream().map(extensionFieldName -> getExtensionInstanceFromField(extensionFieldName, loader)).toList();
+        Map<Class<?>, List<?>> extensionsInstances = new HashMap<>();
+        for (Map.Entry<String, List<String>> entry : extensionsFields.entrySet()) {
+            String extensibleClassName = entry.getKey();
+            Class<?> extensibleClass;
+            try {
+                extensibleClass = loader.loadClass(extensibleClassName);
+            } catch (ClassNotFoundException e) {
+                throw new AssertionError(e);
+            }
+            List<Object> instances = entry.getValue().stream()
+                .map(extensionFieldName -> getExtensionInstanceFromField(extensionFieldName, loader))
+                .toList();
+            extensionsInstances.put(extensibleClass, instances);
+        }
+
+        // TODO: we need to have all Extensible classes in the map,
+        //  otherwise, Injector won't know anything about them and will fail attempting to find a suitable constructor
+        extensionsInstances.putIfAbsent(FixedExecutorBuilderSpec.class, Collections.emptyList());
+
+        return extensionsInstances;
     }
 
     private static Object getExtensionInstanceFromField(String extensionFieldName, ClassLoader loader) {

@@ -31,18 +31,6 @@ import java.util.function.Supplier;
 
 public class Downsample extends Plugin implements ActionPlugin, PersistentTaskPlugin {
 
-    public static final String DOWNSAMPLE_TASK_THREAD_POOL_NAME = "downsample_indexing";
-    private static final int DOWNSAMPLE_TASK_THREAD_POOL_QUEUE_SIZE = 256;
-    public static final String DOWNSAMPLE_MIN_NUMBER_OF_REPLICAS_NAME = "downsample.min_number_of_replicas";
-
-    @Extension
-    public static final FixedExecutorBuilderSpec DOWNSAMPLE_EXECUTOR = new FixedExecutorBuilderSpec(
-        DOWNSAMPLE_TASK_THREAD_POOL_NAME,
-        settings -> ThreadPool.oneEighthAllocatedProcessors(EsExecutors.allocatedProcessors(settings)),
-        DOWNSAMPLE_TASK_THREAD_POOL_QUEUE_SIZE,
-        "xpack.downsample.thread_pool"
-    );
-
     /*@Override
     public Collection<ActionHandler> getActions() {
         return List.of(

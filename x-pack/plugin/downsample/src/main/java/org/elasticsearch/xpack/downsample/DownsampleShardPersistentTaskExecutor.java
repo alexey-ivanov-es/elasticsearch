@@ -10,13 +10,12 @@ package org.elasticsearch.xpack.downsample;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.BytesRef;
-import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.AbstractActionRequest;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.ActionType;
 import org.elasticsearch.action.IndicesRequest;
-import org.elasticsearch.action.downsample.DownsampleAction;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.action.support.IndicesOptions;
@@ -40,11 +39,13 @@ import org.elasticsearch.persistent.AllocatedPersistentTask;
 import org.elasticsearch.persistent.InjectablePersistentTasksExecutor;
 import org.elasticsearch.persistent.PersistentTaskState;
 import org.elasticsearch.persistent.PersistentTasksCustomMetadata;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugin.NamedComponent;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskId;
+import org.elasticsearch.threadpool.FixedExecutorBuilderSpec;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.xpack.core.downsample.DownsampleShardIndexerStatus;
@@ -57,15 +58,25 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
-import static org.elasticsearch.xpack.downsample.Downsample.DOWNSAMPLE_TASK_THREAD_POOL_NAME;
-
 @NamedComponent(DownsampleShardTask.TASK_NAME)
 public class DownsampleShardPersistentTaskExecutor extends InjectablePersistentTasksExecutor<DownsampleShardTaskParams> {
     private static final Logger LOGGER = LogManager.getLogger(DownsampleShardPersistentTaskExecutor.class);
+
+    private static final String DOWNSAMPLE_TASK_THREAD_POOL_NAME = "downsample_indexing";
+    private static final int DOWNSAMPLE_TASK_THREAD_POOL_QUEUE_SIZE = 256;
+
+    @Extension
+    public static final FixedExecutorBuilderSpec DOWNSAMPLE_EXECUTOR = new FixedExecutorBuilderSpec(
+        DOWNSAMPLE_TASK_THREAD_POOL_NAME,
+        settings -> ThreadPool.oneEighthAllocatedProcessors(EsExecutors.allocatedProcessors(settings)),
+        DOWNSAMPLE_TASK_THREAD_POOL_QUEUE_SIZE,
+        "xpack.downsample.thread_pool"
+    );
+
     private final Client client;
 
     public DownsampleShardPersistentTaskExecutor(final NodeClient client, final ThreadPool threadPool) {
-        super(threadPool.executor(DOWNSAMPLE_TASK_THREAD_POOL_NAME));
+        super(threadPool.executor(DOWNSAMPLE_EXECUTOR));
         this.client = Objects.requireNonNull(client);
     }
 
@@ -201,7 +212,7 @@ public class DownsampleShardPersistentTaskExecutor extends InjectablePersistentT
         DownsampleShardTaskParams params,
         BytesRef lastDownsampledTsid
     ) {
-        client.threadPool().executor(DOWNSAMPLE_TASK_THREAD_POOL_NAME).execute(new AbstractRunnable() {
+        client.threadPool().executor(DOWNSAMPLE_EXECUTOR).execute(new AbstractRunnable() {
             @Override
             public void onFailure(Exception e) {
                 markAsFailed(task, e);

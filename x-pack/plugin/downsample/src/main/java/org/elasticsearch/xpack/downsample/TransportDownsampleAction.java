@@ -114,6 +114,8 @@ public class TransportDownsampleAction extends AcknowledgedTransportMasterNodeAc
 
     private static final Logger logger = LogManager.getLogger(TransportDownsampleAction.class);
 
+    public static final String DOWNSAMPLE_MIN_NUMBER_OF_REPLICAS_NAME = "downsample.min_number_of_replicas";
+
     private final Client client;
     private final IndicesService indicesService;
     private final MasterServiceTaskQueue<DownsampleClusterStateUpdateTask> taskQueue;
@@ -365,7 +367,7 @@ public class TransportDownsampleAction extends AcknowledgedTransportMasterNodeAc
              * We should note that there is a risk of losing a node during the downsample process. In this
              * case downsample will fail.
              */
-            int minNumReplicas = clusterService.getSettings().getAsInt(Downsample.DOWNSAMPLE_MIN_NUMBER_OF_REPLICAS_NAME, 0);
+            int minNumReplicas = clusterService.getSettings().getAsInt(DOWNSAMPLE_MIN_NUMBER_OF_REPLICAS_NAME, 0);
 
             // 3. Create downsample index
             createDownsampleIndex(
