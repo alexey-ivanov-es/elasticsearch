@@ -7,21 +7,17 @@
 package org.elasticsearch.xpack.ml.packageloader;
 
 import org.elasticsearch.Build;
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.bootstrap.BootstrapCheck;
 import org.elasticsearch.bootstrap.BootstrapContext;
 import org.elasticsearch.common.ReferenceDocs;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
 import org.elasticsearch.common.settings.Setting;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.util.concurrent.EsExecutors;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.tasks.Task;
-import org.elasticsearch.threadpool.ExecutorBuilder;
-import org.elasticsearch.threadpool.FixedExecutorBuilder;
+import org.elasticsearch.threadpool.FixedExecutorBuilderSpec;
 import org.elasticsearch.xpack.core.ml.packageloader.action.GetTrainedModelPackageConfigAction;
 import org.elasticsearch.xpack.core.ml.packageloader.action.LoadTrainedModelPackageAction;
 import org.elasticsearch.xpack.ml.packageloader.action.ModelDownloadTask;
@@ -57,7 +53,7 @@ public class MachineLearningPackageLoader extends Plugin implements ActionPlugin
         Build.current().version().replaceFirst("^(\\d+\\.\\d+).*", "$1")
     );
 
-    public static final String MODEL_DOWNLOAD_THREADPOOL_NAME = "model_download";
+    private static final String MODEL_DOWNLOAD_THREADPOOL_NAME = "model_download";
 
     public MachineLearningPackageLoader() {}
 
@@ -86,23 +82,15 @@ public class MachineLearningPackageLoader extends Plugin implements ActionPlugin
         );
     }
 
-    @Override
-    public List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
-        return List.of(modelDownloadExecutor(settings));
-    }
-
-    public static FixedExecutorBuilder modelDownloadExecutor(Settings settings) {
-        // Threadpool with a fixed number of threads for
-        // downloading the model definition files
-        return new FixedExecutorBuilder(
-            settings,
-            MODEL_DOWNLOAD_THREADPOOL_NAME,
-            ModelImporter.NUMBER_OF_STREAMS,
-            -1, // unbounded queue size
-            "xpack.ml.model_download_thread_pool",
-            EsExecutors.TaskTrackingConfig.DO_NOT_TRACK
-        );
-    }
+    // Threadpool with a fixed number of threads for
+    // downloading the model definition files
+    @Extension
+    public static final FixedExecutorBuilderSpec MODEL_DOWNLOAD_THREADPOOL = new FixedExecutorBuilderSpec(
+        MODEL_DOWNLOAD_THREADPOOL_NAME,
+        ModelImporter.NUMBER_OF_STREAMS,
+        -1, // unbounded queue size
+        "xpack.ml.model_download_thread_pool"
+    );
 
     @Override
     public List<BootstrapCheck> getBootstrapChecks() {

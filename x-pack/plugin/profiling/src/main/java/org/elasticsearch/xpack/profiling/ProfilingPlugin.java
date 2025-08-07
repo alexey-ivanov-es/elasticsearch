@@ -10,8 +10,6 @@ package org.elasticsearch.xpack.profiling;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.SetOnce;
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
 import org.elasticsearch.cluster.node.DiscoveryNodes;
@@ -24,12 +22,12 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.SettingsFilter;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.features.NodeFeature;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
-import org.elasticsearch.threadpool.ExecutorBuilder;
-import org.elasticsearch.threadpool.ScalingExecutorBuilder;
+import org.elasticsearch.threadpool.ScalingExecutorBuilderSpec;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.xpack.core.XPackPlugin;
 import org.elasticsearch.xpack.core.XPackSettings;
@@ -169,19 +167,15 @@ public class ProfilingPlugin extends Plugin implements ActionPlugin {
         );
     }
 
-    @Override
-    public List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
-        return List.of(responseExecutorBuilder());
-    }
-
     /**
-     * @return <p>An <code>ExecutorBuilder</code> that creates an executor to offload internal query response processing from the
+     * <p>An <code>ExecutorBuilder</code> that creates an executor to offload internal query response processing from the
      * transport thread. The executor will occupy no thread by default to avoid using resources when the plugin is not needed but once used,
      * it will hold onto allocated pool threads for 30 minutes by default to keep response times low.</p>
      */
-    public static ExecutorBuilder<?> responseExecutorBuilder() {
-        return new ScalingExecutorBuilder(PROFILING_THREAD_POOL_NAME, 0, 1, TimeValue.timeValueMinutes(30L), false);
-    }
+    @Extension
+    public static final ScalingExecutorBuilderSpec PROFILING_THREAD_POOL = new ScalingExecutorBuilderSpec(
+        PROFILING_THREAD_POOL_NAME, 0, 1, TimeValue.timeValueMinutes(30L), false
+    );
 
     @Override
     public Collection<ActionHandler> getActions() {

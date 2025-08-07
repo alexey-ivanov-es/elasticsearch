@@ -19,13 +19,13 @@ import org.elasticsearch.common.util.BigArrays;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.indices.recovery.RecoverySettings;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.plugins.ReloadablePlugin;
 import org.elasticsearch.plugins.RepositoryPlugin;
 import org.elasticsearch.repositories.RepositoriesMetrics;
 import org.elasticsearch.repositories.Repository;
-import org.elasticsearch.threadpool.ExecutorBuilder;
-import org.elasticsearch.threadpool.ScalingExecutorBuilder;
+import org.elasticsearch.threadpool.ScalingExecutorBuilderSpec;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 
 import java.security.AccessController;
@@ -115,19 +115,13 @@ public class AzureRepositoryPlugin extends Plugin implements RepositoryPlugin, R
         );
     }
 
-    @Override
-    public List<ExecutorBuilder<?>> getExecutorBuilders(Settings settingsToUse) {
-        return List.of(executorBuilder(), nettyEventLoopExecutorBuilder(settingsToUse));
-    }
+    @Extension
+    public static final ScalingExecutorBuilderSpec REPOSITORY_THREAD_POOL = new ScalingExecutorBuilderSpec(REPOSITORY_THREAD_POOL_NAME,
+        0, 5, TimeValue.timeValueSeconds(30L), false);
 
-    public static ExecutorBuilder<?> executorBuilder() {
-        return new ScalingExecutorBuilder(REPOSITORY_THREAD_POOL_NAME, 0, 5, TimeValue.timeValueSeconds(30L), false);
-    }
-
-    public static ExecutorBuilder<?> nettyEventLoopExecutorBuilder(Settings settings) {
-        int eventLoopThreads = AzureClientProvider.eventLoopThreadsFromSettings(settings);
-        return new ScalingExecutorBuilder(NETTY_EVENT_LOOP_THREAD_POOL_NAME, 0, eventLoopThreads, TimeValue.timeValueSeconds(30L), false);
-    }
+    @Extension
+    public static final ScalingExecutorBuilderSpec NETTY_EVENT_LOOP_THREAD_POOL = new ScalingExecutorBuilderSpec(NETTY_EVENT_LOOP_THREAD_POOL_NAME,
+        0, AzureClientProvider::eventLoopThreadsFromSettings, TimeValue.timeValueSeconds(30L), false);
 
     @Override
     public void reload(Settings settingsToLoad) {

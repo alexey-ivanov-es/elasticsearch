@@ -77,7 +77,7 @@ public class ModelImporter {
         this.modelId = Objects.requireNonNull(modelId);
         this.config = Objects.requireNonNull(packageConfig);
         this.task = Objects.requireNonNull(task);
-        this.executorService = threadPool.executor(MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL_NAME);
+        this.executorService = threadPool.executor(MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL);
         this.uri = ModelLoaderUtils.resolvePackageLocation(
             config.getModelRepository(),
             config.getPackagedModelId() + ModelLoaderUtils.MODEL_FILE_EXTENSION
@@ -90,10 +90,10 @@ public class ModelImporter {
     }
 
     private void doImportInternal(ActionListener<AcknowledgedResponse> finalListener) {
-        assert ThreadPool.assertCurrentThreadPool(MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL_NAME)
+        assert ThreadPool.assertCurrentThreadPool(MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL.name())
             : format(
                 "Model download must execute from [%s] but thread is [%s]",
-                MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL_NAME,
+                MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL.name(),
                 Thread.currentThread().getName()
             );
 
@@ -175,10 +175,10 @@ public class ModelImporter {
         RefCountingListener countingListener,
         ActionListener<Void> rangeFullyDownloadedListener
     ) {
-        assert ThreadPool.assertCurrentThreadPool(MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL_NAME)
+        assert ThreadPool.assertCurrentThreadPool(MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL.name())
             : format(
                 "Model download must execute from [%s] but thread is [%s]",
-                MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL_NAME,
+                MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL.name(),
                 Thread.currentThread().getName()
             );
 
@@ -220,10 +220,10 @@ public class ModelImporter {
         ModelLoaderUtils.HttpStreamChunker downloader,
         ActionListener<AcknowledgedResponse> lastPartWrittenListener
     ) {
-        assert ThreadPool.assertCurrentThreadPool(MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL_NAME)
+        assert ThreadPool.assertCurrentThreadPool(MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL.name())
             : format(
                 "Model download must execute from [%s] but thread is [%s]",
-                MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL_NAME,
+                MachineLearningPackageLoader.MODEL_DOWNLOAD_THREADPOOL.name(),
                 Thread.currentThread().getName()
             );
 

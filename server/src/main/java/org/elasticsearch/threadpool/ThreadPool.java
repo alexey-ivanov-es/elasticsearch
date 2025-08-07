@@ -288,7 +288,7 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler, 
         final Settings settings,
         MeterRegistry meterRegistry,
         BuiltInExecutorBuilders builtInExecutorBuilders,
-        Collection<FixedExecutorBuilderSpec> executorBuilderSpecs,
+        Collection<ThreadPoolSpec<?>> executorBuilderSpecs,
         final ExecutorBuilder<?>... customBuilders
     ) {
         assert Node.NODE_NAME_SETTING.exists(settings);
@@ -304,10 +304,8 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler, 
             }
             builders.put(builder.name(), builder);
         }
-        for (FixedExecutorBuilderSpec spec : executorBuilderSpecs) {
-            int size = spec.sizeFunction().applyAsInt(settings);
-            FixedExecutorBuilder builder = new FixedExecutorBuilder(settings, spec.name(), size, spec.queueSize(), spec.prefix(),
-                EsExecutors.TaskTrackingConfig.DO_NOT_TRACK);
+        for (ThreadPoolSpec<?> spec : executorBuilderSpecs) {
+            ExecutorBuilder<?> builder = spec.toBuilder(settings);
             builders.put(builder.name(), builder);
         }
 

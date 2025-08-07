@@ -23,6 +23,7 @@ import org.elasticsearch.common.settings.SettingsModule;
 import org.elasticsearch.common.util.concurrent.EsExecutors;
 import org.elasticsearch.features.NodeFeature;
 import org.elasticsearch.persistent.PersistentTasksExecutor;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.PersistentTaskPlugin;
 import org.elasticsearch.plugins.Plugin;
@@ -30,6 +31,7 @@ import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
 import org.elasticsearch.threadpool.ExecutorBuilder;
 import org.elasticsearch.threadpool.FixedExecutorBuilder;
+import org.elasticsearch.threadpool.FixedExecutorBuilderSpec;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.xpack.core.action.XPackInfoFeatureAction;
 import org.elasticsearch.xpack.core.action.XPackUsageFeatureAction;
@@ -131,18 +133,13 @@ public class Rollup extends Plugin implements ActionPlugin, PersistentTaskPlugin
         );
     }
 
-    @Override
-    public List<ExecutorBuilder<?>> getExecutorBuilders(Settings settingsToUse) {
-        final FixedExecutorBuilder rollup = new FixedExecutorBuilder(
-            settingsToUse,
-            Rollup.TASK_THREAD_POOL_NAME,
-            1,
-            -1,
-            "xpack.rollup.task_thread_pool",
-            EsExecutors.TaskTrackingConfig.DO_NOT_TRACK
-        );
-        return List.of(rollup);
-    }
+    @Extension
+    public static final FixedExecutorBuilderSpec ROLLUP_TASK_THREAD_POOL = new FixedExecutorBuilderSpec(
+        Rollup.TASK_THREAD_POOL_NAME,
+        1,
+        -1,
+        "xpack.rollup.task_thread_pool"
+    );
 
     @Override
     public List<PersistentTasksExecutor<?>> getPersistentTasksExecutor(

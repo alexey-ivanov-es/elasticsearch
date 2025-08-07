@@ -10,8 +10,6 @@ package org.elasticsearch.xpack.inference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.SetOnce;
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.support.MappedActionFilter;
 import org.elasticsearch.cluster.NamedDiff;
 import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
@@ -35,6 +33,7 @@ import org.elasticsearch.license.License;
 import org.elasticsearch.license.LicensedFeature;
 import org.elasticsearch.license.XPackLicenseState;
 import org.elasticsearch.node.PluginComponentBinding;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.ClusterPlugin;
 import org.elasticsearch.plugins.ExtensiblePlugin;
@@ -50,8 +49,7 @@ import org.elasticsearch.rest.RestHeaderDefinition;
 import org.elasticsearch.search.fetch.subphase.highlight.Highlighter;
 import org.elasticsearch.search.rank.RankBuilder;
 import org.elasticsearch.search.rank.RankDoc;
-import org.elasticsearch.threadpool.ExecutorBuilder;
-import org.elasticsearch.threadpool.ScalingExecutorBuilder;
+import org.elasticsearch.threadpool.ScalingExecutorBuilderSpec;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.ParseField;
@@ -439,21 +437,14 @@ public class InferencePlugin extends Plugin
         );
     }
 
-    @Override
-    public List<ExecutorBuilder<?>> getExecutorBuilders(Settings settingsToUse) {
-        return List.of(inferenceUtilityExecutor(settings));
-    }
-
-    public static ExecutorBuilder<?> inferenceUtilityExecutor(Settings settings) {
-        return new ScalingExecutorBuilder(
-            UTILITY_THREAD_POOL_NAME,
-            0,
-            10,
-            TimeValue.timeValueMinutes(10),
-            false,
-            "xpack.inference.utility_thread_pool"
-        );
-    }
+    @Extension
+    public static final ScalingExecutorBuilderSpec UTILITY_THREAD_POOL = new ScalingExecutorBuilderSpec(
+        UTILITY_THREAD_POOL_NAME,
+        0,
+        10,
+        TimeValue.timeValueMinutes(10),
+        false,
+        "xpack.inference.utility_thread_pool");
 
     @Override
     public List<Setting<?>> getSettings() {

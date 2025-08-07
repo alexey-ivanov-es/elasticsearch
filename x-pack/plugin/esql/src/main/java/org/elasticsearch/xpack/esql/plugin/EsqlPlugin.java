@@ -6,8 +6,6 @@
  */
 package org.elasticsearch.xpack.esql.plugin;
 
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
 import org.elasticsearch.cluster.node.DiscoveryNodes;
 import org.elasticsearch.common.breaker.CircuitBreaker;
@@ -40,12 +38,12 @@ import org.elasticsearch.compute.operator.topn.TopNOperatorStatus;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.features.NodeFeature;
 import org.elasticsearch.license.XPackLicenseState;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
-import org.elasticsearch.threadpool.ExecutorBuilder;
-import org.elasticsearch.threadpool.FixedExecutorBuilder;
+import org.elasticsearch.threadpool.FixedExecutorBuilderSpec;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.xpack.core.XPackPlugin;
 import org.elasticsearch.xpack.core.action.XPackInfoFeatureAction;
@@ -279,19 +277,14 @@ public class EsqlPlugin extends Plugin implements ActionPlugin {
         return entries;
     }
 
-    public List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
-        final int allocatedProcessors = EsExecutors.allocatedProcessors(settings);
-        return List.of(
-            // TODO: Maybe have two types of threadpools for workers: one for CPU-bound and one for I/O-bound tasks.
-            // And we should also reduce the number of threads of the CPU-bound threadpool to allocatedProcessors.
-            new FixedExecutorBuilder(
-                settings,
-                ESQL_WORKER_THREAD_POOL_NAME,
-                ThreadPool.searchOrGetThreadPoolSize(allocatedProcessors),
-                1000,
-                ESQL_WORKER_THREAD_POOL_NAME,
-                EsExecutors.TaskTrackingConfig.DEFAULT
-            )
-        );
-    }
+    // TODO: Maybe have two types of threadpools for workers: one for CPU-bound and one for I/O-bound tasks.
+    // And we should also reduce the number of threads of the CPU-bound threadpool to allocatedProcessors.
+    @Extension
+    public static final FixedExecutorBuilderSpec ESQL_WORKER_THREAD_POOL = new FixedExecutorBuilderSpec(
+        ESQL_WORKER_THREAD_POOL_NAME,
+        settings -> ThreadPool.searchOrGetThreadPoolSize(EsExecutors.allocatedProcessors(settings)),
+        1000,
+        ESQL_WORKER_THREAD_POOL_NAME,
+        EsExecutors.TaskTrackingConfig.DEFAULT
+    );
 }

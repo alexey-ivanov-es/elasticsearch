@@ -220,7 +220,9 @@ import org.elasticsearch.telemetry.tracing.Tracer;
 import org.elasticsearch.threadpool.DefaultBuiltInExecutorBuilders;
 import org.elasticsearch.threadpool.ExecutorBuilder;
 import org.elasticsearch.threadpool.FixedExecutorBuilderSpec;
+import org.elasticsearch.threadpool.ScalingExecutorBuilderSpec;
 import org.elasticsearch.threadpool.ThreadPool;
+import org.elasticsearch.threadpool.ThreadPoolSpec;
 import org.elasticsearch.threadpool.internal.BuiltInExecutorBuilders;
 import org.elasticsearch.transport.Transport;
 import org.elasticsearch.transport.TransportService;
@@ -454,6 +456,7 @@ class NodeConstruction {
         // TODO: we need to have all Extensible classes in the map,
         //  otherwise, Injector won't know anything about them and will fail attempting to find a suitable constructor
         extensionsInstances.putIfAbsent(FixedExecutorBuilderSpec.class, Collections.emptyList());
+        extensionsInstances.putIfAbsent(ScalingExecutorBuilderSpec.class, Collections.emptyList());
 
         return extensionsInstances;
     }
@@ -461,7 +464,7 @@ class NodeConstruction {
     private static Object getExtensionInstanceFromField(String extensionFieldName, ClassLoader loader) {
         String[] parts = extensionFieldName.split("#");
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Incorrect field name [" + extensionFieldName);
+            throw new IllegalArgumentException("Incorrect field name [" + extensionFieldName + "]");
         }
         String className = parts[0];
         String fieldName = parts[1];
@@ -549,10 +552,10 @@ class NodeConstruction {
 
     private ThreadPool createThreadPool(Settings settings, MeterRegistry meterRegistry,
                                         List<org.elasticsearch.injection.Injector> pluginsInjectors) throws IOException {
-        Collection<FixedExecutorBuilderSpec> builderSpecs = pluginsInjectors.stream()
+        Collection<ThreadPoolSpec<?>> builderSpecs = pluginsInjectors.stream()
             .map(injector -> injector.inject(List.of(RecordBuilderSpecs.class)))
             .map(m -> (RecordBuilderSpecs) m.get(RecordBuilderSpecs.class))
-            .flatMap(specs -> specs.specs().stream())
+            .flatMap(RecordBuilderSpecs::specsStream)
             .toList();
 
         ThreadPool threadPool = new ThreadPool(
@@ -1962,6 +1965,9 @@ class NodeConstruction {
         return Set.of(new IndexMode.IndexModeSettingsProvider());
     }
 
-    public record RecordBuilderSpecs(Collection<FixedExecutorBuilderSpec> specs) {
+    public record RecordBuilderSpecs(Collection<FixedExecutorBuilderSpec> fixedSpec, Collection<ScalingExecutorBuilderSpec> scalingSpec) {
+        public Stream<ThreadPoolSpec<?>> specsStream() {
+            return Stream.concat(fixedSpec.stream(), scalingSpec.stream());
+        }
     }
 }

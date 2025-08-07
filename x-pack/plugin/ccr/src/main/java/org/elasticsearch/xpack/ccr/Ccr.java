@@ -9,8 +9,6 @@ package org.elasticsearch.xpack.ccr;
 import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.TransportVersion;
 import org.elasticsearch.TransportVersions;
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.RequestValidators;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -27,7 +25,6 @@ import org.elasticsearch.common.settings.Setting;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.SettingsFilter;
 import org.elasticsearch.common.settings.SettingsModule;
-import org.elasticsearch.common.util.concurrent.EsExecutors;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.features.NodeFeature;
 import org.elasticsearch.index.IndexModule;
@@ -36,6 +33,7 @@ import org.elasticsearch.index.engine.EngineFactory;
 import org.elasticsearch.indices.recovery.RecoverySettings;
 import org.elasticsearch.persistent.PersistentTaskParams;
 import org.elasticsearch.persistent.PersistentTasksExecutor;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.ClusterPlugin;
 import org.elasticsearch.plugins.EnginePlugin;
@@ -46,8 +44,7 @@ import org.elasticsearch.repositories.Repository;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
 import org.elasticsearch.tasks.Task;
-import org.elasticsearch.threadpool.ExecutorBuilder;
-import org.elasticsearch.threadpool.FixedExecutorBuilder;
+import org.elasticsearch.threadpool.FixedExecutorBuilderSpec;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.xcontent.NamedXContentRegistry;
 import org.elasticsearch.xcontent.ParseField;
@@ -147,6 +144,14 @@ public class Ccr extends Plugin implements ActionPlugin, PersistentTaskPlugin, E
     private final SetOnce<CcrRestoreSourceService> restoreSourceService = new SetOnce<>();
     private final SetOnce<CcrSettings> ccrSettings = new SetOnce<>();
     private Client client;
+
+    @Extension
+    public static final FixedExecutorBuilderSpec CCR_THREAD_POOL = new FixedExecutorBuilderSpec(
+        CCR_THREAD_POOL_NAME,
+        32,
+        100,
+        "xpack.ccr.ccr_thread_pool"
+    );
 
     /**
      * Construct an instance of the CCR container with the specified settings.
@@ -354,20 +359,6 @@ public class Ccr extends Plugin implements ActionPlugin, PersistentTaskPlugin, E
         } else {
             return Optional.empty();
         }
-    }
-
-    @SuppressWarnings("HiddenField")
-    public List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
-        return Collections.singletonList(
-            new FixedExecutorBuilder(
-                settings,
-                CCR_THREAD_POOL_NAME,
-                32,
-                100,
-                "xpack.ccr.ccr_thread_pool",
-                EsExecutors.TaskTrackingConfig.DO_NOT_TRACK
-            )
-        );
     }
 
     @Override

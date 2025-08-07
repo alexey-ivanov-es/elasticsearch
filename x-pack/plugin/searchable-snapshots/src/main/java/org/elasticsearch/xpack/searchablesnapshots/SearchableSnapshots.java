@@ -10,8 +10,6 @@ import org.apache.lucene.store.BufferedIndexInput;
 import org.apache.lucene.util.SetOnce;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.blobcache.BlobCacheMetrics;
 import org.elasticsearch.blobcache.shared.SharedBlobCacheService;
 import org.elasticsearch.client.internal.Client;
@@ -54,6 +52,7 @@ import org.elasticsearch.index.translog.TranslogStats;
 import org.elasticsearch.indices.SystemIndexDescriptor;
 import org.elasticsearch.license.LicenseUtils;
 import org.elasticsearch.license.XPackLicenseState;
+import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.ClusterPlugin;
 import org.elasticsearch.plugins.EnginePlugin;
@@ -69,7 +68,7 @@ import org.elasticsearch.rest.RestHandler;
 import org.elasticsearch.snapshots.SearchableSnapshotsSettings;
 import org.elasticsearch.snapshots.sourceonly.SourceOnlySnapshotRepository;
 import org.elasticsearch.threadpool.ExecutorBuilder;
-import org.elasticsearch.threadpool.ScalingExecutorBuilder;
+import org.elasticsearch.threadpool.ScalingExecutorBuilderSpec;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xpack.core.XPackPlugin;
@@ -539,10 +538,6 @@ public class SearchableSnapshots extends Plugin implements IndexStorePlugin, Eng
         );
     }
 
-    public List<ExecutorBuilder<?>> getExecutorBuilders(Settings settings) {
-        return List.of(executorBuilders(settings));
-    }
-
     public static final String SNAPSHOT_RECOVERY_STATE_FACTORY_KEY = "snapshot_prewarm";
 
     @Override
@@ -555,30 +550,25 @@ public class SearchableSnapshots extends Plugin implements IndexStorePlugin, Eng
     public static final String CACHE_PREWARMING_THREAD_POOL_NAME = BlobStoreRepository.SEARCHABLE_SNAPSHOTS_CACHE_PREWARMING_THREAD_NAME;
     public static final String CACHE_PREWARMING_THREAD_POOL_SETTING = "xpack.searchable_snapshots.cache_prewarming_thread_pool";
 
-    public static ScalingExecutorBuilder[] executorBuilders(Settings settings) {
-        final int processors = EsExecutors.allocatedProcessors(settings);
-        // searchable snapshots cache thread pools should always reject tasks once they are shutting down, otherwise some threads might be
-        // waiting for some cache file regions to be populated but this will never happen once the thread pool is shutting down. In order to
-        // prevent these threads to be blocked the cache thread pools will reject after shutdown.
-        final boolean rejectAfterShutdown = true;
-        return new ScalingExecutorBuilder[] {
-            new ScalingExecutorBuilder(
-                CACHE_FETCH_ASYNC_THREAD_POOL_NAME,
-                0,
-                Math.min(processors * 3, 50),
-                TimeValue.timeValueSeconds(30L),
-                rejectAfterShutdown,
-                CACHE_FETCH_ASYNC_THREAD_POOL_SETTING
-            ),
-            new ScalingExecutorBuilder(
-                CACHE_PREWARMING_THREAD_POOL_NAME,
-                0,
-                16,
-                TimeValue.timeValueSeconds(30L),
-                rejectAfterShutdown,
-                CACHE_PREWARMING_THREAD_POOL_SETTING
-            ) };
-    }
+    @Extension
+    public static final ScalingExecutorBuilderSpec CACHE_FETCH_ASYNC_THREAD_POOL = new ScalingExecutorBuilderSpec(
+        CACHE_FETCH_ASYNC_THREAD_POOL_NAME,
+        0,
+        settings -> Math.min(EsExecutors.allocatedProcessors(settings) * 3, 50),
+        TimeValue.timeValueSeconds(30L),
+        true,
+        CACHE_FETCH_ASYNC_THREAD_POOL_SETTING
+    );
+
+    @Extension
+    public static final ScalingExecutorBuilderSpec CACHE_PREWARMING_THREAD_POOL = new ScalingExecutorBuilderSpec(
+        CACHE_PREWARMING_THREAD_POOL_NAME,
+        0,
+        16,
+        TimeValue.timeValueSeconds(30L),
+        true,
+        CACHE_PREWARMING_THREAD_POOL_SETTING
+    );
 
     private static Settings getIndexSettings() {
         return Settings.builder()

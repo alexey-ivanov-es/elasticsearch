@@ -51,11 +51,12 @@ public abstract class GenerateBundleManifestTask extends DefaultTask {
     @TaskAction
     public void scanPluginClasses() {
         File outputFile = projectLayout.getBuildDirectory().file(NAMED_COMPONENTS_PATH).get().getAsFile();
+        File moduleDirectory = projectLayout.getProjectDirectory().getAsFile();
 
         ExecResult execResult = LoggedExec.javaexec(execOperations, spec -> {
             spec.classpath(pluginScannerClasspath.plus(getClasspath()).getAsPath());
             spec.getMainClass().set("org.elasticsearch.plugin.scanner.ManifestBuilder");
-            spec.args(outputFile);
+            spec.args(outputFile, moduleDirectory);
             spec.setErrorOutput(System.err);
             spec.setStandardOutput(System.out);
         });

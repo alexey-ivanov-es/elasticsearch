@@ -10,6 +10,7 @@
 package org.elasticsearch.threadpool;
 
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.util.concurrent.EsExecutors;
 import org.elasticsearch.plugin.Extensible;
 
 import java.util.function.ToIntFunction;
@@ -19,9 +20,20 @@ public record FixedExecutorBuilderSpec(
     String name,
     ToIntFunction<Settings> sizeFunction,
     int queueSize,
-    String prefix
-) {
+    String prefix,
+    EsExecutors.TaskTrackingConfig taskTrackingConfig
+) implements ThreadPoolSpec<FixedExecutorBuilder.FixedExecutorSettings> {
     public FixedExecutorBuilderSpec(String name, int size, int queueSize, String prefix) {
         this(name, ignore -> size, queueSize, prefix);
+    }
+
+    public FixedExecutorBuilderSpec(String name, ToIntFunction<Settings> sizeFunction, int queueSize, String prefix) {
+        this(name, sizeFunction, queueSize, prefix, EsExecutors.TaskTrackingConfig.DO_NOT_TRACK);
+    }
+
+    @Override
+    public FixedExecutorBuilder toBuilder(Settings settings) {
+        int size = sizeFunction().applyAsInt(settings);
+        return new FixedExecutorBuilder(settings, name, size, queueSize, prefix, taskTrackingConfig);
     }
 }

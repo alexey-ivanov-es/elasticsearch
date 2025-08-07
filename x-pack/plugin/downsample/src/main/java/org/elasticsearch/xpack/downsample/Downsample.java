@@ -14,16 +14,12 @@ import org.elasticsearch.common.settings.ClusterSettings;
 import org.elasticsearch.common.settings.IndexScopedSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.SettingsFilter;
-import org.elasticsearch.common.util.concurrent.EsExecutors;
 import org.elasticsearch.features.NodeFeature;
-import org.elasticsearch.plugin.Extension;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.PersistentTaskPlugin;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestHandler;
-import org.elasticsearch.threadpool.FixedExecutorBuilderSpec;
-import org.elasticsearch.threadpool.ThreadPool;
 
 import java.util.List;
 import java.util.function.Predicate;
