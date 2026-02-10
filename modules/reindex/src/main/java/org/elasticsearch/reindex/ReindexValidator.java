@@ -18,6 +18,7 @@ import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.support.AutoCreateIndex;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
 import org.elasticsearch.cluster.metadata.ProjectMetadata;
@@ -32,6 +33,7 @@ import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.reindex.ReindexRequest;
 import org.elasticsearch.index.reindex.RemoteInfo;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.crossproject.CrossProjectIndexResolutionValidator;
 import org.elasticsearch.transport.RemoteClusterAware;
 
 import java.util.Arrays;
@@ -136,6 +138,11 @@ public class ReindexValidator {
              */
             target = indexNameExpressionResolver.concreteWriteIndex(project, destination).getName();
         }
+        if (source.indicesOptions().resolveCrossProjectIndexExpression() == false && source.getProjectRouting() != null) {
+            ActionRequestValidationException e = new ActionRequestValidationException();
+            e.addValidationError("reindex doesn't support project routing [" + source.getProjectRouting() + "] when cross-project search is disabled");
+            throw e;
+        }
         SearchRequest filteredSource = skipRemoteIndexNames(source);
         if (filteredSource.indices().length == 0) {
             return;
@@ -151,9 +158,13 @@ public class ReindexValidator {
     }
 
     private static SearchRequest skipRemoteIndexNames(SearchRequest source) {
+        IndicesOptions indicesOptions = source.indicesOptions();
+        if (indicesOptions.resolveCrossProjectIndexExpression()) {
+            indicesOptions = CrossProjectIndexResolutionValidator.indicesOptionsForCrossProjectFanout(indicesOptions);
+        }
         // An index expression that references a remote cluster uses ":" to separate the cluster-alias from the index portion of the
         // expression, e.g., cluster0:index-name
-        return new SearchRequest(source).indices(
+        return new SearchRequest(source).indicesOptions(indicesOptions).indices(
             Arrays.stream(source.indices()).filter(name -> RemoteClusterAware.isRemoteIndexName(name) == false).toArray(String[]::new)
         );
     }

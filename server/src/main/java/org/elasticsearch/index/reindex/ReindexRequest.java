@@ -342,6 +342,10 @@ public class ReindexRequest extends AbstractBulkIndexByScrollRequest<ReindexRequ
             if (indices != null) {
                 request.getSearchRequest().indices(indices);
             }
+            String projectRouting = extractString(source, "project_routing");
+            if (projectRouting != null) {
+                request.getSearchRequest().setProjectRouting(projectRouting);
+            }
             request.setRemoteInfo(buildRemoteInfo(source));
             XContentBuilder builder = XContentFactory.contentBuilder(parser.contentType());
             builder.map(source);
