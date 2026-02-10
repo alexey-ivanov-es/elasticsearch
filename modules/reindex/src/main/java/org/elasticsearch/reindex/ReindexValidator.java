@@ -140,7 +140,9 @@ public class ReindexValidator {
         }
         if (source.indicesOptions().resolveCrossProjectIndexExpression() == false && source.getProjectRouting() != null) {
             ActionRequestValidationException e = new ActionRequestValidationException();
-            e.addValidationError("reindex doesn't support project routing [" + source.getProjectRouting() + "] when cross-project search is disabled");
+            e.addValidationError(
+                "reindex doesn't support project routing [" + source.getProjectRouting() + "] when cross-project search is disabled"
+            );
             throw e;
         }
         SearchRequest filteredSource = skipRemoteIndexNames(source);
@@ -164,8 +166,9 @@ public class ReindexValidator {
         }
         // An index expression that references a remote cluster uses ":" to separate the cluster-alias from the index portion of the
         // expression, e.g., cluster0:index-name
-        return new SearchRequest(source).indicesOptions(indicesOptions).indices(
-            Arrays.stream(source.indices()).filter(name -> RemoteClusterAware.isRemoteIndexName(name) == false).toArray(String[]::new)
-        );
+        return new SearchRequest(source).indicesOptions(indicesOptions)
+            .indices(
+                Arrays.stream(source.indices()).filter(name -> RemoteClusterAware.isRemoteIndexName(name) == false).toArray(String[]::new)
+            );
     }
 }
