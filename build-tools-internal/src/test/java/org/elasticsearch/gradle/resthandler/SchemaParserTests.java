@@ -13,6 +13,7 @@ import org.elasticsearch.gradle.resthandler.model.Endpoint;
 import org.elasticsearch.gradle.resthandler.model.TypeDefinition;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -23,6 +24,33 @@ import static org.junit.Assert.assertNotNull;
  * Unit tests for {@link SchemaParser} with sample schema.json fragments.
  */
 public class SchemaParserTests {
+
+    /**
+     * Verifies that SchemaParser can parse the real schema.json format used by the generator.
+     * The test resource mirrors the vendored schema at rest-api-spec/src/main/resources/schema/schema.json.
+     */
+    @Test
+    public void parseRealSchemaFromResource() throws Exception {
+        String resource = "org/elasticsearch/gradle/resthandler/schema.json";
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(resource)) {
+            assertNotNull("Missing test resource: " + resource, in);
+            Path schema = Files.createTempFile("schema", ".json");
+            try {
+                Files.write(schema, in.readAllBytes());
+                ParsedSchema parsed = SchemaParser.parse(schema);
+                assertNotNull(parsed.schema());
+                assertNotNull(parsed.schema().types());
+                assertNotNull(parsed.schema().endpoints());
+                assertNotNull(parsed.typeByRef());
+                // Current vendored schema is empty; type map and lists are empty
+                assertEquals(0, parsed.schema().types().size());
+                assertEquals(0, parsed.schema().endpoints().size());
+                assertEquals(0, parsed.typeByRef().size());
+            } finally {
+                Files.deleteIfExists(schema);
+            }
+        }
+    }
 
     @Test
     public void parseEmptySchema() throws Exception {
