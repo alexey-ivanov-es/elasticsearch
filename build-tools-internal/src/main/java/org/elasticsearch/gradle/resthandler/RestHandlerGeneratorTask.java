@@ -21,9 +21,11 @@ import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+
+import javax.inject.Inject;
 
 /**
  * Gradle task that generates REST handler Java source files from the API specification.
@@ -62,7 +64,14 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
 
     @TaskAction
     public void generate() throws IOException {
-        // Ensure output directory exists; generation logic will be added in later tasks
+        Path schemaPath = getSchemaFile().get().getAsFile().toPath();
+        ParsedSchema parsed = SchemaParser.parse(schemaPath);
+        getLogger().debug(
+            "Parsed schema: {} types, {} endpoints",
+            parsed.schema().types().size(),
+            parsed.schema().endpoints() != null ? parsed.schema().endpoints().size() : 0
+        );
         Files.createDirectories(getOutputDir().get().getAsFile().toPath());
+        // Generation of handler source from parsed in Task 1.8
     }
 }

@@ -33,6 +33,10 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Availability.java`
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/AvailabilityDetail.java`
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/EnumMember.java`
+- **Task 1.3 (Schema parser):**
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/SchemaParser.java` — parses schema.json with Jackson, builds type lookup map
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ParsedSchema.java` — parsed schema plus typeByRef map and resolve helpers
+  - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/SchemaParserTests.java` — unit tests for SchemaParser
 
 ---
 
@@ -40,6 +44,7 @@ List of files created, modified, or removed for this project. **Update this file
 
 - `elasticsearch-specification/compiler/package.json` — removed `compiler-wasm-lib` dependency so install works without upstream compiler-rs
 - **Task 1.1:** `gradle/build.versions.toml` — added javapoet; `build-tools-internal/build.gradle` — added restHandlerGenerator plugin registration and deps (javapoet, jackson.databind); `server/build.gradle` — apply plugin `elasticsearch.rest-handler-generator`
+- **Task 1.3:** `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — call SchemaParser.parse(), log parsed counts
 
 ---
 
