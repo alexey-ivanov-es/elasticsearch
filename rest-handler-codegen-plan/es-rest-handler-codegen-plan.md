@@ -228,8 +228,6 @@ This is implemented in a `TransportActionResolver` class that uses Java reflecti
 
 ## 6. Naming Conventions
 
-The generator derives all names from the endpoint name using these conventions:
-
 ### Handler Class Name
 
 Pattern: `Rest` + CamelCase(fullEndpointName) + `Action`
@@ -359,7 +357,7 @@ public static DeleteIndexRequest fromRestRequest(RestRequest request) {
 }
 ```
 
-Parameter names and helpers (e.g. `RestUtils.getAckTimeout`, `RestUtils.getMasterNodeTimeout`) follow the spec’s query parameter names and existing RestUtils where applicable.
+Parameter names and helpers (e.g. `RestUtils.getAckTimeout`, `RestUtils.getMasterNodeTimeout`) follow the spec's query parameter names and existing RestUtils where applicable.
 
 ### Why This Pattern
 
