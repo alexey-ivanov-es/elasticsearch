@@ -37,6 +37,10 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/SchemaParser.java` — parses schema.json with Jackson, builds type lookup map
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ParsedSchema.java` — parsed schema plus typeByRef map and resolve helpers
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/SchemaParserTests.java` — unit tests for SchemaParser
+- **Task 1.5 (TransportActionResolver):**
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/TransportActionResolver.java` — resolve ActionRequest/ActionResponse from transport action class via reflection
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ResolvedTransportAction.java` — record holding transport action class, request class, response class
+  - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/TransportActionResolverTests.java` — unit tests for TransportActionResolver
 
 ---
 
