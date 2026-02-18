@@ -1,0 +1,131 @@
+/*
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import { RequestBase } from '@_types/Base'
+import { IndexName, MediaType, Name, VersionNumber } from '@_types/common'
+import { TypeMapping } from '@_types/mapping/TypeMapping'
+import { integer } from '@_types/Numeric'
+import { Duration } from '@_types/Time'
+import { Alias } from '@indices/_types/Alias'
+import { IndexSettings } from '@indices/_types/IndexSettings'
+import { Dictionary } from '@spec_utils/Dictionary'
+
+/**
+ * Create or update a legacy index template.
+ *
+ * Index templates define settings, mappings, and aliases that can be applied automatically to new indices.
+ * Elasticsearch applies templates to new indices based on an index pattern that matches the index name.
+ *
+ * IMPORTANT: This documentation is about legacy index templates, which are deprecated and will be replaced by the composable templates introduced in Elasticsearch 7.8.
+ *
+ * Composable templates always take precedence over legacy templates.
+ * If no composable template matches a new index, matching legacy templates are applied according to their order.
+ *
+ * Index templates are only applied during index creation.
+ * Changes to index templates do not affect existing indices.
+ * Settings and mappings specified in create index API requests override any settings or mappings specified in an index template.
+ *
+ * You can use C-style `/* *\/` block comments in index templates.
+ * You can include comments anywhere in the request body, except before the opening curly bracket.
+ *
+ * **Indices matching multiple templates**
+ *
+ * Multiple index templates can potentially match an index, in this case, both the settings and mappings are merged into the final configuration of the index.
+ * The order of the merging can be controlled using the order parameter, with lower order being applied first, and higher orders overriding them.
+ * NOTE: Multiple matching templates with the same order value will result in a non-deterministic merging order.
+ * @rest_spec_name indices.put_template
+ * @availability stack stability=stable
+ * @cluster_privileges manage_index_templates, manage
+ * @doc_id index-templates-v1
+ * @ext_doc_id index-templates
+ * @deprecated 7.8.0
+ */
+export interface Request extends RequestBase {
+  urls: [
+    {
+      path: '/_template/{name}'
+      methods: ['PUT', 'POST']
+    }
+  ]
+  path_parts: {
+    /** The name of the template */
+    name: Name
+  }
+  request_media_type: MediaType.Json
+  response_media_type: MediaType.Json
+  query_parameters: {
+    /**
+     * If true, this request cannot replace or update existing index templates.
+     * @server_default false
+     */
+    create?: boolean
+    /**
+     * Period to wait for a connection to the master node. If no response is
+     * received before the timeout expires, the request fails and returns an error.
+     * @server_default 30s
+     */
+    master_timeout?: Duration
+    /**
+     * Order in which Elasticsearch applies this template if index
+     * matches multiple templates.
+     *
+     * Templates with lower 'order' values are merged first. Templates with higher
+     * 'order' values are merged later, overriding templates with lower values.
+     */
+    order?: integer
+    /**
+     * User defined reason for creating or updating the index template
+     * @server_default
+     */
+    cause?: string
+  }
+  body: {
+    /**
+     * Aliases for the index.
+     */
+    aliases?: Dictionary<IndexName, Alias>
+    /**
+     * Array of wildcard expressions used to match the names
+     * of indices during creation.
+     */
+    index_patterns?: string | string[]
+    /**
+     * Mapping for fields in the index.
+     */
+    mappings?: TypeMapping
+    /**
+     * Order in which Elasticsearch applies this template if index
+     * matches multiple templates.
+     *
+     * Templates with lower 'order' values are merged first. Templates with higher
+     * 'order' values are merged later, overriding templates with lower values.
+     */
+    order?: integer
+    /**
+     * Configuration options for the index.
+     */
+    settings?: IndexSettings
+    /**
+     * Version number used to manage index templates externally. This number
+     * is not automatically generated by Elasticsearch.
+     * To unset a version, replace the template without specifying one.
+     */
+    version?: VersionNumber
+  }
+}

@@ -1,0 +1,6 @@
+# Generated output (copy schema.json to rest-api-spec when needed)
+output/
+# Dependencies
+node_modules/
+compiler/node_modules
+specification/node_modules

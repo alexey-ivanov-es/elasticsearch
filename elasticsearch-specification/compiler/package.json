@@ -1,0 +1,58 @@
+{
+  "name": "elasticsearch-client-specification",
+  "version": "0.0.1",
+  "description": "A library that exposes the elasticsearch client specification as a validatable and iteratable source",
+  "main": "src/index.ts",
+  "scripts": {
+    "lint": "ts-standard src",
+    "lint:fix": "ts-standard --fix src",
+    "format:check": "prettier --config .prettierrc.json --loglevel warn --check ../specification/",
+    "format:fix": "prettier --config .prettierrc.json --loglevel warn --write ../specification/",
+    "format:fix-examples": "prettier --config .prettierrc.json --loglevel warn --write ../specification/**/*.yaml",
+    "generate-schema": "ts-node src/index.ts",
+    "transform-expand-generics": "ts-node src/transform/expand-generics.ts",
+    "transform-to-openapi": "ts-node src/transform/schema-to-openapi.ts",
+    "filter-by-availability": "ts-node src/transform/filter-by-availability.ts",
+    "dump-routes": "ts-node src/dump/extract-routes.ts",
+    "compile:specification": "tsc --project ../specification/tsconfig.json --noEmit",
+    "build": "rm -rf lib && tsc",
+    "validate-ts-view": "tsc --noEmit ../output/typescript/types.ts",
+    "generate-dangling": "ts-node src dangling-types-report.ts",
+    "test": "TEST_COMPILER=true ava test/**/*test.ts",
+    "test:coverage": "TEST_COMPILER=true c8 --reporter html ava test/**/*test.ts"
+  },
+  "author": "Elastic",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^24",
+    "ava": "^6",
+    "c8": "^10",
+    "prettier": "2.5.1",
+    "prettier-plugin-organize-imports": "^4.0.0",
+    "ts-node": "^10.4.0",
+    "ts-standard": "^11.0.0",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "fastest-levenshtein": "^1.0.12",
+    "ora": "^5.4.1",
+    "safe-stable-stringify": "^2.5.0",
+    "semver": "^7.5.2",
+    "ts-morph": "^26",
+    "zx": "^8.8.5",
+    "minimist": "^1.2.6"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "keywords": []
+}
