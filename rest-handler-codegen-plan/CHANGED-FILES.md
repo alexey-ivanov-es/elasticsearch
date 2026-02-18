@@ -45,6 +45,11 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ParameterMapping.java` — record for Java type name, extraction code, and special handling (e.g. IndicesOptions)
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/TypeMapper.java` — spec-type to Java type and RestRequest extraction code; IndicesOptions group handling
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/TypeMapperTests.java` — unit tests for TypeMapper
+- **Task 1.7 (ListenerResolver):**
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ListenerKind.java` — enum CHUNKED / NODES / STATUS / DEFAULT
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ResolvedListener.java` — record holding listener kind and FQN for code generation
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ListenerResolver.java` — resolve listener from ActionResponse class via classloader-by-name checks (ChunkedToXContentObject, BaseNodesResponse, StatusToXContentObject, default)
+  - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/ListenerResolverTests.java` — unit tests for ListenerResolver (plain class → DEFAULT; optional server-on-classpath tests for SearchResponse→CHUNKED, NodesInfoResponse→NODES, AcknowledgedResponse→DEFAULT)
 
 ---
 

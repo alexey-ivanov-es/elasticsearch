@@ -16,7 +16,7 @@ Tasks are taken from the full project plan. Update the status when a task is com
 | 1.4 | Add `@server_transport_action` to PoC Endpoints in the Spec | Done |
 | 1.5 | Implement TransportActionResolver | Done |
 | 1.6 | Implement TypeMapper | Done |
-| 1.7 | Implement ListenerResolver | Not done |
+| 1.7 | Implement ListenerResolver | Done |
 | 1.8 | Implement HandlerCodeEmitter | Not done |
 | 1.9 | Add `fromRestRequest()` to PoC ActionRequests | Not done |
 | 1.10 | Generate and Swap | Not done |
