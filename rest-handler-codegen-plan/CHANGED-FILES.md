@@ -41,6 +41,10 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/TransportActionResolver.java` — resolve ActionRequest/ActionResponse from transport action class via reflection
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ResolvedTransportAction.java` — record holding transport action class, request class, response class
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/TransportActionResolverTests.java` — unit tests for TransportActionResolver
+- **Task 1.6 (TypeMapper):**
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ParameterMapping.java` — record for Java type name, extraction code, and special handling (e.g. IndicesOptions)
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/TypeMapper.java` — spec-type to Java type and RestRequest extraction code; IndicesOptions group handling
+  - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/TypeMapperTests.java` — unit tests for TypeMapper
 
 ---
 
