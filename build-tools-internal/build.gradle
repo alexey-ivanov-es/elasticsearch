@@ -232,6 +232,10 @@ gradlePlugin {
       id = 'elasticsearch.transport-version-resources'
       implementationClass = 'org.elasticsearch.gradle.internal.transport.TransportVersionResourcesPlugin'
     }
+    restHandlerGenerator {
+      id = 'elasticsearch.rest-handler-generator'
+      implementationClass = 'org.elasticsearch.gradle.resthandler.RestHandlerGeneratorPlugin'
+    }
   }
 }
 
@@ -323,6 +327,8 @@ dependencies {
   compileOnly buildLibs.reflections
 
   implementation buildLibs.javaparser
+  implementation buildLibs.javapoet
+  implementation buildLibs.jackson.databind
 
   runtimeOnly "org.elasticsearch.gradle:reaper:$version"
   testImplementation buildLibs.checkstyle
