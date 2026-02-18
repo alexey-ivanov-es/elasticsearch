@@ -21,6 +21,18 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorPlugin.java` — plugin that registers `generateRestHandlers` task and wires output into server main source set
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — task with inputs (schema file, server compile classpath) and output directory
   - `rest-api-spec/src/main/resources/schema/schema.json` — minimal placeholder (empty endpoints/types) so the task has a valid input; replaced by vendored spec in Task 1.4
+- **Task 1.2 (Data model):**
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Schema.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Endpoint.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/UrlPattern.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/TypeDefinition.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/TypeReference.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Property.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/TypeDescriptor.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Body.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Availability.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/AvailabilityDetail.java`
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/EnumMember.java`
 
 ---
 
