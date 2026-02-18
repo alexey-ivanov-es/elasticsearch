@@ -20,7 +20,7 @@ List of files created, modified, or removed for this project. **Update this file
 - **Task 1.1 (REST handler generator plugin):**
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorPlugin.java` — plugin that registers `generateRestHandlers` task and wires output into server main source set
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — task with inputs (schema file, server compile classpath) and output directory
-  - `rest-api-spec/src/main/resources/schema/schema.json` — minimal placeholder (empty endpoints/types) so the task has a valid input; replaced by vendored spec in Task 1.4
+  - `rest-api-spec/src/main/resources/schema/schema.json` — minimal placeholder (empty endpoints/types); **Task 1.4:** replaced with full schema including serverTransportAction for PoC endpoints
 - **Task 1.2 (Data model):**
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Schema.java`
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Endpoint.java`
@@ -45,6 +45,7 @@ List of files created, modified, or removed for this project. **Update this file
 - `elasticsearch-specification/compiler/package.json` — removed `compiler-wasm-lib` dependency so install works without upstream compiler-rs
 - **Task 1.1:** `gradle/build.versions.toml` — added javapoet; `build-tools-internal/build.gradle` — added restHandlerGenerator plugin registration and deps (javapoet, jackson.databind); `server/build.gradle` — apply plugin `elasticsearch.rest-handler-generator`
 - **Task 1.3:** `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — call SchemaParser.parse(), log parsed counts
+- **Task 1.4:** `elasticsearch-specification/compiler/src/model/metamodel.ts` — add serverTransportAction to Endpoint; `elasticsearch-specification/compiler/src/model/utils.ts` — parse @server_transport_action and set endpoint.serverTransportAction; `elasticsearch-specification/specification/indices/delete/IndicesDeleteRequest.ts`, `indices/get/IndicesGetRequest.ts`, `cluster/health/ClusterHealthRequest.ts` — add @server_transport_action JSDoc; `rest-api-spec/src/main/resources/schema/schema.json` — regenerated from compiler and copied from elasticsearch-specification/output/schema/schema.json. Parser compatibility with full schema: `build-tools-internal/.../SchemaParser.java` — disable FAIL_ON_UNKNOWN_PROPERTIES; `model/TypeDefinition.java` — name as TypeReference (nested {name, namespace}); `model/TypeDescriptor.java` — value as Object (string or nested descriptor); `model/SchemaParserTests.java` — test schema uses nested type name
 
 ---
 
