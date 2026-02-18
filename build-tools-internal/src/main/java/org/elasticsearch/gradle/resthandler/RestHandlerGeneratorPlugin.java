@@ -29,17 +29,19 @@ public class RestHandlerGeneratorPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         Project rootProject = project.getRootProject();
-        TaskProvider<RestHandlerGeneratorTask> generateTask = project.getTasks()
-            .register(TASK_NAME, RestHandlerGeneratorTask.class);
+        TaskProvider<RestHandlerGeneratorTask> generateTask = project.getTasks().register(TASK_NAME, RestHandlerGeneratorTask.class);
 
         generateTask.configure(task -> {
-            task.getSchemaFile().set(
-                rootProject.getLayout().getProjectDirectory().file("rest-api-spec/src/main/resources/schema/schema.json")
-            );
-            task.getServerCompileClasspath().setFrom(
-                project.getExtensions().getByType(JavaPluginExtension.class).getSourceSets()
-                    .getByName(SourceSet.MAIN_SOURCE_SET_NAME).getCompileClasspath()
-            );
+            task.getSchemaFile()
+                .set(rootProject.getLayout().getProjectDirectory().file("rest-api-spec/src/main/resources/schema/schema.json"));
+            task.getServerCompileClasspath()
+                .setFrom(
+                    project.getExtensions()
+                        .getByType(JavaPluginExtension.class)
+                        .getSourceSets()
+                        .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+                        .getCompileClasspath()
+                );
             task.getOutputDir().set(project.getLayout().getBuildDirectory().dir("generated/sources/rest-handlers"));
         });
 
