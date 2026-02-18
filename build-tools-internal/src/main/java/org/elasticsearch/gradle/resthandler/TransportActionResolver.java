@@ -37,15 +37,15 @@ public final class TransportActionResolver {
      * @param transportActionClassName fully-qualified name of the transport action class
      * @param classpath                classpath (e.g. server compile classpath) as files
      * @return the transport action class and its request and response classes
-     * @throws IllegalArgumentException if the class cannot be loaded or type parameters cannot be resolved
+     * @throws IllegalArgumentException if the class cannot be loaded, type parameters cannot be resolved,
+     *                                   or closing the classloader fails
      */
     public static ResolvedTransportAction resolve(String transportActionClassName, Iterable<File> classpath) {
         URL[] urls = StreamSupport.stream(classpath.spliterator(), false)
             .filter(File::exists)
             .map(TransportActionResolver::toUrl)
             .toArray(URL[]::new);
-        URLClassLoader loader = new URLClassLoader(urls, ClassLoader.getPlatformClassLoader());
-        try {
+        try (URLClassLoader loader = new URLClassLoader(urls, ClassLoader.getPlatformClassLoader())) {
             Class<?> actionClass = loader.loadClass(transportActionClassName);
             Class<?> transportActionBase = loader.loadClass(TRANSPORT_ACTION_CLASS);
             Map<TypeVariable<?>, Type> bindings = new HashMap<>();
@@ -66,10 +66,6 @@ public final class TransportActionResolver {
                             Class<?> requestClass = resolveToClass(actualArgs[0], bindings, loader);
                             Class<?> responseClass = resolveToClass(actualArgs[1], bindings, loader);
                             if (requestClass != null && responseClass != null) {
-                                try {
-                                    loader.close();
-                                } catch (IOException ignored) {
-                                }
                                 return new ResolvedTransportAction(actionClass, requestClass, responseClass);
                             }
                         }
@@ -79,20 +75,10 @@ public final class TransportActionResolver {
                     current = current.getSuperclass();
                 }
             }
-            try {
-                loader.close();
-            } catch (IOException ignored) {
-            }
         } catch (ClassNotFoundException e) {
-            try {
-                loader.close();
-            } catch (IOException ignored) {
-            }
             throw new IllegalArgumentException("Could not load class: " + transportActionClassName + ", or " + TRANSPORT_ACTION_CLASS, e);
-        }
-        try {
-            loader.close();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Failed to close classloader", e);
         }
         throw new IllegalArgumentException(
             "Could not resolve Request/Response type parameters for " + transportActionClassName
