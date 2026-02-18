@@ -83,16 +83,14 @@ public class SchemaParserTests {
                 {
                   "types": [
                     {
-                      "name": "DeleteIndexRequest",
-                      "namespace": "indices",
+                      "name": {"name": "DeleteIndexRequest", "namespace": "indices"},
                       "kind": "request",
                       "path": [{"name": "index", "required": true, "type": {"kind": "instance_of", "type": {"name": "Indices", "namespace": "_types"}}}],
                       "query": [],
                       "body": {"kind": "no_body"}
                     },
                     {
-                      "name": "AcknowledgedResponse",
-                      "namespace": "_types",
+                      "name": {"name": "AcknowledgedResponse", "namespace": "_types"},
                       "kind": "interface",
                       "properties": []
                     }
@@ -116,13 +114,15 @@ public class SchemaParserTests {
 
             TypeDefinition deleteReq = parsed.typeByRef().get("indices.DeleteIndexRequest");
             assertNotNull(deleteReq);
-            assertEquals("DeleteIndexRequest", deleteReq.name());
-            assertEquals("indices", deleteReq.namespace());
+            assertNotNull(deleteReq.name());
+            assertEquals("DeleteIndexRequest", deleteReq.name().name());
+            assertEquals("indices", deleteReq.name().namespace());
             assertEquals("request", deleteReq.kind());
 
             TypeDefinition ackResp = parsed.typeByRef().get("_types.AcknowledgedResponse");
             assertNotNull(ackResp);
-            assertEquals("AcknowledgedResponse", ackResp.name());
+            assertNotNull(ackResp.name());
+            assertEquals("AcknowledgedResponse", ackResp.name().name());
 
             Endpoint endpoint = parsed.schema().endpoints().get(0);
             assertEquals(deleteReq, parsed.getRequestType(endpoint));

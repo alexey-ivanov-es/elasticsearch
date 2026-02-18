@@ -20,11 +20,10 @@ import java.util.List;
  *   <li>{@code interface} or similar — has properties, optional inherits, optional generics</li>
  *   <li>{@code enum} — has members (array of enum values)</li>
  * </ul>
- * Unused fields are null.
+ * Unused fields are null. The type identity is {@code name} (a reference with name and namespace).
  */
 public record TypeDefinition(
-    @JsonProperty("name") String name,
-    @JsonProperty("namespace") String namespace,
+    @JsonProperty("name") TypeReference name,
     @JsonProperty("kind") String kind,
     @JsonProperty("inherits") TypeReference inherits,
     @JsonProperty("path") List<Property> path,

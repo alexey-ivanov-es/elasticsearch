@@ -9,6 +9,7 @@
 
 package org.elasticsearch.gradle.resthandler;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.elasticsearch.gradle.resthandler.model.Schema;
@@ -28,7 +29,9 @@ import java.util.Map;
  */
 public final class SchemaParser {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().disable(
+        DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+    );
 
     private SchemaParser() {}
 
@@ -57,8 +60,10 @@ public final class SchemaParser {
         Map<String, TypeDefinition> typeByRef = new HashMap<>(types == null ? 0 : types.size());
         if (types != null) {
             for (TypeDefinition t : types) {
-                String key = ParsedSchema.typeKey(t.namespace(), t.name());
-                typeByRef.put(key, t);
+                if (t.name() != null) {
+                    String key = ParsedSchema.typeKey(t.name().namespace(), t.name().name());
+                    typeByRef.put(key, t);
+                }
             }
         }
         return Map.copyOf(typeByRef);

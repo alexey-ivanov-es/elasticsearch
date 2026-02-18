@@ -20,14 +20,13 @@ import java.util.List;
  *   <li>{@code array_of} — {@code value}: element type descriptor (use {@link #value()})</li>
  *   <li>{@code dictionary_of} — {@code key}, {@code value}: key and value type descriptors</li>
  *   <li>{@code union_of} — {@code items}: list of alternative type descriptors</li>
- *   <li>{@code literal_value} — {@code value}: constant (use {@link #literalValue()})</li>
+ *   <li>{@code literal_value} — {@code value}: constant (use {@link #{@link #value()})</li>
  * </ul>
  */
 public record TypeDescriptor(
     @JsonProperty("kind") String kind,
     @JsonProperty("type") TypeReference type,
-    @JsonProperty("value") TypeDescriptor value,
+    @JsonProperty("value") Object value,
     @JsonProperty("key") TypeDescriptor key,
-    @JsonProperty("items") List<TypeDescriptor> items,
-    @JsonProperty("literalValue") Object literalValue
+    @JsonProperty("items") List<TypeDescriptor> items
 ) {}
