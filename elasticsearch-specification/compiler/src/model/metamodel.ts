@@ -472,6 +472,12 @@ export class Endpoint {
   }
 
   codegenExclude?: boolean
+
+  /**
+   * Optional fully-qualified Java class name of the server-side transport action for this endpoint.
+   * When present, the REST handler generator uses it to emit handler code that dispatches via that action.
+   */
+  serverTransportAction?: string
 }
 
 export class UrlTemplate {
