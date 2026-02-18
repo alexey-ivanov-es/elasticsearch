@@ -48,6 +48,7 @@ import { WaitForNodes } from './types'
  * @cluster_privileges monitor, manage
  * @doc_id cluster-health
  * @doc_tag cluster
+ * @server_transport_action org.elasticsearch.action.admin.cluster.health.TransportClusterHealthAction
  */
 export interface Request extends RequestBase {
   urls: [

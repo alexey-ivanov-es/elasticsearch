@@ -35,6 +35,7 @@ import { Duration } from '@_types/Time'
  * @availability serverless stability=stable visibility=public
  * @doc_id indices-delete-index
  * @index_privileges delete_index
+ * @server_transport_action org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction
  */
 export interface Request extends RequestBase {
   urls: [
