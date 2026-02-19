@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -108,8 +109,8 @@ public final class HandlerCodeEmitter {
             .addStatement("return $S", handlerNameString)
             .build();
 
-        Set<String> queryParamNames = queryParamNames(requestType);
-        boolean hasQueryParams = queryParamNames.isEmpty() == false;
+        Set<String> supportedParamNames = allSupportedParamNames(requestType);
+        boolean hasSupportedParams = supportedParamNames.isEmpty() == false;
 
         CodeBlock listenerNew = buildListenerInstantiation(listenerType, listenerClass, responseClass);
         MethodSpec prepareRequestMethod = MethodSpec.methodBuilder("prepareRequest")
@@ -133,8 +134,8 @@ public final class HandlerCodeEmitter {
             .superclass(baseRestHandler)
             .addMethod(routesMethod)
             .addMethod(getNameMethod);
-        if (hasQueryParams) {
-            typeBuilder.addField(buildSupportedQueryParametersField(queryParamNames));
+        if (hasSupportedParams) {
+            typeBuilder.addField(buildSupportedQueryParametersField(supportedParamNames));
             typeBuilder.addMethod(buildSupportedQueryParametersMethod());
         }
         typeBuilder.addMethod(prepareRequestMethod);
@@ -236,11 +237,37 @@ public final class HandlerCodeEmitter {
         );
     }
 
-    private static Set<String> queryParamNames(TypeDefinition requestType) {
-        if (requestType == null || requestType.query() == null) {
-            return Set.of();
+    /**
+     * All parameter names the handler must declare as supported so that consumed params match
+     * (BaseRestHandler assertion). Includes: query params from spec, path params, and when the
+     * request has an "index" path param, the IndicesOptions query params consumed by
+     * IndicesOptions.fromRequest() (allow_no_indices, ignore_unavailable, ignore_throttled).
+     */
+    private static Set<String> allSupportedParamNames(TypeDefinition requestType) {
+        Set<String> names = new TreeSet<>();
+        if (requestType == null) {
+            return names;
         }
-        return requestType.query().stream().map(p -> p.name()).filter(n -> n != null).collect(Collectors.toSet());
+        if (requestType.query() != null) {
+            requestType.query().stream().map(p -> p.name()).filter(n -> n != null).forEach(names::add);
+        }
+        boolean hasIndexPath = false;
+        if (requestType.path() != null) {
+            for (var p : requestType.path()) {
+                if (p.name() != null) {
+                    names.add(p.name());
+                    if ("index".equals(p.name())) {
+                        hasIndexPath = true;
+                    }
+                }
+            }
+        }
+        if (hasIndexPath) {
+            names.add("allow_no_indices");
+            names.add("ignore_throttled");
+            names.add("ignore_unavailable");
+        }
+        return names;
     }
 
     private static String handlerClassName(String endpointName) {
