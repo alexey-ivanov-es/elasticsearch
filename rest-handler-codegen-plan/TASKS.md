@@ -13,13 +13,14 @@ Tasks are taken from the full project plan. Update the status when a task is com
 | 1.1 | Create the Gradle Plugin Project | Done |
 | 1.2 | Define the Data Model | Done |
 | 1.3 | Implement Schema Parser | Done |
-| 1.4 | Add `@server_transport_action` to PoC Endpoints in the Spec | Done |
+| 1.4 | Add Server-Side Annotations to PoC Endpoints in the Spec | Done |
 | 1.5 | Implement TransportActionResolver | Done |
 | 1.6 | Implement TypeMapper | Done |
 | 1.7 | Implement ListenerResolver | Done |
 | 1.8 | Implement HandlerCodeEmitter | Done |
-| 1.9 | Add `fromRestRequest()` to PoC ActionRequests | Done |
-| 1.10 | Generate and Swap | Done |
+| 1.9 | Handle Optional Method Overrides (responseParams, supportedCapabilities, allowSystemIndexAccessByDefault) | Not done |
+| 1.10 | Add `fromRestRequest()` to PoC ActionRequests | Done |
+| 1.11 | Generate and Swap | Done |
 
 ---
 
@@ -29,7 +30,7 @@ Tasks are taken from the full project plan. Update the status when a task is com
 |------|-------------|--------|
 | 2.1 | Extend Generator Scope Filter | Not done |
 | 2.2 | Add `fromRestRequest()` to PoC ActionRequests (Phase 2) | Not done |
-| 2.3 | Add `@server_transport_action` to Phase 2 Endpoints | Not done |
+| 2.3 | Add Server-Side Annotations to Phase 2 Endpoints | Not done |
 | 2.4 | Generate and Swap (Phase 2) | Not done |
 
 ---
