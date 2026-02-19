@@ -52,6 +52,10 @@ List of files created, modified, or removed for this project. **Update this file
 - **Task 1.8 (HandlerCodeEmitter):**
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/HandlerCodeEmitter.java` — JavaPoet-based emitter: routes(), getName(), supportedQueryParameters(), prepareRequest() (ActionRequest.fromRestRequest + client.execute(TYPE, actionRequest, listener)); package/class naming; @ServerlessScope from availability; empty routes handled
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/HandlerCodeEmitterTests.java` — unit tests for emitted handler structure, query params, ServerlessScope, multiple routes, chunked listener, invalid listener FQN
+- **Task 1.9 (fromRestRequest for PoC):**
+  - `server/.../action/admin/indices/delete/DeleteIndexRequest.java` — add fromRestRequest(RestRequest); handler prepareRequest unchanged, now delegates to it
+  - `server/.../action/admin/indices/get/GetIndexRequest.java` — add fromRestRequest(RestRequest); RestGetIndicesAction.prepareRequest delegates to it
+  - `server/.../action/admin/cluster/health/ClusterHealthRequest.java` — add fromRestRequest(RestRequest); RestClusterHealthAction.prepareRequest delegates to it, fromRequest() kept as delegating wrapper for tests
 
 ---
 
@@ -61,6 +65,7 @@ List of files created, modified, or removed for this project. **Update this file
 - **Task 1.1:** `gradle/build.versions.toml` — added javapoet; `build-tools-internal/build.gradle` — added restHandlerGenerator plugin registration and deps (javapoet, jackson.databind); `server/build.gradle` — apply plugin `elasticsearch.rest-handler-generator`
 - **Task 1.3:** `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — call SchemaParser.parse(), log parsed counts
 - **Task 1.8:** `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — for each endpoint with serverTransportAction: resolve transport action and listener, emit handler via HandlerCodeEmitter, write JavaFile to output directory; skip endpoints that fail resolution with warn log
+- **Task 1.9:** `server/.../rest/action/admin/indices/RestDeleteIndexAction.java`, `RestGetIndicesAction.java`, `server/.../rest/action/admin/cluster/RestClusterHealthAction.java` — prepareRequest() refactored to call XxxRequest.fromRestRequest(request); prepareRequest not removed (per adjustment)
 - **Task 1.4:** `elasticsearch-specification/compiler/src/model/metamodel.ts` — add serverTransportAction to Endpoint; `elasticsearch-specification/compiler/src/model/utils.ts` — parse @server_transport_action and set endpoint.serverTransportAction; `elasticsearch-specification/specification/indices/delete/IndicesDeleteRequest.ts`, `indices/get/IndicesGetRequest.ts`, `cluster/health/ClusterHealthRequest.ts` — add @server_transport_action JSDoc; `rest-api-spec/src/main/resources/schema/schema.json` — regenerated from compiler and copied from elasticsearch-specification/output/schema/schema.json. Parser compatibility with full schema: `build-tools-internal/.../SchemaParser.java` — disable FAIL_ON_UNKNOWN_PROPERTIES; `model/TypeDefinition.java` — name as TypeReference (nested {name, namespace}); `model/TypeDescriptor.java` — value as Object (string or nested descriptor); `model/SchemaParserTests.java` — test schema uses nested type name
 
 ---

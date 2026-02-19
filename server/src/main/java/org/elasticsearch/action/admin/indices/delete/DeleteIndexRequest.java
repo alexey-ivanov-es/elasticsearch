@@ -17,6 +17,8 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.util.CollectionUtils;
+import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.RestUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -106,6 +108,17 @@ public class DeleteIndexRequest extends AcknowledgedRequest<DeleteIndexRequest> 
     public DeleteIndexRequest indices(String... indices) {
         this.indices = indices;
         return this;
+    }
+
+    /**
+     * Build a delete index request from a REST request (path and query parameters).
+     */
+    public static DeleteIndexRequest fromRestRequest(RestRequest request) {
+        DeleteIndexRequest r = new DeleteIndexRequest(Strings.splitStringByCommaToArray(request.param("index")));
+        r.ackTimeout(RestUtils.getAckTimeout(request));
+        r.masterNodeTimeout(RestUtils.getMasterNodeTimeout(request));
+        r.indicesOptions(IndicesOptions.fromRequest(request, r.indicesOptions()));
+        return r;
     }
 
     /**

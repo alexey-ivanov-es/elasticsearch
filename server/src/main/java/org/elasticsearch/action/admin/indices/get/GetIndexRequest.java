@@ -19,6 +19,7 @@ import org.elasticsearch.common.util.ArrayUtils;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.core.UpdateForV10;
 import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.RestUtils;
 import org.elasticsearch.tasks.CancellableTask;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskId;
@@ -102,6 +103,21 @@ public class GetIndexRequest extends LocalClusterStateRequest implements Indices
     public GetIndexRequest(TimeValue masterTimeout) {
         super(masterTimeout);
         indicesOptions = IndicesOptions.strictExpandOpen();
+    }
+
+    /**
+     * Build a get index request from a REST request (path and query parameters).
+     */
+    public static GetIndexRequest fromRestRequest(RestRequest request) {
+        String[] indices = Strings.splitStringByCommaToArray(request.param("index"));
+        GetIndexRequest r = new GetIndexRequest(RestUtils.getMasterNodeTimeout(request));
+        r.indices(indices);
+        r.indicesOptions(IndicesOptions.fromRequest(request, r.indicesOptions()));
+        RestUtils.consumeDeprecatedLocalParameter(request);
+        r.humanReadable(request.paramAsBoolean("human", false));
+        r.includeDefaults(request.paramAsBoolean("include_defaults", false));
+        r.features(Feature.fromRequest(request));
+        return r;
     }
 
     /**

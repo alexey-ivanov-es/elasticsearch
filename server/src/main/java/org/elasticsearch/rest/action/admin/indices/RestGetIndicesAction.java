@@ -10,13 +10,10 @@
 package org.elasticsearch.rest.action.admin.indices;
 
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.internal.node.NodeClient;
-import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestRequest;
-import org.elasticsearch.rest.RestUtils;
 import org.elasticsearch.rest.Scope;
 import org.elasticsearch.rest.ServerlessScope;
 import org.elasticsearch.rest.action.RestCancellableNodeClient;
@@ -47,14 +44,7 @@ public class RestGetIndicesAction extends BaseRestHandler {
 
     @Override
     public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
-        String[] indices = Strings.splitStringByCommaToArray(request.param("index"));
-        final GetIndexRequest getIndexRequest = new GetIndexRequest(RestUtils.getMasterNodeTimeout(request));
-        getIndexRequest.indices(indices);
-        getIndexRequest.indicesOptions(IndicesOptions.fromRequest(request, getIndexRequest.indicesOptions()));
-        RestUtils.consumeDeprecatedLocalParameter(request);
-        getIndexRequest.humanReadable(request.paramAsBoolean("human", false));
-        getIndexRequest.includeDefaults(request.paramAsBoolean("include_defaults", false));
-        getIndexRequest.features(GetIndexRequest.Feature.fromRequest(request));
+        final GetIndexRequest getIndexRequest = GetIndexRequest.fromRestRequest(request);
         final var httpChannel = request.getHttpChannel();
         return channel -> new RestCancellableNodeClient(client, httpChannel).admin()
             .indices()
