@@ -228,6 +228,8 @@ This is implemented in a `TransportActionResolver` class that uses Java reflecti
 
 ## 6. Naming Conventions
 
+The generator derives all names from the endpoint name using these conventions:
+
 ### Handler Class Name
 
 Pattern: `Rest` + CamelCase(fullEndpointName) + `Action`
@@ -297,7 +299,76 @@ build-tools-internal/
 - **Jackson** (`com.fasterxml.jackson.core:jackson-databind`) for parsing `schema.json`
 - **JavaPoet** (`com.squareup:javapoet`) for type-safe Java code generation. JavaPoet generates `JavaFile` objects that can be written to disk. It handles imports, formatting, and type references correctly.
 - **Gradle API** for the plugin/task infrastructure
-- The generator task requires the **server module's compile classpath** as an input, so it can load transport action classes for reflection-based resolution of ActionRequest/ActionResponse types and listener selection.
+
+### Build Integration: Solving the Circular Dependency
+
+The generator needs compiled server classes (transport actions, ActionRequest, ActionResponse) for reflection-based resolution. But the server module's compilation also needs the generator's output. This is a circular dependency.
+
+**Solution: two source sets within the server module.**
+
+The server module gets a second source set (`restHandlers`) dedicated to generated REST handler classes. The `main` source set contains all hand-written code — transport actions, action requests/responses, and hand-written REST handlers that haven't been migrated yet. The build flows in three stages:
+
+```
+Stage 1: compileJava (main source set)
+    ↓   Compiles all hand-written code: transport actions, ActionRequests,
+    ↓   ActionResponses, hand-written REST handlers, everything else.
+    ↓
+Stage 2: generateRestHandlers task
+    ↓   Reads: vendored schema.json + main source set's compiled .class files
+    ↓   Outputs: generated Java source files to build/generated/sources/rest-handlers/
+    ↓
+Stage 3: compileRestHandlersJava (restHandlers source set)
+    ↓   Compiles generated handlers against main's compiled classes.
+    ↓   The restHandlers source set's compileClasspath includes main's output.
+    ↓
+Stage 4: jar
+        Includes compiled classes from BOTH source sets.
+```
+
+**Gradle wiring** (in the server module's `build.gradle`):
+
+```groovy
+sourceSets {
+    restHandlers {
+        java {
+            srcDir "${buildDir}/generated/sources/rest-handlers"
+        }
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+    }
+}
+
+// The generator task
+tasks.register('generateRestHandlers', RestHandlerGeneratorTask) {
+    schemaFile = file("${project(':rest-api-spec').projectDir}/src/main/resources/schema/schema.json")
+    serverClassesDir = sourceSets.main.output.classesDirs
+    serverClasspath = sourceSets.main.compileClasspath
+    outputDir = file("${buildDir}/generated/sources/rest-handlers")
+    dependsOn compileJava  // must run AFTER main source set compiles
+}
+
+tasks.named('compileRestHandlersJava') {
+    dependsOn generateRestHandlers
+}
+
+// Include both source sets in the jar
+jar {
+    from sourceSets.restHandlers.output
+}
+
+// Include generated handlers in test compilation and runtime
+sourceSets.test {
+    compileClasspath += sourceSets.restHandlers.output
+    runtimeClasspath += sourceSets.restHandlers.output
+}
+```
+
+**How reflection works in the generator task**: The `RestHandlerGeneratorTask` creates a `URLClassLoader` from the `main` source set's compiled classes directory and its compile classpath. This classloader can load any transport action, ActionRequest, or ActionResponse class. The `TransportActionResolver` and `ListenerResolver` use this classloader for their reflection-based resolution. The classloader is created once at the start of the task and closed when the task completes.
+
+**Why this works cleanly**:
+- No circular dependency: `main` compiles first (independently), generator reads its output, `restHandlers` compiles last.
+- During migration, hand-written handlers live in `main` and generated ones in `restHandlers`. Both end up in the jar. As a handler is migrated, the hand-written version is deleted from `src/main/java/` and the generated version appears in `build/generated/sources/rest-handlers/`.
+- The generator only processes endpoints that have a `serverTransportAction` field in schema.json — endpoints without it are skipped.
+- Standard Gradle incremental build support: if neither schema.json nor the server's compiled classes change, the generator task is up-to-date and skipped.
 
 ### Spec Input Location
 
@@ -311,15 +382,41 @@ The Gradle task takes this file path as an `@InputFile`. When the vendored spec 
 
 ### Generated Output Location
 
-Generated sources go into a build directory (e.g. `server/build/generated/sources/rest-handlers/`) and are added to the source set. The Gradle plugin registers the generation task and wires the output directory as a source directory.
+Generated sources go into `server/build/generated/sources/rest-handlers/` and are part of the `restHandlers` source set. They are never committed to version control. The generator emits:
+- One handler class per endpoint (e.g. `RestIndicesDeleteAction.java`)
+- One `GeneratedRestHandlerRegistry.java` that registers all generated handlers
 
-### Plugin Application
+### Handler Registration
 
-The generator plugin is applied **only to the `:server` project** for now. The long-term intention is to apply it to every module that registers REST handlers (e.g. x-pack and other plugins).
+REST handlers must be explicitly registered to be active. Core server handlers are registered in `ActionModule.initRestHandlers()`, and plugin handlers via `ActionPlugin.getRestHandlers()`. Simply compiling a generated handler class is not enough — it must be instantiated and passed to the handler registrar.
 
-### Coexistence with Hand-Written Handlers
+**Solution: generated registry class.** In addition to individual handler classes, the generator emits a single `GeneratedRestHandlerRegistry` class that knows how to register all generated handlers:
 
-During migration, generated and hand-written handlers coexist. The hand-written handler is deleted only after the generated one is verified to produce identical behavior (verified by existing YAML REST tests passing). The generator only processes endpoints that have a `serverTransportAction` field in schema.json — endpoints without it are skipped.
+```java
+// Generated by RestHandlerGeneratorTask — do not edit
+public class GeneratedRestHandlerRegistry {
+
+    public static void registerHandlers(
+            java.util.function.BiConsumer<RestHandler, RestHandler> registerHandler) {
+        registerHandler.accept(new RestIndicesDeleteAction(), null);
+        registerHandler.accept(new RestIndicesGetAction(), null);
+        registerHandler.accept(new RestClusterHealthAction(), null);
+        // ... one line per generated handler
+    }
+}
+```
+
+Then, in `ActionModule.initRestHandlers()`, a single one-time call is added:
+
+```java
+GeneratedRestHandlerRegistry.registerHandlers(registerHandler);
+```
+
+This call is added **once** during Phase 1 and never needs to change again. Every subsequent endpoint migration only requires adding the `@server_transport_action` tag in the spec and deleting the hand-written handler — `ActionModule` is untouched.
+
+**During migration**, the hand-written handler's registration line in `initRestHandlers()` is removed at the same time the generated handler is enabled. There is no duplication — at any given time, each endpoint is registered exactly once, either via its hand-written line or via the generated registry.
+
+**For plugin handlers** (future work beyond the server module): the same pattern applies. The generator emits a plugin-specific registry class, and the plugin's `getRestHandlers()` delegates to it.
 
 ---
 
@@ -337,8 +434,9 @@ For `DeleteIndexRequest`, the existing handler code:
 // Currently in RestDeleteIndexAction.prepareRequest():
 DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(
     Strings.splitStringByCommaToArray(request.param("index")));
-deleteIndexRequest.ackTimeout(RestUtils.getAckTimeout(request));
-deleteIndexRequest.masterNodeTimeout(RestUtils.getMasterNodeTimeout(request));
+deleteIndexRequest.timeout(request.paramAsTime("timeout", deleteIndexRequest.timeout()));
+deleteIndexRequest.masterNodeTimeout(
+    request.paramAsTime("master_timeout", deleteIndexRequest.masterNodeTimeout()));
 deleteIndexRequest.indicesOptions(
     IndicesOptions.fromRequest(request, deleteIndexRequest.indicesOptions()));
 ```
@@ -346,18 +444,16 @@ deleteIndexRequest.indicesOptions(
 Gets relocated to:
 
 ```java
-// New method on DeleteIndexRequest itself (using RestUtils for ack_timeout / master_timeout):
+// New method on DeleteIndexRequest itself:
 public static DeleteIndexRequest fromRestRequest(RestRequest request) {
     DeleteIndexRequest r = new DeleteIndexRequest(
         Strings.splitStringByCommaToArray(request.param("index")));
-    r.ackTimeout(RestUtils.getAckTimeout(request));
-    r.masterNodeTimeout(RestUtils.getMasterNodeTimeout(request));
+    r.timeout(request.paramAsTime("timeout", r.timeout()));
+    r.masterNodeTimeout(request.paramAsTime("master_timeout", r.masterNodeTimeout()));
     r.indicesOptions(IndicesOptions.fromRequest(request, r.indicesOptions()));
     return r;
 }
 ```
-
-Parameter names and helpers (e.g. `RestUtils.getAckTimeout`, `RestUtils.getMasterNodeTimeout`) follow the spec's query parameter names and existing RestUtils where applicable.
 
 ### Why This Pattern
 
@@ -401,9 +497,13 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 
 - Create directory structure under `build-tools-internal/rest-handler-generator/`.
 - Set up `build.gradle` with dependencies on Jackson and JavaPoet.
-- Implement `RestHandlerGeneratorPlugin` that registers a `RestHandlerGeneratorTask`.
-- The task takes inputs: path to the vendored `schema.json` (at `rest-api-spec/src/main/resources/schema/schema.json`), the server module's compile classpath, and output directory.
-- Wire the output directory into the server module's source sets.
+- Implement `RestHandlerGeneratorPlugin` that, when applied to the server module:
+  1. Creates the `restHandlers` source set with `compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath`.
+  2. Registers a `RestHandlerGeneratorTask` (`generateRestHandlers`) with inputs: vendored `schema.json` path (`@InputFile`), the `main` source set's classes directories and compile classpath (`@InputFiles`/`@Classpath`), and an output directory (`@OutputDirectory`) at `build/generated/sources/rest-handlers/`.
+  3. Wires the output directory as the `restHandlers` source set's source directory.
+  4. Makes `compileRestHandlersJava` depend on `generateRestHandlers`, and `generateRestHandlers` depend on `compileJava`.
+  5. Adds `sourceSets.restHandlers.output` to the jar, test compile classpath, and test runtime classpath.
+- In the server module's `build.gradle`, apply the plugin.
 
 #### Task 1.2: Define the Data Model
 
@@ -425,11 +525,12 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 
 #### Task 1.5: Implement TransportActionResolver
 
-- Create `TransportActionResolver` class that takes a fully-qualified transport action class name and the server compile classpath.
-- Using a `URLClassLoader` over the compile classpath, load the transport action class.
+- Create `TransportActionResolver` class that takes a fully-qualified transport action class name and resolves its ActionRequest/ActionResponse types.
+- At the start of the generator task, create a `URLClassLoader` from the `main` source set's compiled classes directories and its compile classpath (these are task inputs). This classloader can see all transport actions, ActionRequests, ActionResponses, and their dependencies.
 - Walk the superclass chain using `getGenericSuperclass()` and `ParameterizedType.getActualTypeArguments()` to find the `ActionRequest` and `ActionResponse` type parameters.
 - Return a record containing: the transport action class, the ActionRequest class, and the ActionResponse class.
 - Handle edge cases: the transport action may have multiple levels of inheritance (e.g. `TransportDeleteIndexAction extends TransportMasterNodeAction<DeleteIndexRequest, AcknowledgedResponse>` where `TransportMasterNodeAction extends TransportMasterNodeReadAction` etc.). Walk until you find concrete type arguments, not type variables.
+- Close the classloader when the task completes.
 
 #### Task 1.6: Implement TypeMapper
 
@@ -455,6 +556,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 - `prepareRequest()` calls `ActionRequest.fromRestRequest(request)` and dispatches via `client.execute(TYPE, actionRequest, new Listener<>(channel))`.
 - Add `@ServerlessScope` annotation based on availability.
 - Add a `@Generated` annotation or file header comment marking the file as generated.
+- **Also generate `GeneratedRestHandlerRegistry`**: a single class with a static `registerHandlers()` method that instantiates and registers every generated handler. This class is regenerated on every run, reflecting the current set of generated endpoints.
 
 #### Task 1.9: Add `fromRestRequest()` to PoC ActionRequests
 
@@ -465,9 +567,12 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 
 #### Task 1.10: Generate and Swap
 
-- Run the generator for the 3 PoC endpoints.
+- Run the generator for the 3 PoC endpoints. Generated sources (handler classes + `GeneratedRestHandlerRegistry`) appear in `build/generated/sources/rest-handlers/` (the `restHandlers` source set).
 - Compare generated handler code with existing hand-written code to verify they're functionally equivalent.
-- Replace hand-written handlers with generated ones.
+- In `ActionModule.initRestHandlers()`:
+  - Add one line: `GeneratedRestHandlerRegistry.registerHandlers(registerHandler);` (done once, never changes again).
+  - Remove the 3 hand-written handler registration lines for the PoC endpoints.
+- Delete the hand-written handler classes from `src/main/java/` (the `main` source set). The generated ones in the `restHandlers` source set take their place in the jar.
 - Run the full YAML REST test suite to verify no regressions.
 
 ### Success Criteria
@@ -809,10 +914,11 @@ After generating handlers, validate that:
 1. Add `@server_transport_action` tag to the endpoint's request definition in the TypeScript spec. Regenerate `schema.json` and copy to the vendored location in the elasticsearch repo.
 2. Add `fromRestRequest()` to the ActionRequest class (refactor from existing handler).
 3. Run YAML REST tests to verify refactoring.
-4. Enable generation for this endpoint.
+4. Enable generation for this endpoint (the generator picks it up automatically from the `serverTransportAction` field in schema.json). The `GeneratedRestHandlerRegistry` is regenerated to include the new handler.
 5. Compare generated handler with hand-written handler (manual review or automated diff).
-6. Delete hand-written handler.
-7. Run full YAML REST test suite.
+6. Remove the hand-written handler's registration line from `ActionModule.initRestHandlers()` (the generated registry now handles it).
+7. Delete hand-written handler class.
+8. Run full YAML REST test suite.
 
 ### Ordering
 
@@ -823,7 +929,7 @@ Start with the simplest, most stable endpoints. Avoid endpoints that are:
 
 ### Rollback
 
-If a generated handler causes issues, re-enable the hand-written handler by removing the `@server_transport_action` tag from the spec (so the generator skips it) and restoring the hand-written class.
+If a generated handler causes issues, re-enable the hand-written handler by removing the `@server_transport_action` tag from the spec (so the generator skips it), restoring the hand-written class, and re-adding its registration line to `ActionModule.initRestHandlers()`.
 
 ---
 
@@ -894,8 +1000,9 @@ build-tools-internal/rest-handler-generator/
 
 - **`elasticsearch-specification`** (upstream): add `@server_transport_action` JSDoc tags to PoC endpoint request definitions; extend spec compiler to parse the tag and include it in `schema.json`.
 - **`rest-api-spec/src/main/resources/schema/schema.json`**: updated by copying regenerated `schema.json` from the spec repo after each phase.
+- **`ActionModule.initRestHandlers()`**: add one-time call to `GeneratedRestHandlerRegistry.registerHandlers()` (Phase 1). Remove hand-written handler registration lines as endpoints are migrated.
 - ActionRequest classes for PoC endpoints: add `fromRestRequest()` static factory method.
-- Server module `build.gradle`: apply the generator plugin, add generated sources to source sets, pass compile classpath to generator task.
+- Server module `build.gradle`: apply the generator plugin, configure `restHandlers` source set.
 - Existing hand-written handlers: delete after successful migration (one at a time).
 
 ### External Dependency
