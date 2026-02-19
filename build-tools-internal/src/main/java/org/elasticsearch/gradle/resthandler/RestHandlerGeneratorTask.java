@@ -9,6 +9,9 @@
 
 package org.elasticsearch.gradle.resthandler;
 
+import org.elasticsearch.gradle.resthandler.model.Endpoint;
+import org.elasticsearch.gradle.resthandler.model.Schema;
+
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
@@ -24,6 +27,7 @@ import org.gradle.api.tasks.TaskAction;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -66,12 +70,41 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
     public void generate() throws IOException {
         Path schemaPath = getSchemaFile().get().getAsFile().toPath();
         ParsedSchema parsed = SchemaParser.parse(schemaPath);
-        getLogger().debug(
-            "Parsed schema: {} types, {} endpoints",
-            parsed.schema().types().size(),
-            parsed.schema().endpoints() != null ? parsed.schema().endpoints().size() : 0
+        Path outputPath = getOutputDir().get().getAsFile().toPath();
+        Files.createDirectories(outputPath);
+
+        Schema schema = parsed.schema();
+        List<Endpoint> endpoints = schema.endpoints() != null ? schema.endpoints() : List.of();
+        Iterable<java.io.File> classpath = getServerCompileClasspath().getFiles();
+
+        int generated = 0;
+        for (Endpoint endpoint : endpoints) {
+            String transportAction = endpoint.serverTransportAction();
+            if (transportAction == null || transportAction.isBlank()) {
+                continue;
+            }
+            try {
+                ResolvedTransportAction resolvedAction = TransportActionResolver.resolve(transportAction, classpath);
+                ResolvedListener resolvedListener = ListenerResolver.resolve(resolvedAction.responseClass());
+                org.elasticsearch.gradle.resthandler.model.TypeDefinition requestType = parsed.getRequestType(endpoint);
+                com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(
+                    endpoint,
+                    requestType,
+                    resolvedAction,
+                    resolvedListener
+                );
+                javaFile.writeTo(outputPath);
+                generated++;
+                getLogger().debug("Generated handler for endpoint {}", endpoint.name());
+            } catch (Exception e) {
+                getLogger().warn("Skipping endpoint {}: {}", endpoint.name(), e.getMessage());
+            }
+        }
+        getLogger().info(
+            "Parsed schema: {} types, {} endpoints; generated {} handler(s)",
+            schema.types().size(),
+            endpoints.size(),
+            generated
         );
-        Files.createDirectories(getOutputDir().get().getAsFile().toPath());
-        // Generation of handler source from parsed in Task 1.8
     }
 }
