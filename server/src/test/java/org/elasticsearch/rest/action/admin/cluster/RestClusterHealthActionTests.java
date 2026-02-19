@@ -17,6 +17,7 @@ import org.elasticsearch.client.internal.node.NodeClient;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.Priority;
 import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.action.admin.cluster.health.RestClusterHealthAction;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.rest.FakeRestRequest;
 
@@ -61,7 +62,7 @@ public class RestClusterHealthActionTests extends ESTestCase {
         params.put("wait_for_events", waitForEvents.name());
 
         FakeRestRequest restRequest = buildRestRequest(params);
-        ClusterHealthRequest clusterHealthRequest = RestClusterHealthAction.fromRequest(restRequest);
+        ClusterHealthRequest clusterHealthRequest = ClusterHealthRequest.fromRestRequest(restRequest);
         assertThat(clusterHealthRequest.indices().length, equalTo(1));
         assertThat(clusterHealthRequest.indices()[0], equalTo(index));
         assertThat(clusterHealthRequest.local(), equalTo(local));

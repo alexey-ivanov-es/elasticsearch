@@ -290,7 +290,6 @@ import org.elasticsearch.rest.action.admin.cluster.RestClearVotingConfigExclusio
 import org.elasticsearch.rest.action.admin.cluster.RestCloneSnapshotAction;
 import org.elasticsearch.rest.action.admin.cluster.RestClusterAllocationExplainAction;
 import org.elasticsearch.rest.action.admin.cluster.RestClusterGetSettingsAction;
-import org.elasticsearch.rest.action.admin.cluster.RestClusterHealthAction;
 import org.elasticsearch.rest.action.admin.cluster.RestClusterRerouteAction;
 import org.elasticsearch.rest.action.admin.cluster.RestClusterSearchShardsAction;
 import org.elasticsearch.rest.action.admin.cluster.RestClusterStateAction;
@@ -339,7 +338,6 @@ import org.elasticsearch.rest.action.admin.indices.RestCloseIndexAction;
 import org.elasticsearch.rest.action.admin.indices.RestCreateIndexAction;
 import org.elasticsearch.rest.action.admin.indices.RestDeleteComponentTemplateAction;
 import org.elasticsearch.rest.action.admin.indices.RestDeleteComposableIndexTemplateAction;
-import org.elasticsearch.rest.action.admin.indices.RestDeleteIndexAction;
 import org.elasticsearch.rest.action.admin.indices.RestDeleteIndexTemplateAction;
 import org.elasticsearch.rest.action.admin.indices.RestFieldUsageStatsAction;
 import org.elasticsearch.rest.action.admin.indices.RestFlushAction;
@@ -349,7 +347,6 @@ import org.elasticsearch.rest.action.admin.indices.RestGetComponentTemplateActio
 import org.elasticsearch.rest.action.admin.indices.RestGetComposableIndexTemplateAction;
 import org.elasticsearch.rest.action.admin.indices.RestGetFieldMappingAction;
 import org.elasticsearch.rest.action.admin.indices.RestGetIndexTemplateAction;
-import org.elasticsearch.rest.action.admin.indices.RestGetIndicesAction;
 import org.elasticsearch.rest.action.admin.indices.RestGetMappingAction;
 import org.elasticsearch.rest.action.admin.indices.RestGetSettingsAction;
 import org.elasticsearch.rest.action.admin.indices.RestIndexDeleteAliasesAction;
@@ -866,6 +863,21 @@ public class ActionModule extends AbstractModule {
         return new ActionFilters(Set.copyOf(finalFilters));
     }
 
+    /**
+     * Registers generated REST handlers via reflection so that the server module's main source set
+     * does not need to compile against the generated {@code GeneratedRestHandlerRegistry} class.
+     */
+    private static void registerGeneratedHandlers(Consumer<RestHandler> registerHandler) {
+        try {
+            Class<?> registry = Class.forName("org.elasticsearch.rest.action.GeneratedRestHandlerRegistry");
+            registry.getMethod("registerHandlers", Consumer.class).invoke(null, registerHandler);
+        } catch (ClassNotFoundException e) {
+            // Generated handlers not present (e.g. partial build); skip.
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError("Failed to invoke GeneratedRestHandlerRegistry.registerHandlers", e);
+        }
+    }
+
     public void initRestHandlers(Supplier<DiscoveryNodes> nodesInCluster, Predicate<NodeFeature> clusterSupportsFeature) {
         List<AbstractCatAction> catActions = new ArrayList<>();
         Predicate<AbstractCatAction> catActionsFilter = restExtension.getCatActionsFilter();
@@ -884,6 +896,7 @@ public class ActionModule extends AbstractModule {
                 handler.routes().forEach(route -> restController.registerHandler(route, placeholderRestHandler));
             }
         };
+        registerGeneratedHandlers(registerHandler);
         registerHandler.accept(new RestAddVotingConfigExclusionAction());
         registerHandler.accept(new RestClearVotingConfigExclusionsAction());
         registerHandler.accept(new RestNodesInfoAction(settingsFilter));
@@ -897,7 +910,6 @@ public class ActionModule extends AbstractModule {
         registerHandler.accept(new RestDeleteDesiredBalanceAction());
         registerHandler.accept(new RestClusterStatsAction());
         registerHandler.accept(new RestClusterStateAction(settingsFilter));
-        registerHandler.accept(new RestClusterHealthAction());
         registerHandler.accept(new RestClusterUpdateSettingsAction());
         registerHandler.accept(new RestClusterGetSettingsAction(settings, clusterSettings, settingsFilter));
         registerHandler.accept(new RestClusterRerouteAction(settingsFilter, projectIdResolver));
@@ -916,7 +928,6 @@ public class ActionModule extends AbstractModule {
         registerHandler.accept(new RestSnapshotsStatusAction());
         registerHandler.accept(new RestSnapshottableFeaturesAction());
         registerHandler.accept(new RestResetFeatureStateAction());
-        registerHandler.accept(new RestGetIndicesAction());
         registerHandler.accept(new RestIndicesStatsAction());
         registerHandler.accept(new RestIndicesSegmentsAction());
         registerHandler.accept(new RestIndicesShardStoresAction());
@@ -929,7 +940,6 @@ public class ActionModule extends AbstractModule {
         registerHandler.accept(new RestResizeHandler.RestSplitIndexAction());
         registerHandler.accept(new RestResizeHandler.RestCloneIndexAction());
         registerHandler.accept(new RestRolloverIndexAction());
-        registerHandler.accept(new RestDeleteIndexAction());
         registerHandler.accept(new RestCloseIndexAction());
         registerHandler.accept(new RestOpenIndexAction());
         registerHandler.accept(new RestAddIndexBlockAction());

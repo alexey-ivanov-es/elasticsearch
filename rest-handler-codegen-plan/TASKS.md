@@ -19,7 +19,7 @@ Tasks are taken from the full project plan. Update the status when a task is com
 | 1.7 | Implement ListenerResolver | Done |
 | 1.8 | Implement HandlerCodeEmitter | Done |
 | 1.9 | Add `fromRestRequest()` to PoC ActionRequests | Done |
-| 1.10 | Generate and Swap | Not done |
+| 1.10 | Generate and Swap | Done |
 
 ---
 

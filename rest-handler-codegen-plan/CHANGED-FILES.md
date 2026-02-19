@@ -66,12 +66,14 @@ List of files created, modified, or removed for this project. **Update this file
 - **Task 1.3:** `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — call SchemaParser.parse(), log parsed counts
 - **Task 1.8:** `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — for each endpoint with serverTransportAction: resolve transport action and listener, emit handler via HandlerCodeEmitter, write JavaFile to output directory; skip endpoints that fail resolution with warn log
 - **Task 1.9:** `server/.../rest/action/admin/indices/RestDeleteIndexAction.java`, `RestGetIndicesAction.java`, `server/.../rest/action/admin/cluster/RestClusterHealthAction.java` — prepareRequest() refactored to call XxxRequest.fromRestRequest(request); prepareRequest not removed (per adjustment)
+- **Task 1.10:** `server/.../action/ActionModule.java` — registerGeneratedHandlers(registerHandler) via reflection; remove hand-written registration for RestClusterHealthAction, RestGetIndicesAction, RestDeleteIndexAction. `server/.../rest/action/admin/cluster/RestClusterHealthActionTests.java` — use ClusterHealthRequest.fromRestRequest and import generated RestClusterHealthAction from org.elasticsearch.rest.action.admin.cluster.health.
 - **Task 1.4:** `elasticsearch-specification/compiler/src/model/metamodel.ts` — add serverTransportAction to Endpoint; `elasticsearch-specification/compiler/src/model/utils.ts` — parse @server_transport_action and set endpoint.serverTransportAction; `elasticsearch-specification/specification/indices/delete/IndicesDeleteRequest.ts`, `indices/get/IndicesGetRequest.ts`, `cluster/health/ClusterHealthRequest.ts` — add @server_transport_action JSDoc; `rest-api-spec/src/main/resources/schema/schema.json` — regenerated from compiler and copied from elasticsearch-specification/output/schema/schema.json. Parser compatibility with full schema: `build-tools-internal/.../SchemaParser.java` — disable FAIL_ON_UNKNOWN_PROPERTIES; `model/TypeDefinition.java` — name as TypeReference (nested {name, namespace}); `model/TypeDescriptor.java` — value as Object (string or nested descriptor); `model/SchemaParserTests.java` — test schema uses nested type name
 
 ---
 
 ## Removed / moved files
 
+- **Task 1.10:** `server/.../rest/action/admin/indices/RestDeleteIndexAction.java`, `RestGetIndicesAction.java`, `server/.../rest/action/admin/cluster/RestClusterHealthAction.java` — deleted; replaced by generated RestIndicesDeleteAction, RestIndicesGetAction, RestClusterHealthAction in restHandlers source set.
 - `es-rest-handler-codegen-plan.md` — moved to `rest-handler-codegen-plan/es-rest-handler-codegen-plan.md`
 - `build-tools-internal/.../ListenerKind.java` — removed; replaced by RestListenerType (enum with package/class for emitter)
 - `build-tools-internal/.../ResolvedListener.java` — removed; ListenerResolver now returns RestListenerType directly
