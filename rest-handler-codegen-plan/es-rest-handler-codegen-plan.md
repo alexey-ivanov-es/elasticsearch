@@ -101,6 +101,7 @@ Every REST handler extends `BaseRestHandler` and overrides these methods:
 - **`routes()`** → returns `List<Route>` where each Route is a pair of HTTP method and path string (e.g. `new Route(DELETE, "/{index}")`). Deprecated routes use `Route.builder(method, path).deprecated(message, version).build()`.
 - **`getName()`** → returns a unique string identifier for the handler (e.g. `"delete_index_action"`), used for usage tracking.
 - **`supportedQueryParameters()`** → returns `Set<String>` of query parameter names this handler accepts. Strict checking rejects unknown parameters.
+- **`responseParams()`** → returns `Set<String>` of additional parameter names that are consumed during response serialization rather than during request preparation. These are parameters like `flat_settings` or `include_defaults` that affect how the response is formatted. `BaseRestHandler` unions `supportedQueryParameters()` and `responseParams()` when checking for unrecognized parameters, so response params are accepted but not consumed in `prepareRequest()`. Default returns `Collections.emptySet()`.
 - **`prepareRequest(RestRequest, NodeClient)`** → extracts parameters from the RestRequest, builds an ActionRequest, and returns a `RestChannelConsumer` lambda that dispatches the request via `client.execute(TYPE, actionRequest, listener)`.
 
 ### Parameter Extraction Patterns
@@ -129,6 +130,18 @@ Derived from the spec's `availability.serverless` field:
 - `visibility: "public"` → annotate handler class with `@ServerlessScope(Scope.PUBLIC)`
 - `visibility: "internal"` → `@ServerlessScope(Scope.INTERNAL)`
 - No serverless availability → no annotation
+
+### Handler Capabilities
+
+Some handlers override `supportedCapabilities()` to advertise feature capabilities (defined on `RestHandler` interface, default returns `Set.of()`). These capability strings are exposed to clients via the `_capabilities` API for feature detection and version negotiation. For example, `RestSearchAction` returns `SearchCapabilities.CAPABILITIES`.
+
+The generator must emit a `supportedCapabilities()` override if the endpoint has capabilities. The spec should be extended with a `capabilities` array on the endpoint object. If the array is present and non-empty, the generator emits `return Set.of("cap1", "cap2", ...)`. If absent, the default (`Set.of()`) is used and no override is generated.
+
+### System Index Access
+
+Some handlers override `allowSystemIndexAccessByDefault()` (defined on `RestHandler` interface, default returns `false`). When `true`, requests handled by this class are allowed to access system indices without explicit opt-in. Examples: `cluster.health`, `indices.resolve_index`.
+
+The generator must emit an `allowSystemIndexAccessByDefault()` override returning `true` when the spec indicates it. The spec should be extended with an `allowSystemIndexAccess: true` boolean on the endpoint object. For the PoC, the 3 chosen endpoints do NOT override this method, so this is not needed immediately but should be handled before wider migration.
 
 ### Transport Action Dispatch
 
@@ -160,12 +173,35 @@ This annotation is added to the spec **from the very start**, including for the 
 }
 ```
 
+### Additional Server-Side Spec Fields
+
+Several more optional fields are needed on the endpoint object in `schema.json` to support full handler generation:
+
+- **`capabilities`** (array of strings, optional): the set of capability strings this handler advertises via `supportedCapabilities()`. Example: `"capabilities": ["search_query_rules"]`. When absent or empty, the default `Set.of()` is used.
+- **`allowSystemIndexAccess`** (boolean, optional, default `false`): when `true`, the generated handler overrides `allowSystemIndexAccessByDefault()` to return `true`.
+- **`responseParams`** (array of strings, optional): query parameter names that are consumed during response serialization rather than during request preparation. These go into the generated `responseParams()` override. Example: `"responseParams": ["flat_settings", "include_defaults"]`. The parameters listed here are still part of the endpoint's query params in the spec, but the generator must route them to `responseParams()` and exclude them from `supportedQueryParameters()`. When absent or empty, no `responseParams()` override is generated.
+
+These are expressed as JSDoc tags in the TypeScript spec:
+
+```typescript
+/**
+ * @rest_spec_name search
+ * @server_transport_action org.elasticsearch.action.search.TransportSearchAction
+ * @server_capabilities search_query_rules,search_phase_took
+ * @server_allow_system_index_access false
+ * @server_response_params typed_keys,rest_total_hits_as_int
+ */
+```
+
+For the PoC: `cluster.get_settings` uses `responseParams` (`flat_settings`, `include_defaults`), providing an immediate test case. The other two PoC endpoints don't need it.
+
 ### Spec Compiler Changes
 
-The `elasticsearch-specification` compiler needs a small change:
-1. Parse the `@server_transport_action` JSDoc tag from the TypeScript definitions.
-2. Include the value as a `serverTransportAction` string field on the endpoint object in `schema.json`.
-3. The field is optional — endpoints without it are skipped by the generator.
+The `elasticsearch-specification` compiler needs changes to parse new JSDoc tags:
+1. `@server_transport_action` → `serverTransportAction` string field on the endpoint object. Optional — endpoints without it are skipped by the generator.
+2. `@server_capabilities` → `capabilities` array of strings on the endpoint object. Optional.
+3. `@server_allow_system_index_access` → `allowSystemIndexAccess` boolean on the endpoint object. Optional, defaults to `false`.
+4. `@server_response_params` → `responseParams` array of strings on the endpoint object. Optional.
 
 For the PoC, add this tag to the 3 phase-1 endpoints and the 3 phase-2 endpoints in the TypeScript spec. After regenerating `schema.json` in the `elasticsearch-specification` repo, copy the result to the vendored location in the `elasticsearch` repo (`rest-api-spec/src/main/resources/schema/schema.json`).
 
@@ -239,7 +275,7 @@ The full endpoint name (including namespace) is converted from `dot.separated.sn
 Examples:
 - `indices.delete` → `RestIndicesDeleteAction`
 - `indices.get` → `RestIndicesGetAction`
-- `cluster.health` → `RestClusterHealthAction`
+- `cluster.get_settings` → `RestClusterGetSettingsAction`
 - `ingest.put_pipeline` → `RestIngestPutPipelineAction`
 - `search` (top-level) → `RestSearchAction`
 - `indices.put_mapping` → `RestIndicesPutMappingAction`
@@ -486,7 +522,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 
 2. **`indices.get`** — `GET /{index}`, `HEAD /{index}`. Path param, query params (`flat_settings`, `include_defaults`, `local`, `features`). Response: `GetIndexResponse`. Listener: `RestToXContentListener`. Tests HEAD method support and multiple routes for same endpoint.
 
-3. **`cluster.health`** — `GET /_cluster/health`, `GET /_cluster/health/{index}`. Optional path param (two URL patterns — one with `{index}`, one without), many query params (`level`, `local`, `timeout`, `wait_for_active_shards`, `wait_for_nodes`, `wait_for_events`, `wait_for_status`, `wait_for_no_relocating_shards`, `wait_for_no_initializing_shards`). Response: `ClusterHealthResponse`. Tests optional path parameters and larger parameter sets.
+3. **`cluster.get_settings`** — `GET /_cluster/settings`. No path params, query params (`flat_settings`, `include_defaults`, `master_timeout`, `timeout`). Response: `ClusterGetSettingsResponse`. Listener: `RestToXContentListener`. Tests a different namespace (cluster) and exercises `responseParams()` — `flat_settings` and `include_defaults` are response params that affect response serialization, not request preparation.
 
 ### Implementation Tasks
 
@@ -505,6 +541,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 #### Task 1.2: Define the Data Model
 
 - Create Java records (or classes) mirroring the schema.json structure: `Schema`, `Endpoint`, `UrlPattern`, `TypeDefinition`, `Property`, `TypeDescriptor`, `Body`, `Availability`, `AvailabilityDetail`, `TypeReference`.
+- The `Endpoint` record must include the server-side extension fields: `serverTransportAction` (String, nullable), `capabilities` (List<String>, nullable), `allowSystemIndexAccess` (boolean, default false), `responseParams` (List<String>, nullable).
 - These are internal to the generator — they don't need to be part of the Elasticsearch server runtime.
 
 #### Task 1.3: Implement Schema Parser
@@ -513,11 +550,12 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 - Build a type lookup map: `namespace.name` → `TypeDefinition` for resolving type references.
 - Resolve each endpoint's request and response types by looking up their `{name, namespace}` reference in the type map.
 
-#### Task 1.4: Add `@server_transport_action` to PoC Endpoints in the Spec
+#### Task 1.4: Add Server-Side Annotations to PoC Endpoints in the Spec
 
 - In the `elasticsearch-specification` repo, add the `@server_transport_action` JSDoc tag to the TypeScript request definitions for the 3 PoC endpoints.
-- Extend the spec compiler to parse this tag and include `serverTransportAction` as a field on the endpoint object in `schema.json`.
-- Regenerate `schema.json` and verify the field appears correctly.
+- For `cluster.get_settings`, also add `@server_response_params flat_settings,include_defaults`.
+- Extend the spec compiler to parse all server-side tags (`@server_transport_action`, `@server_capabilities`, `@server_allow_system_index_access`, `@server_response_params`) and include them as fields on the endpoint object in `schema.json`.
+- Regenerate `schema.json` and verify the fields appear correctly.
 - Copy the regenerated `schema.json` to the vendored location in the `elasticsearch` repo: `rest-api-spec/src/main/resources/schema/schema.json`.
 
 #### Task 1.5: Implement TransportActionResolver
@@ -549,20 +587,33 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 
 - Using JavaPoet, generate a complete Java class for each endpoint.
 - Generated class extends `BaseRestHandler`.
-- Generate these methods: `routes()`, `getName()`, `supportedQueryParameters()`, `prepareRequest()`.
+- Generate these core methods: `routes()`, `getName()`, `supportedQueryParameters()`, `prepareRequest()`.
 - `prepareRequest()` calls `ActionRequest.fromRestRequest(request)` and dispatches via `client.execute(TYPE, actionRequest, new Listener<>(channel))`.
 - Add `@ServerlessScope` annotation based on availability.
 - Add a `@Generated` annotation or file header comment marking the file as generated.
-- **Also generate `GeneratedRestHandlerRegistry`**: a single class in package `org.elasticsearch.rest.action` with a static `registerHandlers(Consumer<RestHandler> registerHandler)` method that instantiates and registers every generated handler. This class is regenerated on every run, reflecting the current set of generated endpoints.
+- **Also generate `GeneratedRestHandlerRegistry`**: a single class with a static `registerHandlers()` method that instantiates and registers every generated handler. This class is regenerated on every run, reflecting the current set of generated endpoints.
 
-#### Task 1.9: Add `fromRestRequest()` to PoC ActionRequests
+#### Task 1.9: Handle Optional Method Overrides (`responseParams`, `supportedCapabilities`, `allowSystemIndexAccessByDefault`)
+
+- In `HandlerCodeEmitter`, generate conditional overrides based on spec fields:
+  - **`responseParams()`**: if the endpoint has `responseParams` in the spec, generate an override returning `Set.of(...)` with the listed parameter names. These are query parameters consumed during response serialization rather than request preparation. `BaseRestHandler` accepts both `supportedQueryParameters()` and `responseParams()` when checking for unrecognized parameters, so response params need only be in the `responseParams()` set — they should NOT be duplicated into `supportedQueryParameters()`. For the PoC, `cluster.get_settings` has `responseParams: ["flat_settings", "include_defaults"]` — this is our test case.
+  - **`supportedCapabilities()`**: if the endpoint has `capabilities` in the spec, generate an override returning `Set.of(...)` with the listed capability strings.
+  - **`allowSystemIndexAccessByDefault()`**: if the endpoint has `allowSystemIndexAccess: true`, generate an override returning `true`.
+  - If none of these fields are present, no overrides are generated (the defaults from `BaseRestHandler`/`RestHandler` apply).
+- Add unit tests verifying that:
+  - An endpoint with `responseParams` produces the correct `responseParams()` override, and those params are excluded from `supportedQueryParameters()`.
+  - An endpoint with `capabilities` produces the correct `supportedCapabilities()` override.
+  - An endpoint with `allowSystemIndexAccess: true` produces the correct override.
+  - An endpoint without any of these produces no overrides.
+
+#### Task 1.10: Add `fromRestRequest()` to PoC ActionRequests
 
 - For each of the 3 PoC endpoints, add a `public static XxxRequest fromRestRequest(RestRequest request)` method to the existing ActionRequest class.
 - The body of this method is copied from the existing handler's `prepareRequest()` — it's a refactoring, not new logic.
 - Temporarily modify the existing hand-written handler to call `fromRestRequest()` to verify the refactoring is correct.
 - Run YAML REST tests for these endpoints.
 
-#### Task 1.10: Generate and Swap
+#### Task 1.11: Generate and Swap
 
 - Run the generator for the 3 PoC endpoints. Generated sources (handler classes + `GeneratedRestHandlerRegistry`) appear in `build/generated/sources/rest-handlers/` (the `restHandlers` source set).
 - Compare generated handler code with existing hand-written code to verify they're functionally equivalent.
@@ -576,7 +627,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 
 - Generator Gradle task runs successfully as part of the build.
 - Generated handlers compile without manual edits.
-- All existing YAML REST tests for `indices.delete`, `indices.get`, and `cluster.health` pass with the generated handlers.
+- All existing YAML REST tests for `indices.delete`, `indices.get`, and `cluster.get_settings` pass with the generated handlers.
 - Generated code is readable and follows Elasticsearch code conventions.
 
 ---
@@ -632,9 +683,9 @@ The generator itself only needs to know that the endpoint has a body (from the s
 - Include body parsing using the existing `.source()` / `fromXContent()` methods.
 - Refactor existing handlers to call it, verify with tests.
 
-#### Task 2.3: Add `@server_transport_action` to Phase 2 Endpoints
+#### Task 2.3: Add Server-Side Annotations to Phase 2 Endpoints
 
-- Add the `@server_transport_action` tag to the 3 phase-2 endpoints in the TypeScript spec.
+- Add all required server-side tags (`@server_transport_action`, plus `@server_response_params` / `@server_capabilities` / `@server_allow_system_index_access` as applicable) to the 3 phase-2 endpoints in the TypeScript spec.
 - Regenerate `schema.json` and copy to the vendored location in the `elasticsearch` repo.
 
 #### Task 2.4: Generate and Swap
@@ -908,7 +959,7 @@ After generating handlers, validate that:
 
 ### Per-Endpoint Migration Checklist
 
-1. Add `@server_transport_action` tag to the endpoint's request definition in the TypeScript spec. Regenerate `schema.json` and copy to the vendored location in the elasticsearch repo.
+1. Add server-side annotations to the endpoint's request definition in the TypeScript spec: `@server_transport_action` (required), plus `@server_response_params`, `@server_capabilities`, `@server_allow_system_index_access` as needed. Regenerate `schema.json` and copy to the vendored location in the elasticsearch repo.
 2. Add `fromRestRequest()` to the ActionRequest class (refactor from existing handler).
 3. Run YAML REST tests to verify refactoring.
 4. Enable generation for this endpoint (the generator picks it up automatically from the `serverTransportAction` field in schema.json). The `GeneratedRestHandlerRegistry` is regenerated to include the new handler.
