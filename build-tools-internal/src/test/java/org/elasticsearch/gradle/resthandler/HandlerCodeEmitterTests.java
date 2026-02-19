@@ -84,7 +84,7 @@ public class HandlerCodeEmitterTests {
         assertTrue("Generated source should contain prepareRequest", source.contains("prepareRequest"));
         assertTrue("Generated source should call fromRestRequest", source.contains("fromRestRequest(request)"));
         assertTrue("Generated source should call client.execute", source.contains("client.execute("));
-        assertTrue("Generated source should contain supportedQueryParameters", source.contains("supportedQueryParameters()"));
+        // no query params for this endpoint, so supportedQueryParameters() is not overridden
         assertTrue("Generated source should have file comment", source.contains("DO NOT EDIT"));
     }
 
