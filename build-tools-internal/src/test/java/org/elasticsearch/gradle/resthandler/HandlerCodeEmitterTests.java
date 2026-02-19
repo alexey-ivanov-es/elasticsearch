@@ -67,7 +67,9 @@ public class HandlerCodeEmitterTests {
         ResolvedTransportAction resolved = new ResolvedTransportAction(
             FakeTransportAction.class,
             FakeRequest.class,
-            FakeResponse.class
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
@@ -110,7 +112,9 @@ public class HandlerCodeEmitterTests {
         ResolvedTransportAction resolved = new ResolvedTransportAction(
             FakeTransportAction.class,
             FakeRequest.class,
-            FakeResponse.class
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
@@ -136,7 +140,9 @@ public class HandlerCodeEmitterTests {
         ResolvedTransportAction resolved = new ResolvedTransportAction(
             FakeTransportAction.class,
             FakeRequest.class,
-            FakeResponse.class
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
@@ -159,7 +165,9 @@ public class HandlerCodeEmitterTests {
         ResolvedTransportAction resolved = new ResolvedTransportAction(
             FakeTransportAction.class,
             FakeRequest.class,
-            FakeResponse.class
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
@@ -180,7 +188,9 @@ public class HandlerCodeEmitterTests {
         ResolvedTransportAction resolved = new ResolvedTransportAction(
             FakeTransportAction.class,
             FakeRequest.class,
-            FakeResponse.class
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
         );
         RestListenerType listenerType = RestListenerType.CHUNKED;
 

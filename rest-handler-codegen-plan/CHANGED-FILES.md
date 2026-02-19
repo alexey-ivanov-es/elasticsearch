@@ -18,8 +18,8 @@ List of files created, modified, or removed for this project. **Update this file
   - `elasticsearch-specification/.nvmrc` — Node 24
   - `elasticsearch-specification/.gitignore` — output/, compiler/node_modules
 - **Task 1.1 (REST handler generator plugin):**
-  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorPlugin.java` — plugin that registers `generateRestHandlers` task and wires output into server main source set
-  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — task with inputs (schema file, server compile classpath) and output directory
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorPlugin.java` — plugin that creates `restHandlers` source set, registers `generateRestHandlers` task (depends on compileJava), wires output to restHandlers, jar and test classpaths
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestHandlerGeneratorTask.java` — task with inputs (schema file, server main classes dirs, server compile classpath), URLClassLoader for resolution, emits handler classes + GeneratedRestHandlerRegistry
   - `rest-api-spec/src/main/resources/schema/schema.json` — minimal placeholder (empty endpoints/types); **Task 1.4:** replaced with full schema including serverTransportAction for PoC endpoints
 - **Task 1.2 (Data model):**
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/model/Schema.java`
@@ -38,8 +38,8 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ParsedSchema.java` — parsed schema plus typeByRef map and resolve helpers
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/SchemaParserTests.java` — unit tests for SchemaParser
 - **Task 1.5 (TransportActionResolver):**
-  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/TransportActionResolver.java` — resolve ActionRequest/ActionResponse from transport action class via reflection
-  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ResolvedTransportAction.java` — record holding transport action class, request class, response class
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/TransportActionResolver.java` — resolve ActionRequest/ActionResponse and action type reference (TYPE or INSTANCE) from transport action class via reflection; overload with ClassLoader
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ResolvedTransportAction.java` — record holding transport action class, request class, response class, actionTypeReferenceClass, actionTypeReferenceField
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/TransportActionResolverTests.java` — unit tests for TransportActionResolver
 - **Task 1.6 (TypeMapper):**
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ParameterMapping.java` — record for Java type name, extraction code, and special handling (e.g. IndicesOptions)
@@ -50,7 +50,7 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ListenerResolver.java` — resolve listener from ActionResponse class via classloader-by-name checks (ChunkedToXContentObject, BaseNodesResponse, StatusToXContentObject, default)
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/ListenerResolverTests.java` — unit tests for ListenerResolver (plain class → DEFAULT; optional server-on-classpath tests for SearchResponse→CHUNKED, NodesInfoResponse→NODES, AcknowledgedResponse→DEFAULT)
 - **Task 1.8 (HandlerCodeEmitter):**
-  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/HandlerCodeEmitter.java` — JavaPoet-based emitter: routes(), getName(), supportedQueryParameters(), prepareRequest() (ActionRequest.fromRestRequest + client.execute(TYPE, actionRequest, listener)); package/class naming; @ServerlessScope from availability; empty routes handled
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/HandlerCodeEmitter.java` — JavaPoet-based emitter: routes(), getName(), supportedQueryParameters(), prepareRequest(); package from transport action (org.elasticsearch.rest.action + suffix after "action."); RestHandler.Route, BaseRestHandler.RestChannelConsumer; action type TYPE/INSTANCE; emitRegistry(Consumer<RestHandler>) for GeneratedRestHandlerRegistry
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/HandlerCodeEmitterTests.java` — unit tests for emitted handler structure, query params, ServerlessScope, multiple routes, chunked listener, invalid listener FQN
 - **Task 1.9 (fromRestRequest for PoC):**
   - `server/.../action/admin/indices/delete/DeleteIndexRequest.java` — add fromRestRequest(RestRequest); handler prepareRequest unchanged, now delegates to it

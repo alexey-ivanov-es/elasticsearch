@@ -11,10 +11,14 @@ package org.elasticsearch.gradle.resthandler;
 
 /**
  * Result of resolving a transport action class: the action class plus the
- * ActionRequest and ActionResponse types from its generic superclass chain.
+ * ActionRequest and ActionResponse types from its generic superclass chain,
+ * and the class/field to use for {@code client.execute(..., request, listener)}
+ * (either {@code TransportXxxAction.TYPE} or {@code XxxAction.INSTANCE}).
  */
 public record ResolvedTransportAction(
     Class<?> transportActionClass,
     Class<?> requestClass,
-    Class<?> responseClass
+    Class<?> responseClass,
+    Class<?> actionTypeReferenceClass,
+    String actionTypeReferenceField
 ) {}

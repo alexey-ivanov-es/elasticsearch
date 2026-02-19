@@ -16,39 +16,55 @@ import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.bundling.Jar;
 
 /**
- * Gradle plugin that registers the REST handler code generator task and wires its output
- * into the project's main Java source set. Applied to the server module (and later to other
- * modules that register REST handlers).
+ * Gradle plugin that registers the REST handler code generator task and a dedicated
+ * {@code restHandlers} source set. Main compiles first; the generator reads main's output
+ * and classpath; generated sources are compiled by {@code compileRestHandlersJava}.
+ * Applied to the server module (and later to other modules that register REST handlers).
  */
 public class RestHandlerGeneratorPlugin implements Plugin<Project> {
 
     public static final String TASK_NAME = "generateRestHandlers";
+    public static final String REST_HANDLERS_SOURCE_SET_NAME = "restHandlers";
 
     @Override
     public void apply(Project project) {
         Project rootProject = project.getRootProject();
         TaskProvider<RestHandlerGeneratorTask> generateTask = project.getTasks().register(TASK_NAME, RestHandlerGeneratorTask.class);
 
-        generateTask.configure(task -> {
-            task.getSchemaFile()
-                .set(rootProject.getLayout().getProjectDirectory().file("rest-api-spec/src/main/resources/schema/schema.json"));
-            task.getServerCompileClasspath()
-                .setFrom(
-                    project.getExtensions()
-                        .getByType(JavaPluginExtension.class)
-                        .getSourceSets()
-                        .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-                        .getCompileClasspath()
-                );
-            task.getOutputDir().set(project.getLayout().getBuildDirectory().dir("generated/sources/rest-handlers"));
-        });
-
         project.getPlugins().withType(JavaPlugin.class, javaPlugin -> {
-            SourceSetContainer sourceSets = project.getExtensions().getByType(JavaPluginExtension.class).getSourceSets();
+            JavaPluginExtension javaExtension = project.getExtensions().getByType(JavaPluginExtension.class);
+            SourceSetContainer sourceSets = javaExtension.getSourceSets();
             SourceSet mainSourceSet = sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-            mainSourceSet.getJava().srcDir(generateTask);
+
+            SourceSet restHandlersSourceSet = sourceSets.create(REST_HANDLERS_SOURCE_SET_NAME);
+            restHandlersSourceSet.setCompileClasspath(
+                project.getObjects().fileCollection().from(mainSourceSet.getOutput(), mainSourceSet.getCompileClasspath())
+            );
+            restHandlersSourceSet.getJava().srcDir(project.getLayout().getBuildDirectory().dir("generated/sources/rest-handlers"));
+
+            generateTask.configure(task -> {
+                task.getSchemaFile()
+                    .set(rootProject.getLayout().getProjectDirectory().file("rest-api-spec/src/main/resources/schema/schema.json"));
+                task.getServerClassesDirs().setFrom(mainSourceSet.getOutput().getClassesDirs());
+                task.getServerCompileClasspath().setFrom(mainSourceSet.getCompileClasspath());
+                task.getOutputDir().set(project.getLayout().getBuildDirectory().dir("generated/sources/rest-handlers"));
+                task.dependsOn(project.getTasks().named(JavaPlugin.COMPILE_JAVA_TASK_NAME));
+            });
+
+            project.getTasks().named(restHandlersSourceSet.getCompileJavaTaskName()).configure(compileRestHandlers -> {
+                compileRestHandlers.dependsOn(generateTask);
+            });
+
+            project.getTasks()
+                .named(JavaPlugin.JAR_TASK_NAME, Jar.class)
+                .configure(jar -> { jar.from(restHandlersSourceSet.getOutput()); });
+
+            SourceSet testSourceSet = sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME);
+            testSourceSet.setCompileClasspath(testSourceSet.getCompileClasspath().plus(restHandlersSourceSet.getOutput()));
+            testSourceSet.setRuntimeClasspath(testSourceSet.getRuntimeClasspath().plus(restHandlersSourceSet.getOutput()));
         });
     }
 }

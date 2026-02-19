@@ -82,5 +82,7 @@ public class TransportActionResolverTests {
         assertEquals("org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction", resolved.transportActionClass().getName());
         assertEquals("org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest", resolved.requestClass().getName());
         assertEquals("org.elasticsearch.action.support.master.AcknowledgedResponse", resolved.responseClass().getName());
+        assertEquals("org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction", resolved.actionTypeReferenceClass().getName());
+        assertEquals("TYPE", resolved.actionTypeReferenceField());
     }
 }
