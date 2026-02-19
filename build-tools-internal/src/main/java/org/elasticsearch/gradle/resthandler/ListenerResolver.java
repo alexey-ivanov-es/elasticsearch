@@ -24,35 +24,30 @@ public final class ListenerResolver {
     private static final String BASE_NODES_RESPONSE = "org.elasticsearch.action.support.nodes.BaseNodesResponse";
     private static final String STATUS_TO_XCONTENT_OBJECT = "org.elasticsearch.rest.action.StatusToXContentObject";
 
-    private static final String LISTENER_CHUNKED = "org.elasticsearch.rest.action.RestRefCountedChunkedToXContentListener";
-    private static final String LISTENER_NODES = "org.elasticsearch.rest.action.RestActions.NodesResponseRestListener";
-    private static final String LISTENER_STATUS = "org.elasticsearch.rest.action.RestStatusToXContentListener";
-    private static final String LISTENER_DEFAULT = "org.elasticsearch.rest.action.RestToXContentListener";
-
     private ListenerResolver() {}
 
     /**
-     * Resolve the listener kind and class name for the given ActionResponse class.
+     * Resolve the listener type for the given ActionResponse class.
      *
      * @param responseClass the ActionResponse class (e.g. from {@link ResolvedTransportAction#responseClass()})
-     * @return the listener kind and fully-qualified listener class name for code generation
+     * @return the listener type (package and class name are on the enum)
      */
-    public static ResolvedListener resolve(Class<?> responseClass) {
+    public static RestListenerType resolve(Class<?> responseClass) {
         ClassLoader loader = responseClass.getClassLoader();
         if (loader == null) {
             loader = ClassLoader.getSystemClassLoader();
         }
 
         if (isAssignableFrom(responseClass, CHUNKED_TO_XCONTENT_OBJECT, loader)) {
-            return new ResolvedListener(ListenerKind.CHUNKED, LISTENER_CHUNKED);
+            return RestListenerType.CHUNKED;
         }
         if (isAssignableFrom(responseClass, BASE_NODES_RESPONSE, loader)) {
-            return new ResolvedListener(ListenerKind.NODES, LISTENER_NODES);
+            return RestListenerType.NODES;
         }
         if (isAssignableFrom(responseClass, STATUS_TO_XCONTENT_OBJECT, loader)) {
-            return new ResolvedListener(ListenerKind.STATUS, LISTENER_STATUS);
+            return RestListenerType.STATUS;
         }
-        return new ResolvedListener(ListenerKind.DEFAULT, LISTENER_DEFAULT);
+        return RestListenerType.DEFAULT;
     }
 
     private static boolean isAssignableFrom(Class<?> responseClass, String typeName, ClassLoader loader) {

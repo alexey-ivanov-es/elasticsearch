@@ -22,7 +22,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -70,9 +69,9 @@ public class HandlerCodeEmitterTests {
             FakeRequest.class,
             FakeResponse.class
         );
-        ResolvedListener listener = new ResolvedListener(ListenerKind.DEFAULT, "org.elasticsearch.rest.action.RestToXContentListener");
+        RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listener);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType);
 
         assertNotNull(javaFile);
         String source = javaFile.toString();
@@ -113,9 +112,9 @@ public class HandlerCodeEmitterTests {
             FakeRequest.class,
             FakeResponse.class
         );
-        ResolvedListener listener = new ResolvedListener(ListenerKind.DEFAULT, "org.elasticsearch.rest.action.RestToXContentListener");
+        RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolved, listener);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolved, listenerType);
 
         String source = javaFile.toString();
         assertTrue("Should include timeout in supportedQueryParameters", source.contains("timeout"));
@@ -139,9 +138,9 @@ public class HandlerCodeEmitterTests {
             FakeRequest.class,
             FakeResponse.class
         );
-        ResolvedListener listener = new ResolvedListener(ListenerKind.DEFAULT, "org.elasticsearch.rest.action.RestToXContentListener");
+        RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listener);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType);
 
         String source = javaFile.toString();
         assertTrue("Should add @ServerlessScope when visibility is public", source.contains("ServerlessScope"));
@@ -162,9 +161,9 @@ public class HandlerCodeEmitterTests {
             FakeRequest.class,
             FakeResponse.class
         );
-        ResolvedListener listener = new ResolvedListener(ListenerKind.DEFAULT, "org.elasticsearch.rest.action.RestToXContentListener");
+        RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listener);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType);
 
         String source = javaFile.toString();
         assertTrue("Should contain Route", source.contains("Route"));
@@ -183,27 +182,12 @@ public class HandlerCodeEmitterTests {
             FakeRequest.class,
             FakeResponse.class
         );
-        ResolvedListener listener = new ResolvedListener(
-            ListenerKind.CHUNKED,
-            "org.elasticsearch.rest.action.RestRefCountedChunkedToXContentListener"
-        );
+        RestListenerType listenerType = RestListenerType.CHUNKED;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listener);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType);
 
         String source = javaFile.toString();
         assertTrue("Should reference chunked listener", source.contains("RestRefCountedChunkedToXContentListener"));
     }
 
-    @Test
-    public void emitThrowsWhenListenerClassNameInvalid() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> HandlerCodeEmitter.emit(
-                endpoint("x", List.of(), null),
-                null,
-                new ResolvedTransportAction(FakeTransportAction.class, FakeRequest.class, FakeResponse.class),
-                new ResolvedListener(ListenerKind.DEFAULT, "invalid")
-            )
-        );
-    }
 }

@@ -48,14 +48,14 @@ public final class HandlerCodeEmitter {
      * @param endpoint         the API endpoint from the spec
      * @param requestType      the request type definition (for query param names); may be null
      * @param resolvedAction   the resolved transport action and request/response classes
-     * @param resolvedListener the resolved response listener type
+     * @param listenerType the resolved response listener type
      * @return a JavaFile ready to write to disk
      */
     public static JavaFile emit(
         Endpoint endpoint,
         TypeDefinition requestType,
         ResolvedTransportAction resolvedAction,
-        ResolvedListener resolvedListener
+        RestListenerType listenerType
     ) {
         String packageName = packageForEndpoint(endpoint);
         String handlerClassName = handlerClassName(endpoint.name());
@@ -70,7 +70,7 @@ public final class HandlerCodeEmitter {
 
         ClassName requestClass = classNameFromFqn(resolvedAction.requestClass().getName());
         ClassName transportActionClass = classNameFromFqn(resolvedAction.transportActionClass().getName());
-        ClassName listenerClass = listenerClassNameFromFqn(resolvedListener.listenerClassName());
+        ClassName listenerClass = listenerType.getClassName();
         ClassName responseClass = classNameFromFqn(resolvedAction.responseClass().getName());
 
         MethodSpec routesMethod = buildRoutesMethod(endpoint, route, restRequestMethod);
@@ -84,7 +84,7 @@ public final class HandlerCodeEmitter {
         Set<String> queryParamNames = queryParamNames(requestType);
         MethodSpec supportedQueryParametersMethod = buildSupportedQueryParametersMethod(queryParamNames);
 
-        CodeBlock listenerNew = buildListenerInstantiation(resolvedListener, listenerClass, responseClass);
+        CodeBlock listenerNew = buildListenerInstantiation(listenerType, listenerClass, responseClass);
         MethodSpec prepareRequestMethod = MethodSpec.methodBuilder("prepareRequest")
             .addAnnotation(Override.class)
             .addModifiers(Modifier.PUBLIC)
@@ -175,14 +175,14 @@ public final class HandlerCodeEmitter {
     }
 
     private static CodeBlock buildListenerInstantiation(
-        ResolvedListener resolvedListener,
+        RestListenerType listenerType,
         ClassName listenerClass,
         ClassName responseClass
     ) {
-        return switch (resolvedListener.kind()) {
-            case CHUNKED, NODES, DEFAULT -> CodeBlock.of("new $T<>(channel)", listenerClass);
-            case STATUS -> CodeBlock.of("new $T<>(channel, $T::status)", listenerClass, responseClass);
-        };
+        if (listenerType.needsStatusMethodReference()) {
+            return CodeBlock.of("new $T<>(channel, $T::status)", listenerClass, responseClass);
+        }
+        return CodeBlock.of("new $T<>(channel)", listenerClass);
     }
 
     private static void addServerlessScope(Endpoint endpoint, TypeSpec.Builder typeBuilder) {
@@ -261,22 +261,6 @@ public final class HandlerCodeEmitter {
     }
 
     private static ClassName classNameFromFqn(String fqn) {
-        return ClassName.bestGuess(fqn);
-    }
-
-    private static ClassName listenerClassNameFromFqn(String fqn) {
-        String[] parts = fqn.split("\\.");
-        if (parts.length < 2) {
-            throw new IllegalArgumentException("Invalid listener class name: " + fqn);
-        }
-        if (parts.length == 5) {
-            return ClassName.get(String.join(".", parts[0], parts[1], parts[2], parts[3]), parts[4]);
-        }
-        if (parts.length >= 6) {
-            String packageName = String.join(".", parts[0], parts[1], parts[2], parts[3]);
-            ClassName outer = ClassName.get(packageName, parts[4]);
-            return outer.nestedClass(parts[5]);
-        }
         return ClassName.bestGuess(fqn);
     }
 }

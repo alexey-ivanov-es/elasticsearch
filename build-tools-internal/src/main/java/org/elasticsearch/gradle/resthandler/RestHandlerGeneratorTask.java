@@ -85,13 +85,13 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
             }
             try {
                 ResolvedTransportAction resolvedAction = TransportActionResolver.resolve(transportAction, classpath);
-                ResolvedListener resolvedListener = ListenerResolver.resolve(resolvedAction.responseClass());
+                RestListenerType listenerType = ListenerResolver.resolve(resolvedAction.responseClass());
                 org.elasticsearch.gradle.resthandler.model.TypeDefinition requestType = parsed.getRequestType(endpoint);
                 com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(
                     endpoint,
                     requestType,
                     resolvedAction,
-                    resolvedListener
+                    listenerType
                 );
                 javaFile.writeTo(outputPath);
                 generated++;

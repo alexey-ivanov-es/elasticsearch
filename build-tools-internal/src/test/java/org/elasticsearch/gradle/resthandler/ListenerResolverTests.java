@@ -28,16 +28,16 @@ public class ListenerResolverTests {
 
     @Test
     public void resolvePlainClassReturnsDefault() {
-        ResolvedListener resolved = ListenerResolver.resolve(PlainResponse.class);
+        RestListenerType resolved = ListenerResolver.resolve(PlainResponse.class);
         assertNotNull(resolved);
-        assertEquals(ListenerKind.DEFAULT, resolved.kind());
-        assertEquals("org.elasticsearch.rest.action.RestToXContentListener", resolved.listenerClassName());
+        assertEquals(RestListenerType.DEFAULT, resolved);
+        assertEquals("org.elasticsearch.rest.action.RestToXContentListener", resolved.getClassName().toString());
     }
 
     @Test
     public void resolveReturnsExpectedListenerClassNames() {
-        ResolvedListener resolved = ListenerResolver.resolve(PlainResponse.class);
-        assertEquals("org.elasticsearch.rest.action.RestToXContentListener", resolved.listenerClassName());
+        RestListenerType resolved = ListenerResolver.resolve(PlainResponse.class);
+        assertEquals("org.elasticsearch.rest.action.RestToXContentListener", resolved.getClassName().toString());
     }
 
     /**
@@ -49,10 +49,10 @@ public class ListenerResolverTests {
         ClassLoader cl = getClass().getClassLoader();
         try {
             Class<?> searchResponse = cl.loadClass("org.elasticsearch.action.search.SearchResponse");
-            ResolvedListener resolved = ListenerResolver.resolve(searchResponse);
+            RestListenerType resolved = ListenerResolver.resolve(searchResponse);
             assertNotNull(resolved);
-            assertEquals(ListenerKind.CHUNKED, resolved.kind());
-            assertEquals("org.elasticsearch.rest.action.RestRefCountedChunkedToXContentListener", resolved.listenerClassName());
+            assertEquals(RestListenerType.CHUNKED, resolved);
+            assertEquals("org.elasticsearch.rest.action.RestRefCountedChunkedToXContentListener", resolved.getClassName().toString());
         } catch (ClassNotFoundException e) {
             assumeTrue("Server not on classpath, skip", false);
         }
@@ -67,10 +67,10 @@ public class ListenerResolverTests {
         ClassLoader cl = getClass().getClassLoader();
         try {
             Class<?> nodesInfoResponse = cl.loadClass("org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse");
-            ResolvedListener resolved = ListenerResolver.resolve(nodesInfoResponse);
+            RestListenerType resolved = ListenerResolver.resolve(nodesInfoResponse);
             assertNotNull(resolved);
-            assertEquals(ListenerKind.NODES, resolved.kind());
-            assertEquals("org.elasticsearch.rest.action.RestActions.NodesResponseRestListener", resolved.listenerClassName());
+            assertEquals(RestListenerType.NODES, resolved);
+            assertEquals("org.elasticsearch.rest.action.RestActions$NodesResponseRestListener", resolved.getClassName().toString());
         } catch (ClassNotFoundException e) {
             assumeTrue("Server not on classpath, skip", false);
         }
@@ -85,10 +85,10 @@ public class ListenerResolverTests {
         ClassLoader cl = getClass().getClassLoader();
         try {
             Class<?> ackResponse = cl.loadClass("org.elasticsearch.action.support.master.AcknowledgedResponse");
-            ResolvedListener resolved = ListenerResolver.resolve(ackResponse);
+            RestListenerType resolved = ListenerResolver.resolve(ackResponse);
             assertNotNull(resolved);
-            assertEquals(ListenerKind.DEFAULT, resolved.kind());
-            assertEquals("org.elasticsearch.rest.action.RestToXContentListener", resolved.listenerClassName());
+            assertEquals(RestListenerType.DEFAULT, resolved);
+            assertEquals("org.elasticsearch.rest.action.RestToXContentListener", resolved.getClassName().toString());
         } catch (ClassNotFoundException e) {
             assumeTrue("Server not on classpath, skip", false);
         }

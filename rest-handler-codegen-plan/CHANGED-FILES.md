@@ -46,8 +46,7 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/TypeMapper.java` — spec-type to Java type and RestRequest extraction code; IndicesOptions group handling
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/TypeMapperTests.java` — unit tests for TypeMapper
 - **Task 1.7 (ListenerResolver):**
-  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ListenerKind.java` — enum CHUNKED / NODES / STATUS / DEFAULT
-  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ResolvedListener.java` — record holding listener kind and FQN for code generation
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestListenerType.java` — enum of supported listeners (CHUNKED, NODES, STATUS, DEFAULT) with package/class and getClassName() for JavaPoet; replaces ListenerKind
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ListenerResolver.java` — resolve listener from ActionResponse class via classloader-by-name checks (ChunkedToXContentObject, BaseNodesResponse, StatusToXContentObject, default)
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/ListenerResolverTests.java` — unit tests for ListenerResolver (plain class → DEFAULT; optional server-on-classpath tests for SearchResponse→CHUNKED, NodesInfoResponse→NODES, AcknowledgedResponse→DEFAULT)
 - **Task 1.8 (HandlerCodeEmitter):**
@@ -69,3 +68,5 @@ List of files created, modified, or removed for this project. **Update this file
 ## Removed / moved files
 
 - `es-rest-handler-codegen-plan.md` — moved to `rest-handler-codegen-plan/es-rest-handler-codegen-plan.md`
+- `build-tools-internal/.../ListenerKind.java` — removed; replaced by RestListenerType (enum with package/class for emitter)
+- `build-tools-internal/.../ResolvedListener.java` — removed; ListenerResolver now returns RestListenerType directly
