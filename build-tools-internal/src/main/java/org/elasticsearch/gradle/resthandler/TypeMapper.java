@@ -26,15 +26,9 @@ import java.util.Set;
  */
 public final class TypeMapper {
 
-    private static final Set<String> INDICES_OPTIONS_PARAM_NAMES = Set.of(
-        "expand_wildcards",
-        "ignore_unavailable",
-        "allow_no_indices"
-    );
+    private static final Set<String> INDICES_OPTIONS_PARAM_NAMES = Set.of("expand_wildcards", "ignore_unavailable", "allow_no_indices");
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().disable(
-        DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-    );
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     private TypeMapper() {}
 
@@ -88,10 +82,7 @@ public final class TypeMapper {
                     return null;
                 }
                 if ("String".equals(elementMapping.javaTypeName())) {
-                    return ParameterMapping.of(
-                        "String[]",
-                        "Strings.splitStringByCommaToArray(request.param(\"" + paramName + "\"))"
-                    );
+                    return ParameterMapping.of("String[]", "Strings.splitStringByCommaToArray(request.param(\"" + paramName + "\"))");
                 }
                 return null;
             }
@@ -120,30 +111,12 @@ public final class TypeMapper {
     private static ParameterMapping mapBuiltin(String name, String paramName, Object serverDefault) {
         String defaultStr = defaultLiteral(serverDefault);
         return switch (name) {
-            case "boolean" -> ParameterMapping.of(
-                "boolean",
-                "request.paramAsBoolean(\"" + paramName + "\", " + defaultStr + ")"
-            );
-            case "integer" -> ParameterMapping.of(
-                "int",
-                "request.paramAsInt(\"" + paramName + "\", " + defaultStr + ")"
-            );
-            case "long" -> ParameterMapping.of(
-                "long",
-                "request.paramAsLong(\"" + paramName + "\", " + defaultStr + ")"
-            );
-            case "float" -> ParameterMapping.of(
-                "float",
-                "Float.parseFloat(request.param(\"" + paramName + "\"))"
-            );
-            case "double" -> ParameterMapping.of(
-                "double",
-                "Double.parseDouble(request.param(\"" + paramName + "\"))"
-            );
-            case "string" -> ParameterMapping.of(
-                "String",
-                "request.param(\"" + paramName + "\")"
-            );
+            case "boolean" -> ParameterMapping.of("boolean", "request.paramAsBoolean(\"" + paramName + "\", " + defaultStr + ")");
+            case "integer" -> ParameterMapping.of("int", "request.paramAsInt(\"" + paramName + "\", " + defaultStr + ")");
+            case "long" -> ParameterMapping.of("long", "request.paramAsLong(\"" + paramName + "\", " + defaultStr + ")");
+            case "float" -> ParameterMapping.of("float", "Float.parseFloat(request.param(\"" + paramName + "\"))");
+            case "double" -> ParameterMapping.of("double", "Double.parseDouble(request.param(\"" + paramName + "\"))");
+            case "string" -> ParameterMapping.of("String", "request.param(\"" + paramName + "\")");
             default -> null;
         };
     }
@@ -151,18 +124,9 @@ public final class TypeMapper {
     private static ParameterMapping mapTypes(String name, String paramName, Object serverDefault) {
         String defaultStr = defaultLiteral(serverDefault);
         return switch (name) {
-            case "Duration" -> ParameterMapping.of(
-                "TimeValue",
-                "request.paramAsTime(\"" + paramName + "\", " + defaultStr + ")"
-            );
-            case "ByteSize" -> ParameterMapping.of(
-                "ByteSizeValue",
-                "request.paramAsSize(\"" + paramName + "\", " + defaultStr + ")"
-            );
-            case "IndexName", "Name", "Id", "Routing" -> ParameterMapping.of(
-                "String",
-                "request.param(\"" + paramName + "\")"
-            );
+            case "Duration" -> ParameterMapping.of("TimeValue", "request.paramAsTime(\"" + paramName + "\", " + defaultStr + ")");
+            case "ByteSize" -> ParameterMapping.of("ByteSizeValue", "request.paramAsSize(\"" + paramName + "\", " + defaultStr + ")");
+            case "IndexName", "Name", "Id", "Routing" -> ParameterMapping.of("String", "request.param(\"" + paramName + "\")");
             case "Indices", "Names", "Ids" -> ParameterMapping.of(
                 "String[]",
                 "Strings.splitStringByCommaToArray(request.param(\"" + paramName + "\"))"
@@ -175,22 +139,10 @@ public final class TypeMapper {
                 "ActiveShardCount",
                 "ActiveShardCount.parseString(request.param(\"" + paramName + "\"))"
             );
-            case "VersionType" -> ParameterMapping.of(
-                "VersionType",
-                "VersionType.fromString(request.param(\"" + paramName + "\"))"
-            );
-            case "Refresh" -> ParameterMapping.of(
-                "String",
-                "request.param(\"" + paramName + "\")"
-            );
-            case "Scroll" -> ParameterMapping.of(
-                "Scroll",
-                "new Scroll(request.paramAsTime(\"" + paramName + "\", " + defaultStr + "))"
-            );
-            default -> ParameterMapping.of(
-                "String",
-                "request.param(\"" + paramName + "\")"
-            );
+            case "VersionType" -> ParameterMapping.of("VersionType", "VersionType.fromString(request.param(\"" + paramName + "\"))");
+            case "Refresh" -> ParameterMapping.of("String", "request.param(\"" + paramName + "\")");
+            case "Scroll" -> ParameterMapping.of("Scroll", "new Scroll(request.paramAsTime(\"" + paramName + "\", " + defaultStr + "))");
+            default -> ParameterMapping.of("String", "request.param(\"" + paramName + "\")");
         };
     }
 

@@ -85,12 +85,8 @@ public class ClusterHealthRequest extends MasterNodeReadRequest<ClusterHealthReq
         if (waitForStatus != null) {
             r.waitForStatus(ClusterHealthStatus.valueOf(waitForStatus.toUpperCase(Locale.ROOT)));
         }
-        r.waitForNoRelocatingShards(
-            request.paramAsBoolean("wait_for_no_relocating_shards", r.waitForNoRelocatingShards())
-        );
-        r.waitForNoInitializingShards(
-            request.paramAsBoolean("wait_for_no_initializing_shards", r.waitForNoInitializingShards())
-        );
+        r.waitForNoRelocatingShards(request.paramAsBoolean("wait_for_no_relocating_shards", r.waitForNoRelocatingShards()));
+        r.waitForNoInitializingShards(request.paramAsBoolean("wait_for_no_initializing_shards", r.waitForNoInitializingShards()));
         if (request.hasParam("wait_for_relocating_shards")) {
             throw new IllegalArgumentException(
                 "wait_for_relocating_shards has been removed, use wait_for_no_relocating_shards [true/false] instead"

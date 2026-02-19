@@ -29,9 +29,7 @@ import java.util.Map;
  */
 public final class SchemaParser {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().disable(
-        DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-    );
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     private SchemaParser() {}
 

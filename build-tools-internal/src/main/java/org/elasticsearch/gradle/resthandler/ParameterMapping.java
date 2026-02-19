@@ -14,11 +14,7 @@ package org.elasticsearch.gradle.resthandler;
  * extraction code fragment for {@code RestRequest}, and any special handling
  * (e.g. IndicesOptions group).
  */
-public record ParameterMapping(
-    String javaTypeName,
-    String extractionCode,
-    SpecialHandling specialHandling
-) {
+public record ParameterMapping(String javaTypeName, String extractionCode, SpecialHandling specialHandling) {
 
     /**
      * How this parameter is extracted. {@link #INDICES_OPTIONS} means the param
@@ -43,10 +39,6 @@ public record ParameterMapping(
      * The emitter should generate a single {@code IndicesOptions.fromRequest(...)} call.
      */
     public static ParameterMapping indicesOptions() {
-        return new ParameterMapping(
-            "IndicesOptions",
-            "",
-            SpecialHandling.INDICES_OPTIONS
-        );
+        return new ParameterMapping("IndicesOptions", "", SpecialHandling.INDICES_OPTIONS);
     }
 }
