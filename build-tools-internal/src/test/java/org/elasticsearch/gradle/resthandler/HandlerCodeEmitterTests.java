@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -44,6 +45,17 @@ public class HandlerCodeEmitterTests {
         List<UrlPattern> urls,
         Availability availability
     ) {
+        return endpoint(name, urls, availability, null, null, null);
+    }
+
+    private static Endpoint endpoint(
+        String name,
+        List<UrlPattern> urls,
+        Availability availability,
+        List<String> capabilities,
+        Boolean allowSystemIndexAccess,
+        List<String> responseParams
+    ) {
         return new Endpoint(
             name,
             "description",
@@ -53,7 +65,10 @@ public class HandlerCodeEmitterTests {
             new TypeReference("AcknowledgedResponse", "indices"),
             false,
             availability,
-            "org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction"
+            "org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction",
+            capabilities,
+            allowSystemIndexAccess,
+            responseParams
         );
     }
 
@@ -198,6 +213,142 @@ public class HandlerCodeEmitterTests {
 
         String source = javaFile.toString();
         assertTrue("Should reference chunked listener", source.contains("RestRefCountedChunkedToXContentListener"));
+    }
+
+    @Test
+    public void emitWithResponseParamsExcludesThemFromSupportedQueryParametersAndAddsResponseParamsOverride() {
+        Endpoint endpoint = endpoint(
+            "cluster.get_settings",
+            List.of(new UrlPattern("/_cluster/settings", List.of("GET"))),
+            null,
+            null,
+            null,
+            List.of("flat_settings", "include_defaults")
+        );
+        TypeDefinition requestType = new TypeDefinition(
+            new TypeReference("ClusterGetSettingsRequest", "cluster"),
+            "request",
+            null,
+            List.of(),
+            List.of(
+                new Property("flat_settings", false, null, null, null),
+                new Property("include_defaults", false, null, null, null),
+                new Property("master_timeout", false, null, null, null),
+                new Property("timeout", false, null, null, null)
+            ),
+            null,
+            null,
+            null,
+            null
+        );
+        ResolvedTransportAction resolved = new ResolvedTransportAction(
+            FakeTransportAction.class,
+            FakeRequest.class,
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
+        );
+        RestListenerType listenerType = RestListenerType.DEFAULT;
+
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolved, listenerType);
+
+        String source = javaFile.toString();
+        assertTrue("Should override responseParams()", source.contains("responseParams()"));
+        assertTrue("Should include flat_settings in response params", source.contains("flat_settings"));
+        assertTrue("Should include include_defaults in response params", source.contains("include_defaults"));
+        assertTrue("supportedQueryParameters should include master_timeout", source.contains("master_timeout"));
+        assertTrue("supportedQueryParameters should include timeout", source.contains("timeout"));
+        // Response params must not appear in the SUPPORTED_QUERY_PARAMETERS Set.of(...) — they appear in RESPONSE_PARAMS
+        int supportedOf = source.indexOf("SUPPORTED_QUERY_PARAMETERS");
+        int responseParamsOf = source.indexOf("RESPONSE_PARAMS");
+        assertTrue("RESPONSE_PARAMS field should be present", responseParamsOf >= 0);
+        String afterSupported = source.substring(supportedOf, responseParamsOf);
+        assertTrue(
+            "flat_settings and include_defaults should not be in SUPPORTED_QUERY_PARAMETERS",
+            afterSupported.contains("master_timeout") && afterSupported.contains("timeout")
+                && !afterSupported.contains("flat_settings") && !afterSupported.contains("include_defaults")
+        );
+    }
+
+    @Test
+    public void emitWithCapabilitiesAddsSupportedCapabilitiesOverride() {
+        Endpoint endpoint = endpoint(
+            "search",
+            List.of(new UrlPattern("/_search", List.of("POST"))),
+            null,
+            List.of("search_query_rules", "search_phase_took"),
+            null,
+            null
+        );
+        ResolvedTransportAction resolved = new ResolvedTransportAction(
+            FakeTransportAction.class,
+            FakeRequest.class,
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
+        );
+        RestListenerType listenerType = RestListenerType.DEFAULT;
+
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType);
+
+        String source = javaFile.toString();
+        assertTrue("Should override supportedCapabilities()", source.contains("supportedCapabilities()"));
+        assertTrue("Should include search_query_rules", source.contains("search_query_rules"));
+        assertTrue("Should include search_phase_took", source.contains("search_phase_took"));
+    }
+
+    @Test
+    public void emitWithAllowSystemIndexAccessAddsOverride() {
+        Endpoint endpoint = endpoint(
+            "cluster.health",
+            List.of(new UrlPattern("/_cluster/health", List.of("GET"))),
+            null,
+            null,
+            true,
+            null
+        );
+        ResolvedTransportAction resolved = new ResolvedTransportAction(
+            FakeTransportAction.class,
+            FakeRequest.class,
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
+        );
+        RestListenerType listenerType = RestListenerType.DEFAULT;
+
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType);
+
+        String source = javaFile.toString();
+        assertTrue("Should override allowSystemIndexAccessByDefault()", source.contains("allowSystemIndexAccessByDefault()"));
+        assertTrue("Should return true", source.contains("return true"));
+    }
+
+    @Test
+    public void emitWithoutOptionalOverridesProducesNoResponseParamsOrCapabilitiesOrAllowSystemIndexAccess() {
+        Endpoint endpoint = endpoint(
+            "indices.delete",
+            List.of(new UrlPattern("/{index}", List.of("DELETE"))),
+            null
+        );
+        ResolvedTransportAction resolved = new ResolvedTransportAction(
+            FakeTransportAction.class,
+            FakeRequest.class,
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
+        );
+        RestListenerType listenerType = RestListenerType.DEFAULT;
+
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType);
+
+        String source = javaFile.toString();
+        assertTrue("Should contain prepareRequest", source.contains("prepareRequest"));
+        assertFalse("Should not override responseParams (no RESPONSE_PARAMS field)", source.contains("RESPONSE_PARAMS"));
+        assertFalse("Should not override supportedCapabilities (no CAPABILITIES field)", source.contains("CAPABILITIES"));
+        assertFalse(
+            "Should not override allowSystemIndexAccessByDefault",
+            source.contains("allowSystemIndexAccessByDefault()")
+        );
     }
 
 }

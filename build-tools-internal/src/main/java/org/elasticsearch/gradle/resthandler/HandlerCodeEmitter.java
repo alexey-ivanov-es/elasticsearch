@@ -43,6 +43,8 @@ public final class HandlerCodeEmitter {
     private static final String BASE_PACKAGE = "org.elasticsearch.rest.action";
     private static final String ACTION_PACKAGE_PREFIX = "org.elasticsearch.action.";
     private static final String SUPPORTED_QUERY_PARAMETERS_FIELD = "SUPPORTED_QUERY_PARAMETERS";
+    private static final String RESPONSE_PARAMS_FIELD = "RESPONSE_PARAMS";
+    private static final String CAPABILITIES_FIELD = "CAPABILITIES";
 
     private HandlerCodeEmitter() {}
 
@@ -109,8 +111,13 @@ public final class HandlerCodeEmitter {
             .addStatement("return $S", handlerNameString)
             .build();
 
-        Set<String> supportedParamNames = allSupportedParamNames(requestType);
+        Set<String> supportedParamNames = supportedQueryParamNames(endpoint, requestType);
         boolean hasSupportedParams = supportedParamNames.isEmpty() == false;
+        List<String> responseParamsList = endpoint.responseParams() != null ? endpoint.responseParams() : List.of();
+        boolean hasResponseParams = responseParamsList.isEmpty() == false;
+        List<String> capabilitiesList = endpoint.capabilities() != null ? endpoint.capabilities() : List.of();
+        boolean hasCapabilities = capabilitiesList.isEmpty() == false;
+        boolean allowSystemIndexAccess = Boolean.TRUE.equals(endpoint.allowSystemIndexAccess());
 
         CodeBlock listenerNew = buildListenerInstantiation(listenerType, listenerClass, responseClass);
         MethodSpec prepareRequestMethod = MethodSpec.methodBuilder("prepareRequest")
@@ -137,6 +144,17 @@ public final class HandlerCodeEmitter {
         if (hasSupportedParams) {
             typeBuilder.addField(buildSupportedQueryParametersField(supportedParamNames));
             typeBuilder.addMethod(buildSupportedQueryParametersMethod());
+        }
+        if (hasResponseParams) {
+            typeBuilder.addField(buildResponseParamsField(responseParamsList));
+            typeBuilder.addMethod(buildResponseParamsMethod());
+        }
+        if (hasCapabilities) {
+            typeBuilder.addField(buildCapabilitiesField(capabilitiesList));
+            typeBuilder.addMethod(buildSupportedCapabilitiesMethod());
+        }
+        if (allowSystemIndexAccess) {
+            typeBuilder.addMethod(buildAllowSystemIndexAccessByDefaultMethod());
         }
         typeBuilder.addMethod(prepareRequestMethod);
 
@@ -177,6 +195,71 @@ public final class HandlerCodeEmitter {
             .addModifiers(Modifier.PUBLIC)
             .returns(ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class)))
             .addStatement("return $L", SUPPORTED_QUERY_PARAMETERS_FIELD)
+            .build();
+    }
+
+    private static FieldSpec buildResponseParamsField(List<String> responseParamNames) {
+        ParameterizedTypeName setOfString = ParameterizedTypeName.get(
+            ClassName.get(Set.class),
+            ClassName.get(String.class)
+        );
+        String placeholders = responseParamNames.stream().map(x -> "$S").collect(Collectors.joining(", "));
+        Object[] args = new Object[responseParamNames.size() + 1];
+        args[0] = Set.class;
+        int i = 1;
+        for (String n : responseParamNames) {
+            args[i++] = n;
+        }
+        CodeBlock initializer = CodeBlock.of("$T.of(" + placeholders + ")", args);
+        return FieldSpec.builder(setOfString, RESPONSE_PARAMS_FIELD)
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+            .initializer(initializer)
+            .build();
+    }
+
+    private static MethodSpec buildResponseParamsMethod() {
+        return MethodSpec.methodBuilder("responseParams")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class)))
+            .addStatement("return $L", RESPONSE_PARAMS_FIELD)
+            .build();
+    }
+
+    private static FieldSpec buildCapabilitiesField(List<String> capabilityStrings) {
+        ParameterizedTypeName setOfString = ParameterizedTypeName.get(
+            ClassName.get(Set.class),
+            ClassName.get(String.class)
+        );
+        String placeholders = capabilityStrings.stream().map(x -> "$S").collect(Collectors.joining(", "));
+        Object[] args = new Object[capabilityStrings.size() + 1];
+        args[0] = Set.class;
+        int i = 1;
+        for (String c : capabilityStrings) {
+            args[i++] = c;
+        }
+        CodeBlock initializer = CodeBlock.of("$T.of(" + placeholders + ")", args);
+        return FieldSpec.builder(setOfString, CAPABILITIES_FIELD)
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+            .initializer(initializer)
+            .build();
+    }
+
+    private static MethodSpec buildSupportedCapabilitiesMethod() {
+        return MethodSpec.methodBuilder("supportedCapabilities")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class)))
+            .addStatement("return $L", CAPABILITIES_FIELD)
+            .build();
+    }
+
+    private static MethodSpec buildAllowSystemIndexAccessByDefaultMethod() {
+        return MethodSpec.methodBuilder("allowSystemIndexAccessByDefault")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(boolean.class)
+            .addStatement("return true")
             .build();
     }
 
@@ -235,6 +318,18 @@ public final class HandlerCodeEmitter {
         typeBuilder.addAnnotation(
             com.squareup.javapoet.AnnotationSpec.builder(serverlessScope).addMember("value", "$T.$L", scope, scopeConstant).build()
         );
+    }
+
+    /**
+     * Parameter names for {@code supportedQueryParameters()}: all consumed params minus
+     * {@code responseParams}. Response params are declared in {@code responseParams()} only
+     * and must not be duplicated in {@code supportedQueryParameters()}.
+     */
+    private static Set<String> supportedQueryParamNames(Endpoint endpoint, TypeDefinition requestType) {
+        Set<String> names = new TreeSet<>(allSupportedParamNames(requestType));
+        List<String> responseParamsList = endpoint.responseParams() != null ? endpoint.responseParams() : List.of();
+        names.removeAll(responseParamsList);
+        return names;
     }
 
     /**
