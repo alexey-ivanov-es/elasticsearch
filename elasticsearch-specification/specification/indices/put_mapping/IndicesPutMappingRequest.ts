@@ -60,6 +60,7 @@ import { Dictionary, SingleKeyDictionary } from '@spec_utils/Dictionary'
  * @doc_id indices-put-mapping
  * @ext_doc_id mapping-params
  * @index_privileges manage
+ * @server_transport_action org.elasticsearch.action.admin.indices.mapping.put.TransportPutMappingAction
  */
 export interface Request extends RequestBase {
   urls: [

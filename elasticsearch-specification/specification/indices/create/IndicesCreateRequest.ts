@@ -52,6 +52,8 @@ import { Dictionary } from '@spec_utils/Dictionary'
  * @availability stack stability=stable
  * @availability serverless stability=stable visibility=public
  * @index_privileges create_index, manage
+ * @server_transport_action org.elasticsearch.action.admin.indices.create.TransportCreateIndexAction
+ * @server_capabilities logsdb_index_mode,lookup_index_mode,nested_dense_vector_synthetic_test,poorly_formatted_bad_request,hunspell_dict_400
  */
 export interface Request extends RequestBase {
   urls: [

@@ -33,6 +33,8 @@ import { ProcessorContainer } from '@ingest/_types/Processors'
  * @availability stack since=5.0.0 stability=stable
  * @availability serverless stability=stable visibility=public
  * @ext_doc_id ingest
+ * @server_transport_action org.elasticsearch.action.ingest.PutPipelineTransportAction
+ * @server_capabilities pipeline_tracking_info,field_access_pattern.flexible
  */
 export interface Request extends RequestBase {
   urls: [
