@@ -22,3 +22,9 @@ This folder contains the project plan and tracking files for the **Elasticsearch
 - When you add, modify, or remove any file as part of this project, update **CHANGED-FILES.md** (new / modified / removed) in the same commit.
 
 This keeps the plan folder accurate and reviewable without digging through git history.
+
+---
+
+## schema.json changes
+
+Never try to make any changes in `schema.json` manually. If you need to modify it - update the spec and regenerate the json file.
