@@ -138,5 +138,10 @@ export interface Request extends RequestBase {
      * By default, the request does not wait for a particular status.
      */
     wait_for_status?: HealthStatus
+    /**
+     * Removed; use wait_for_no_relocating_shards instead. Still accepted so the server can return a clear error.
+     * @deprecated 7.0.0 Use wait_for_no_relocating_shards instead.
+     */
+    wait_for_relocating_shards?: string
   }
 }

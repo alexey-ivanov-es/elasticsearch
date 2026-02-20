@@ -61,9 +61,7 @@ public class ClusterHealthRequest extends MasterNodeReadRequest<ClusterHealthReq
     public static ClusterHealthRequest fromRestRequest(RestRequest request) {
         String[] indices = Strings.splitStringByCommaToArray(request.param("index"));
 
-        final TimeValue masterNodeTimeout = request.hasParam(RestUtils.REST_MASTER_TIMEOUT_PARAM)
-            ? RestUtils.getMasterNodeTimeout(request)
-            : request.paramAsTime("timeout", RestUtils.REST_MASTER_TIMEOUT_DEFAULT);
+        final TimeValue masterNodeTimeout = RestUtils.getMasterNodeTimeout(request);
 
         final ClusterHealthRequest clusterHealthRequest = new ClusterHealthRequest(masterNodeTimeout, indices);
         clusterHealthRequest.indicesOptions(IndicesOptions.fromRequest(request, clusterHealthRequest.indicesOptions()));
