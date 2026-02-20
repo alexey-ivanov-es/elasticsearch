@@ -171,10 +171,7 @@ public final class HandlerCodeEmitter {
      * query parameters.
      */
     private static FieldSpec buildSupportedQueryParametersField(Set<String> queryParamNames) {
-        ParameterizedTypeName setOfString = ParameterizedTypeName.get(
-            ClassName.get(Set.class),
-            ClassName.get(String.class)
-        );
+        ParameterizedTypeName setOfString = ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class));
         String placeholders = queryParamNames.stream().map(x -> "$S").collect(Collectors.joining(", "));
         Object[] args = new Object[queryParamNames.size() + 1];
         args[0] = Set.class;
@@ -199,10 +196,7 @@ public final class HandlerCodeEmitter {
     }
 
     private static FieldSpec buildResponseParamsField(List<String> responseParamNames) {
-        ParameterizedTypeName setOfString = ParameterizedTypeName.get(
-            ClassName.get(Set.class),
-            ClassName.get(String.class)
-        );
+        ParameterizedTypeName setOfString = ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class));
         String placeholders = responseParamNames.stream().map(x -> "$S").collect(Collectors.joining(", "));
         Object[] args = new Object[responseParamNames.size() + 1];
         args[0] = Set.class;
@@ -227,10 +221,7 @@ public final class HandlerCodeEmitter {
     }
 
     private static FieldSpec buildCapabilitiesField(List<String> capabilityStrings) {
-        ParameterizedTypeName setOfString = ParameterizedTypeName.get(
-            ClassName.get(Set.class),
-            ClassName.get(String.class)
-        );
+        ParameterizedTypeName setOfString = ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class));
         String placeholders = capabilityStrings.stream().map(x -> "$S").collect(Collectors.joining(", "));
         Object[] args = new Object[capabilityStrings.size() + 1];
         args[0] = Set.class;
