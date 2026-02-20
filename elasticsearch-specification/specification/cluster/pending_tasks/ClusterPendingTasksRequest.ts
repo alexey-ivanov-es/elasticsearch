@@ -34,6 +34,7 @@ import { MediaType } from '@_types/common'
  * @availability serverless stability=stable visibility=private
  * @cluster_privileges monitor
  * @doc_id cluster-pending
+ * @server_transport_action org.elasticsearch.action.admin.cluster.tasks.TransportPendingClusterTasksAction
  */
 export interface Request extends RequestBase {
   urls: [
