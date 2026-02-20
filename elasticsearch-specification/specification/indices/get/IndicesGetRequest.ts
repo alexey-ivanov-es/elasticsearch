@@ -31,7 +31,6 @@ import { Duration } from '@_types/Time'
  * @availability serverless stability=stable visibility=public
  * @index_privileges view_index_metadata, manage
  * @doc_id indices-get-index
- * @server_response_params flat_settings
  * @server_transport_action org.elasticsearch.action.admin.indices.get.TransportGetIndexAction
  */
 export interface Request extends RequestBase {
@@ -67,6 +66,7 @@ export interface Request extends RequestBase {
     /**
      * If true, returns settings in flat format.
      * @server_default false
+     * @server_response_param
      */
     flat_settings?: boolean
     /**

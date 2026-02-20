@@ -633,7 +633,7 @@ export function hoistRequestAnnotations (
   request: model.Request, jsDocs: JSDoc[], mappings: Record<string, model.Endpoint>, response: model.TypeName | null
 ): void {
   const knownRequestAnnotations = [
-    'rest_spec_name', 'behavior', 'class_serializer', 'index_privileges', 'cluster_privileges', 'doc_id', 'availability', 'doc_tag', 'ext_doc_id', 'codegen_exclude', 'server_transport_action', 'server_capabilities', 'server_allow_system_index_access', 'server_response_params'
+    'rest_spec_name', 'behavior', 'class_serializer', 'index_privileges', 'cluster_privileges', 'doc_id', 'availability', 'doc_tag', 'ext_doc_id', 'codegen_exclude', 'server_transport_action', 'server_capabilities', 'server_allow_system_index_access'
   ]
   // in most of the cases the jsDocs comes in a single block,
   // but it can happen that the user defines multiple single line jsDoc.
@@ -741,8 +741,6 @@ export function hoistRequestAnnotations (
       endpoint.capabilities = parseCommaSeparated(value)
     } else if (tag === 'server_allow_system_index_access') {
       endpoint.allowSystemIndexAccess = value.trim().toLowerCase() === 'true'
-    } else if (tag === 'server_response_params') {
-      endpoint.responseParams = parseCommaSeparated(value)
     } else {
       assert(jsDocs, false, `Unhandled tag: '${tag}' with value: '${value}' on request ${request.name.name}`)
     }
@@ -819,7 +817,7 @@ function hoistPropertyAnnotations (property: model.Property, jsDocs: JSDoc[]): v
   assert(jsDocs, jsDocs.length < 2, 'Use a single multiline jsDoc block instead of multiple single line blocks')
 
   const validTags = ['prop_serializer', 'doc_url', 'aliases', 'codegen_name', 'server_default',
-    'variant', 'doc_id', 'es_quirk', 'availability', 'ext_doc_id']
+    'server_response_param', 'variant', 'doc_id', 'es_quirk', 'availability', 'ext_doc_id']
   const tags = parseJsDocTags(jsDocs)
   if (jsDocs.length === 1) {
     const description = jsDocs[0].getDescription()
@@ -870,6 +868,8 @@ function hoistPropertyAnnotations (property: model.Property, jsDocs: JSDoc[]): v
       if (docUrl != null) {
         property.extDocUrl = docUrl[1].replace(/\r/g, '')
       }
+    } else if (tag === 'server_response_param') {
+      property.serverResponseParam = true
     } else if (tag === 'server_default') {
       assert(jsDocs, property.type.kind === 'instance_of' || property.type.kind === 'union_of' || property.type.kind === 'array_of', `Default values can only be configured for instance_of or union_of types, you are using ${property.type.kind}`)
       assert(jsDocs, !property.required, 'Default values can only be specified on optional properties')

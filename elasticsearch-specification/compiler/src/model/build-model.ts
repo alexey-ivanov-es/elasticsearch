@@ -209,6 +209,10 @@ function compileRequest (declaration: InterfaceDeclaration, mappings: Record<str
       assert(member, property.properties.length > 0, 'There is no need to declare an empty object path_parts, just remove the path_parts declaration.')
       pathMember = member
       type.path = property.properties
+      const fromPath = type.path.filter((p: model.Property) => p.serverResponseParam === true).map((p: model.Property) => p.name)
+      if (fromPath.length > 0) {
+        mapping.responseParams = [...(mapping.responseParams ?? []), ...fromPath]
+      }
     } else if (name === 'request_media_type' || name === 'response_media_type') {
       // add those property to requestMediaType and responseMediaType of the endpoint
       const mediaType = (member as PropertySignature).getStructure().type as string
@@ -221,6 +225,11 @@ function compileRequest (declaration: InterfaceDeclaration, mappings: Record<str
       const property = visitRequestOrResponseProperty(member)
       assert(member, property.properties.length > 0, 'There is no need to declare an empty object query_parameters, just remove the query_parameters declaration.')
       type.query = property.properties
+      // Collect field-level @server_response_param into endpoint.responseParams
+      const fromQuery = type.query.filter((p: model.Property) => p.serverResponseParam === true).map((p: model.Property) => p.name)
+      if (fromQuery.length > 0) {
+        mapping.responseParams = [...(mapping.responseParams ?? []), ...fromQuery]
+      }
     } else if (name === 'body') {
       const property = visitRequestOrResponseProperty(member)
       bodyMember = member

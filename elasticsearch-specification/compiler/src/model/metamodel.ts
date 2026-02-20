@@ -142,6 +142,11 @@ export class Property {
   containerProperty?: boolean
   /** If this property has a quirk that needs special attention, give a short explanation about it */
   esQuirk?: string
+  /**
+   * If true, this query/path parameter is consumed during response serialization (e.g. flat_settings).
+   * Such params are emitted in responseParams() and excluded from supportedQueryParameters().
+   */
+  serverResponseParam?: boolean
 }
 
 // ------------------------------------------------------------------------------------------------
