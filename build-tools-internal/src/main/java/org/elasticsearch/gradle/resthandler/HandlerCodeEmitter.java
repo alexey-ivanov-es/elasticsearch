@@ -44,6 +44,7 @@ public final class HandlerCodeEmitter {
     private static final String ACTION_PACKAGE_PREFIX = "org.elasticsearch.action.";
     private static final String SUPPORTED_QUERY_PARAMETERS_FIELD = "SUPPORTED_QUERY_PARAMETERS";
     private static final String RESPONSE_PARAMS_FIELD = "RESPONSE_PARAMS";
+    private static final String ALL_SUPPORTED_PARAMETERS_FIELD = "ALL_SUPPORTED_PARAMETERS";
     private static final String CAPABILITIES_FIELD = "CAPABILITIES";
 
     private HandlerCodeEmitter() {}
@@ -148,6 +149,8 @@ public final class HandlerCodeEmitter {
         if (hasResponseParams) {
             typeBuilder.addField(buildResponseParamsField(responseParamsList));
             typeBuilder.addMethod(buildResponseParamsMethod());
+            typeBuilder.addField(buildAllSupportedParametersField());
+            typeBuilder.addMethod(buildAllSupportedParametersMethod());
         }
         if (hasCapabilities) {
             typeBuilder.addField(buildCapabilitiesField(capabilitiesList));
@@ -214,9 +217,31 @@ public final class HandlerCodeEmitter {
     private static MethodSpec buildResponseParamsMethod() {
         return MethodSpec.methodBuilder("responseParams")
             .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
+            .addModifiers(Modifier.PROTECTED)
             .returns(ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class)))
             .addStatement("return $L", RESPONSE_PARAMS_FIELD)
+            .build();
+    }
+
+    /**
+     * When the handler has response params, allSupportedParameters() must return their union with
+     * supportedQueryParameters() so that BaseRestHandler's assert (supported equals consumed) passes.
+     */
+    private static FieldSpec buildAllSupportedParametersField() {
+        ParameterizedTypeName setOfString = ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class));
+        ClassName sets = ClassName.get("org.elasticsearch.common.util.set", "Sets");
+        return FieldSpec.builder(setOfString, ALL_SUPPORTED_PARAMETERS_FIELD)
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+            .initializer("$T.union($L, $L)", sets, SUPPORTED_QUERY_PARAMETERS_FIELD, RESPONSE_PARAMS_FIELD)
+            .build();
+    }
+
+    private static MethodSpec buildAllSupportedParametersMethod() {
+        return MethodSpec.methodBuilder("allSupportedParameters")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(ParameterizedTypeName.get(ClassName.get(Set.class), ClassName.get(String.class)))
+            .addStatement("return $L", ALL_SUPPORTED_PARAMETERS_FIELD)
             .build();
     }
 

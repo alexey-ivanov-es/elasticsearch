@@ -68,8 +68,9 @@ public class GetIndexRequest extends LocalClusterStateRequest implements Indices
         }
 
         public static Feature[] fromRequest(RestRequest request) {
-            if (request.hasParam("features")) {
-                String[] featureNames = request.param("features").split(",");
+            String featuresParam = request.param("features");
+            if (featuresParam != null && featuresParam.isEmpty() == false) {
+                String[] featureNames = featuresParam.split(",");
                 Set<Feature> features = EnumSet.noneOf(Feature.class);
                 List<String> invalidFeatures = new ArrayList<>();
                 for (int k = 0; k < featureNames.length; k++) {
@@ -116,6 +117,8 @@ public class GetIndexRequest extends LocalClusterStateRequest implements Indices
         RestUtils.consumeDeprecatedLocalParameter(request);
         r.humanReadable(request.paramAsBoolean("human", false));
         r.includeDefaults(request.paramAsBoolean("include_defaults", false));
+        // Consume flat_settings so supported/consumed param sets match in BaseRestHandler (response formatting uses it).
+        request.paramAsBoolean("flat_settings", false);
         r.features(Feature.fromRequest(request));
         return r;
     }

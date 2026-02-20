@@ -350,12 +350,9 @@ public class RestUtils {
     // NOTE: ensure each usage of this method has been deprecated for long enough to remove it.
     @UpdateForV10(owner = UpdateForV10.Owner.DISTRIBUTED)
     public static void consumeDeprecatedLocalParameter(RestRequest request) {
-        if (request.hasParam("local") == false) {
-            return;
-        }
-        // Consume this param just for validation when in BWC mode.
-        final var local = request.paramAsBoolean("local", false);
-        if (request.getRestApiVersion() != RestApiVersion.V_8) {
+        // Always consume so supported/consumed param sets match in BaseRestHandler.
+        final String localParam = request.param("local");
+        if (localParam != null && request.getRestApiVersion() != RestApiVersion.V_8) {
             DeprecationLogger.getLogger(TransportLocalClusterStateAction.class)
                 .critical(
                     DeprecationCategory.API,
