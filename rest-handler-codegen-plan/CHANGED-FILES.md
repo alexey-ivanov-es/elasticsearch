@@ -11,6 +11,7 @@ List of files created, modified, or removed for this project. **Update this file
 - `rest-handler-codegen-plan/TASKS.md` — task list with status
 - `rest-handler-codegen-plan/CHANGED-FILES.md` — this file
 - `rest-handler-codegen-plan/README.md` — instructions and pointers
+- `rest-handler-codegen-plan/MIGRATION-GUIDE.md` — step-by-step instructions for migrating an endpoint from hand-written to generated handler (HEAD, server_response_param, consuming params, capabilities, allow_system_indices_access)
 - `elasticsearch-specification/` — vendored from [elasticsearch-specification](https://github.com/elastic/elasticsearch-specification) for editing in this repo:
   - `elasticsearch-specification/specification/` — TypeScript API definitions (full tree)
   - `elasticsearch-specification/compiler/` — Node/TS compiler that produces schema.json (excl. node_modules; `compiler-wasm-lib` dependency removed so npm install works without Rust)

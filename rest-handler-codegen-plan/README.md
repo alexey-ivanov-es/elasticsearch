@@ -9,6 +9,7 @@ This folder contains the project plan and tracking files for the **Elasticsearch
 | What | File |
 |------|------|
 | **Full project plan** | [es-rest-handler-codegen-plan.md](es-rest-handler-codegen-plan.md) |
+| **Migrate endpoint (hand-written → generated)** | [MIGRATION-GUIDE.md](MIGRATION-GUIDE.md) |
 | **List of tasks (with status)** | [TASKS.md](TASKS.md) |
 | **List of changed files** | [CHANGED-FILES.md](CHANGED-FILES.md) |
 
