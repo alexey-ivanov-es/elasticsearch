@@ -33,7 +33,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import javax.inject.Inject;
@@ -82,22 +84,16 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
         return outputDir;
     }
 
+    /** Canonical form so paths from writeToPath and from Files.walk match in set containment. */
+    private static Path canonical(Path p) {
+        return p.toAbsolutePath().normalize();
+    }
+
     @TaskAction
     public void generate() throws IOException {
         Path schemaPath = getSchemaFile().get().getAsFile().toPath();
         ParsedSchema parsed = SchemaParser.parse(schemaPath);
-        Path outputPath = getOutputDir().get().getAsFile().toPath();
-        if (Files.exists(outputPath)) {
-            try (var stream = Files.walk(outputPath)) {
-                stream.sorted((a, b) -> b.compareTo(a)).forEach(p -> {
-                    try {
-                        Files.deleteIfExists(p);
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                });
-            }
-        }
+        Path outputPath = getOutputDir().get().getAsFile().toPath().normalize().toAbsolutePath();
         Files.createDirectories(outputPath);
 
         Schema schema = parsed.schema();
@@ -123,6 +119,7 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
         System.arraycopy(urls, 0, allUrls, 0, urls.length);
         System.arraycopy(classpathUrls, 0, allUrls, urls.length, classpathUrls.length);
 
+        Set<Path> generatedPaths = new HashSet<>();
         List<ClassName> generatedHandlerClasses = new ArrayList<>();
         try (URLClassLoader loader = new URLClassLoader(allUrls, ClassLoader.getPlatformClassLoader())) {
             for (Endpoint endpoint : endpoints) {
@@ -135,7 +132,8 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
                     RestListenerType listenerType = ListenerResolver.resolve(resolvedAction.responseClass());
                     org.elasticsearch.gradle.resthandler.model.TypeDefinition requestType = parsed.getRequestType(endpoint);
                     JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolvedAction, listenerType);
-                    javaFile.writeTo(outputPath);
+                    Path writtenPath = javaFile.writeToPath(outputPath);
+                    generatedPaths.add(canonical(writtenPath));
                     String packageName = HandlerCodeEmitter.packageForTransportAction(resolvedAction.transportActionClass().getName());
                     String handlerClassName = HandlerCodeEmitter.handlerClassNameForEndpoint(endpoint.name());
                     generatedHandlerClasses.add(ClassName.get(packageName, handlerClassName));
@@ -148,7 +146,22 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
 
         if (!generatedHandlerClasses.isEmpty()) {
             JavaFile registryFile = HandlerCodeEmitter.emitRegistry(generatedHandlerClasses);
-            registryFile.writeTo(outputPath);
+            Path registryPath = registryFile.writeToPath(outputPath);
+            generatedPaths.add(canonical(registryPath));
+        }
+
+        // Remove stale .java files from a previous run (e.g. endpoint no longer in schema).
+        try (var stream = Files.walk(outputPath)) {
+            stream.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().endsWith(".java"))
+                .map(RestHandlerGeneratorTask::canonical)
+                .filter(p -> !generatedPaths.contains(p))
+                .forEach(p -> {
+                    try {
+                        Files.deleteIfExists(p);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
         }
 
         getLogger().info(
