@@ -334,7 +334,6 @@ import org.elasticsearch.rest.action.admin.indices.RestAnalyzeAction;
 import org.elasticsearch.rest.action.admin.indices.RestAnalyzeIndexDiskUsageAction;
 import org.elasticsearch.rest.action.admin.indices.RestClearIndicesCacheAction;
 import org.elasticsearch.rest.action.admin.indices.RestCloseIndexAction;
-import org.elasticsearch.rest.action.admin.indices.RestCreateIndexAction;
 import org.elasticsearch.rest.action.admin.indices.RestDeleteComponentTemplateAction;
 import org.elasticsearch.rest.action.admin.indices.RestDeleteComposableIndexTemplateAction;
 import org.elasticsearch.rest.action.admin.indices.RestDeleteIndexTemplateAction;
@@ -358,7 +357,6 @@ import org.elasticsearch.rest.action.admin.indices.RestOpenIndexAction;
 import org.elasticsearch.rest.action.admin.indices.RestPutComponentTemplateAction;
 import org.elasticsearch.rest.action.admin.indices.RestPutComposableIndexTemplateAction;
 import org.elasticsearch.rest.action.admin.indices.RestPutIndexTemplateAction;
-import org.elasticsearch.rest.action.admin.indices.RestPutMappingAction;
 import org.elasticsearch.rest.action.admin.indices.RestRecoveryAction;
 import org.elasticsearch.rest.action.admin.indices.RestRefreshAction;
 import org.elasticsearch.rest.action.admin.indices.RestReloadAnalyzersAction;
@@ -406,7 +404,6 @@ import org.elasticsearch.rest.action.document.RestUpdateAction;
 import org.elasticsearch.rest.action.info.RestClusterInfoAction;
 import org.elasticsearch.rest.action.ingest.RestDeletePipelineAction;
 import org.elasticsearch.rest.action.ingest.RestGetPipelineAction;
-import org.elasticsearch.rest.action.ingest.RestPutPipelineAction;
 import org.elasticsearch.rest.action.ingest.RestSimulateIngestAction;
 import org.elasticsearch.rest.action.ingest.RestSimulatePipelineAction;
 import org.elasticsearch.rest.action.search.RestClearScrollAction;
@@ -933,7 +930,6 @@ public class ActionModule extends AbstractModule {
         registerHandler.accept(new RestIndexDeleteAliasesAction());
         registerHandler.accept(new RestIndexPutAliasAction());
         registerHandler.accept(new RestIndicesAliasesAction());
-        registerHandler.accept(new RestCreateIndexAction());
         registerHandler.accept(new RestResizeHandler.RestShrinkIndexAction());
         registerHandler.accept(new RestResizeHandler.RestSplitIndexAction());
         registerHandler.accept(new RestResizeHandler.RestCloneIndexAction());
@@ -963,7 +959,6 @@ public class ActionModule extends AbstractModule {
         registerHandler.accept(new RestSimulateIngestAction());
         registerHandler.accept(new RestSimulateTemplateAction());
 
-        registerHandler.accept(new RestPutMappingAction());
         registerHandler.accept(new RestGetMappingAction());
         registerHandler.accept(new RestGetFieldMappingAction());
 
@@ -1018,7 +1013,6 @@ public class ActionModule extends AbstractModule {
         registerHandler.accept(new RestCancelTasksAction(nodesInCluster));
 
         // Ingest API
-        registerHandler.accept(new RestPutPipelineAction());
         registerHandler.accept(new RestGetPipelineAction());
         registerHandler.accept(new RestDeletePipelineAction());
         registerHandler.accept(new RestSimulatePipelineAction());

@@ -21,10 +21,11 @@ import java.io.IOException;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+
 import static org.elasticsearch.rest.RestRequest.Method.POST;
 import static org.elasticsearch.rest.RestRequest.Method.PUT;
 import static org.elasticsearch.rest.RestUtils.getMasterNodeTimeout;
-import static org.elasticsearch.rest.action.admin.indices.RestCreateIndexAction.prepareMappings;
 
 public class RestPutIndexTemplateAction extends BaseRestHandler {
 
@@ -51,7 +52,7 @@ public class RestPutIndexTemplateAction extends BaseRestHandler {
         putRequest.masterNodeTimeout(getMasterNodeTimeout(request));
         putRequest.create(request.paramAsBoolean("create", false));
         putRequest.cause(request.param("cause", ""));
-        putRequest.source(prepareMappings(XContentHelper.convertToMap(request.requiredContent(), false, request.getXContentType()).v2()));
+        putRequest.source(CreateIndexRequest.prepareMappings(XContentHelper.convertToMap(request.requiredContent(), false, request.getXContentType()).v2()));
 
         return channel -> client.admin().indices().putTemplate(putRequest, new RestToXContentListener<>(channel));
     }

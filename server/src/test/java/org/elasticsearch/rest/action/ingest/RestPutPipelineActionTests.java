@@ -29,11 +29,11 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class RestPutPipelineActionTests extends RestActionTestCase {
 
-    private RestPutPipelineAction action;
+    private RestIngestPutPipelineAction action;
 
     @Before
     public void setUpAction() {
-        action = new RestPutPipelineAction();
+        action = new RestIngestPutPipelineAction();
         controller().registerHandler(action);
         verifyingClient.setExecuteVerifier((actionType, request) -> Mockito.mock(AcknowledgedResponse.class));
         verifyingClient.setExecuteLocallyVerifier((actionType, request) -> Mockito.mock(AcknowledgedResponse.class));

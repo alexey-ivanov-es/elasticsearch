@@ -81,6 +81,7 @@ public final class HandlerCodeEmitter {
      * @param resolvedAction         the resolved transport action and request/response classes
      * @param listenerType           the resolved response listener type
      * @param useRestCancellableClient when true, wrap client in RestCancellableNodeClient before execute
+     * @param useReleasableSource       when true, wrap listener with ActionListener.withRef(listener, request.getSourceForRelease())
      * @return a JavaFile ready to write to disk
      */
     public static JavaFile emit(
@@ -88,7 +89,8 @@ public final class HandlerCodeEmitter {
         TypeDefinition requestType,
         ResolvedTransportAction resolvedAction,
         RestListenerType listenerType,
-        boolean useRestCancellableClient
+        boolean useRestCancellableClient,
+        boolean useReleasableSource
     ) {
         String packageName = packageForTransportAction(resolvedAction.transportActionClass().getName());
         String handlerClassName = handlerClassName(endpoint.name());
@@ -124,7 +126,20 @@ public final class HandlerCodeEmitter {
         boolean allowSystemIndexAccess = Boolean.TRUE.equals(endpoint.allowSystemIndexAccess());
         boolean canTripCircuitBreaker = Boolean.FALSE.equals(endpoint.canTripCircuitBreaker());
 
-        CodeBlock listenerNew = buildListenerInstantiation(listenerType, listenerClass, responseClass);
+        CodeBlock listenerNew;
+        if (useReleasableSource) {
+            CodeBlock plainListener = buildListenerInstantiation(listenerType, listenerClass, responseClass);
+            ClassName actionListener = ClassName.get("org.elasticsearch.action", "ActionListener");
+            ClassName releasableSourceRequest = ClassName.get("org.elasticsearch.rest.action", "ReleasableSourceRequest");
+            listenerNew = CodeBlock.of(
+                "$T.withRef($L, (($T) actionRequest).getSourceForRelease())",
+                actionListener,
+                plainListener,
+                releasableSourceRequest
+            );
+        } else {
+            listenerNew = buildListenerInstantiation(listenerType, listenerClass, responseClass);
+        }
         MethodSpec prepareRequestMethod = buildPrepareRequestMethod(
             restChannelConsumer,
             restRequest,

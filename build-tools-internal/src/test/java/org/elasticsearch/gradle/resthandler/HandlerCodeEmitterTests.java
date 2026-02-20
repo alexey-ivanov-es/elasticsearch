@@ -90,7 +90,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false, false);
 
         assertNotNull(javaFile);
         String source = javaFile.toString();
@@ -135,7 +135,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should include timeout in supportedQueryParameters", source.contains("timeout"));
@@ -163,7 +163,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should add @ServerlessScope when visibility is public", source.contains("ServerlessScope"));
@@ -188,7 +188,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should contain Route", source.contains("Route"));
@@ -211,7 +211,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.CHUNKED;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should reference chunked listener", source.contains("RestRefCountedChunkedToXContentListener"));
@@ -253,7 +253,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should override responseParams()", source.contains("responseParams()"));
@@ -293,7 +293,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should override supportedCapabilities()", source.contains("supportedCapabilities()"));
@@ -321,7 +321,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should override allowSystemIndexAccessByDefault()", source.contains("allowSystemIndexAccessByDefault()"));
@@ -348,7 +348,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should override canTripCircuitBreaker()", source.contains("canTripCircuitBreaker()"));
@@ -371,7 +371,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, false, false);
 
         String source = javaFile.toString();
         assertTrue("Should contain prepareRequest", source.contains("prepareRequest"));
@@ -403,7 +403,7 @@ public class HandlerCodeEmitterTests {
         );
         RestListenerType listenerType = RestListenerType.DEFAULT;
 
-        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, true);
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType, true, false);
 
         String source = javaFile.toString();
         assertTrue(

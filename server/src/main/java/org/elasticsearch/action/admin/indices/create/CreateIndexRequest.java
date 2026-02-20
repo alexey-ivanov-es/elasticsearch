@@ -143,7 +143,11 @@ public class CreateIndexRequest extends AcknowledgedRequest<CreateIndexRequest> 
         return createIndexRequest;
     }
 
-    private static Map<String, Object> prepareMappingsFromRest(Map<String, Object> source) {
+    /**
+     * Prepares a create-index or put-template source map by wrapping typeless mappings
+     * under {@link MapperService#SINGLE_MAPPING_NAME}. Used by create-index and put-index-template REST handlers.
+     */
+    public static Map<String, Object> prepareMappings(Map<String, Object> source) {
         if (source.containsKey("mappings") == false || (source.get("mappings") instanceof Map) == false) {
             return source;
         }
@@ -157,6 +161,10 @@ public class CreateIndexRequest extends AcknowledgedRequest<CreateIndexRequest> 
         }
         newSource.put("mappings", singletonMap(MapperService.SINGLE_MAPPING_NAME, mappings));
         return newSource;
+    }
+
+    private static Map<String, Object> prepareMappingsFromRest(Map<String, Object> source) {
+        return prepareMappings(source);
     }
 
     @Override

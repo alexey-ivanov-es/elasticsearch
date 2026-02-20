@@ -15,10 +15,12 @@ import org.elasticsearch.common.bytes.ReleasableBytesReference;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.xcontent.XContentHelper;
+import org.elasticsearch.core.Releasable;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.core.Tuple;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestUtils;
+import org.elasticsearch.rest.action.ReleasableSourceRequest;
 import org.elasticsearch.xcontent.ToXContentObject;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentType;
@@ -27,7 +29,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 
-public class PutPipelineRequest extends AcknowledgedRequest<PutPipelineRequest> implements ToXContentObject {
+public class PutPipelineRequest extends AcknowledgedRequest<PutPipelineRequest> implements ToXContentObject, ReleasableSourceRequest {
 
     /**
      * Creates a new put-pipeline request from a REST request. Parses path and query parameters
@@ -113,6 +115,11 @@ public class PutPipelineRequest extends AcknowledgedRequest<PutPipelineRequest> 
 
     public Integer getVersion() {
         return version;
+    }
+
+    @Override
+    public Releasable getSourceForRelease() {
+        return source instanceof Releasable ? (Releasable) source : null;
     }
 
     @Override

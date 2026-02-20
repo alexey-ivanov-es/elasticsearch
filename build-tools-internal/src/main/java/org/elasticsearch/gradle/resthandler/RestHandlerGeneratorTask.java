@@ -154,12 +154,14 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
                     ResolvedTransportAction resolvedAction = TransportActionResolver.resolve(transportAction, loader);
                     RestListenerType listenerType = ListenerResolver.resolve(resolvedAction.responseClass());
                     boolean useRestCancellableClient = CancellableActionRequestResolver.isCancellable(resolvedAction.requestClass());
+                    boolean useReleasableSource = ReleasableSourceRequestResolver.hasReleasableSource(resolvedAction.requestClass());
                     JavaFile javaFile = HandlerCodeEmitter.emit(
                         endpoint,
                         requestType,
                         resolvedAction,
                         listenerType,
-                        useRestCancellableClient
+                        useRestCancellableClient,
+                        useReleasableSource
                     );
                     Path writtenPath = javaFile.writeToPath(outputPath);
                     generatedPaths.add(canonical(writtenPath));

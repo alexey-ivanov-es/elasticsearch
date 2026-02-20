@@ -9,6 +9,7 @@
 
 package org.elasticsearch.rest.action.admin.indices;
 
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.test.ESTestCase;
@@ -40,7 +41,7 @@ public class RestCreateIndexActionTests extends ESTestCase {
             .endObject();
 
         Map<String, Object> contentAsMap = XContentHelper.convertToMap(BytesReference.bytes(content), true, content.contentType()).v2();
-        Map<String, Object> source = RestCreateIndexAction.prepareMappings(contentAsMap);
+        Map<String, Object> source = CreateIndexRequest.prepareMappings(contentAsMap);
 
         XContentBuilder expectedContent = XContentFactory.jsonBuilder()
             .startObject()
@@ -82,7 +83,7 @@ public class RestCreateIndexActionTests extends ESTestCase {
 
         Map<String, Object> contentAsMap = XContentHelper.convertToMap(BytesReference.bytes(content), true, content.contentType()).v2();
 
-        Map<String, Object> source = RestCreateIndexAction.prepareMappings(contentAsMap);
+        Map<String, Object> source = CreateIndexRequest.prepareMappings(contentAsMap);
         assertEquals(contentAsMap, source);
     }
 }
