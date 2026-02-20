@@ -27,6 +27,7 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -86,6 +87,17 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
         Path schemaPath = getSchemaFile().get().getAsFile().toPath();
         ParsedSchema parsed = SchemaParser.parse(schemaPath);
         Path outputPath = getOutputDir().get().getAsFile().toPath();
+        if (Files.exists(outputPath)) {
+            try (var stream = Files.walk(outputPath)) {
+                stream.sorted((a, b) -> b.compareTo(a)).forEach(p -> {
+                    try {
+                        Files.deleteIfExists(p);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+            }
+        }
         Files.createDirectories(outputPath);
 
         Schema schema = parsed.schema();
