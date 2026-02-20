@@ -17,7 +17,6 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.settings.SettingsFilter;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestRequest;
-import org.elasticsearch.rest.RestUtils;
 import org.elasticsearch.rest.Scope;
 import org.elasticsearch.rest.ServerlessScope;
 import org.elasticsearch.rest.action.RestCancellableNodeClient;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.elasticsearch.rest.RestRequest.Method.GET;
-import static org.elasticsearch.rest.RestUtils.getMasterNodeTimeout;
 
 @ServerlessScope(Scope.INTERNAL)
 public class RestClusterGetSettingsAction extends BaseRestHandler {
@@ -57,8 +55,7 @@ public class RestClusterGetSettingsAction extends BaseRestHandler {
     public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
         final boolean renderDefaults = request.paramAsBoolean("include_defaults", false);
 
-        ClusterGetSettingsAction.Request clusterSettingsRequest = new ClusterGetSettingsAction.Request(getMasterNodeTimeout(request));
-        RestUtils.consumeDeprecatedLocalParameter(request);
+        ClusterGetSettingsAction.Request clusterSettingsRequest = ClusterGetSettingsAction.Request.fromRestRequest(request);
 
         return channel -> new RestCancellableNodeClient(client, request.getHttpChannel()).execute(
             ClusterGetSettingsAction.INSTANCE,

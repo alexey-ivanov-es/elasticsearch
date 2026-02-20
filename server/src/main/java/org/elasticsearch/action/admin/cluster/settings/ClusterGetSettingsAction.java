@@ -18,6 +18,8 @@ import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.core.UpdateForV10;
+import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.RestUtils;
 import org.elasticsearch.tasks.CancellableTask;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskId;
@@ -50,6 +52,14 @@ public class ClusterGetSettingsAction extends ActionType<ClusterGetSettingsActio
         @UpdateForV10(owner = UpdateForV10.Owner.CORE_INFRA)
         public Request(StreamInput in) throws IOException {
             super(in);
+        }
+
+        /**
+         * Build a cluster get settings request from a REST request (query parameters).
+         */
+        public static Request fromRestRequest(RestRequest request) {
+            RestUtils.consumeDeprecatedLocalParameter(request);
+            return new Request(RestUtils.getMasterNodeTimeout(request));
         }
 
         @Override
