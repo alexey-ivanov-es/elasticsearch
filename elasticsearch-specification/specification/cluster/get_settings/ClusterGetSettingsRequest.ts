@@ -31,6 +31,8 @@ import { MediaType } from '@_types/common'
  * @cluster_privileges monitor
  * @doc_id cluster-get-settings
  * @ext_doc_id stack-settings
+ * @server_transport_action org.elasticsearch.action.admin.cluster.settings.TransportClusterGetSettingsAction
+ * @server_response_params flat_settings,include_defaults
  */
 export interface Request extends RequestBase {
   urls: [

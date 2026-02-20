@@ -633,7 +633,7 @@ export function hoistRequestAnnotations (
   request: model.Request, jsDocs: JSDoc[], mappings: Record<string, model.Endpoint>, response: model.TypeName | null
 ): void {
   const knownRequestAnnotations = [
-    'rest_spec_name', 'behavior', 'class_serializer', 'index_privileges', 'cluster_privileges', 'doc_id', 'availability', 'doc_tag', 'ext_doc_id', 'codegen_exclude', 'server_transport_action'
+    'rest_spec_name', 'behavior', 'class_serializer', 'index_privileges', 'cluster_privileges', 'doc_id', 'availability', 'doc_tag', 'ext_doc_id', 'codegen_exclude', 'server_transport_action', 'server_capabilities', 'server_allow_system_index_access', 'server_response_params'
   ]
   // in most of the cases the jsDocs comes in a single block,
   // but it can happen that the user defines multiple single line jsDoc.
@@ -737,6 +737,12 @@ export function hoistRequestAnnotations (
     } else if (tag === 'server_transport_action') {
       assert(jsDocs, value.trim() !== '', `Request ${request.name.name}'s @server_transport_action cannot be empty`)
       endpoint.serverTransportAction = value.trim()
+    } else if (tag === 'server_capabilities') {
+      endpoint.capabilities = parseCommaSeparated(value)
+    } else if (tag === 'server_allow_system_index_access') {
+      endpoint.allowSystemIndexAccess = value.trim().toLowerCase() === 'true'
+    } else if (tag === 'server_response_params') {
+      endpoint.responseParams = parseCommaSeparated(value)
     } else {
       assert(jsDocs, false, `Unhandled tag: '${tag}' with value: '${value}' on request ${request.name.name}`)
     }

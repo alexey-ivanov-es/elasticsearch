@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * A REST endpoint from the schema: name, URLs, request/response type references,
- * body requirement, availability, and optional server transport action class name.
+ * body requirement, availability, and optional server-side extension fields.
  */
 public record Endpoint(
     @JsonProperty("name") String name,
@@ -26,5 +26,8 @@ public record Endpoint(
     @JsonProperty("response") TypeReference response,
     @JsonProperty("requestBodyRequired") boolean requestBodyRequired,
     @JsonProperty("availability") Availability availability,
-    @JsonProperty("serverTransportAction") String serverTransportAction
+    @JsonProperty("serverTransportAction") String serverTransportAction,
+    @JsonProperty("capabilities") List<String> capabilities,
+    @JsonProperty("allowSystemIndexAccess") Boolean allowSystemIndexAccess,
+    @JsonProperty("responseParams") List<String> responseParams
 ) {}

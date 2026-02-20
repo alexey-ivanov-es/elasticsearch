@@ -478,6 +478,22 @@ export class Endpoint {
    * When present, the REST handler generator uses it to emit handler code that dispatches via that action.
    */
   serverTransportAction?: string
+
+  /**
+   * Optional capability strings this handler advertises via supportedCapabilities().
+   */
+  capabilities?: string[]
+
+  /**
+   * When true, the generated handler overrides allowSystemIndexAccessByDefault() to return true.
+   */
+  allowSystemIndexAccess?: boolean
+
+  /**
+   * Query parameter names consumed during response serialization (e.g. flat_settings, include_defaults).
+   * These are emitted in responseParams() and excluded from supportedQueryParameters().
+   */
+  responseParams?: string[]
 }
 
 export class UrlTemplate {
