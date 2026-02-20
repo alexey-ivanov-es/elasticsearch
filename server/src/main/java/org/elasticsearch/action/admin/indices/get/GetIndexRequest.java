@@ -117,8 +117,6 @@ public class GetIndexRequest extends LocalClusterStateRequest implements Indices
         RestUtils.consumeDeprecatedLocalParameter(request);
         r.humanReadable(request.paramAsBoolean("human", false));
         r.includeDefaults(request.paramAsBoolean("include_defaults", false));
-        // Consume flat_settings so supported/consumed param sets match in BaseRestHandler (response formatting uses it).
-        request.paramAsBoolean("flat_settings", false);
         r.features(Feature.fromRequest(request));
         return r;
     }
