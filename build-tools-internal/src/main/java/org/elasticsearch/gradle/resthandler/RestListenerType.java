@@ -24,8 +24,8 @@ public enum RestListenerType {
     /** Nodes API envelope; {@code RestActions.NodesResponseRestListener}. */
     NODES("org.elasticsearch.rest.action", "RestActions", "NodesResponseRestListener"),
 
-    /** Status-bearing (e.g. document CRUD); {@code RestStatusToXContentListener}. */
-    STATUS("org.elasticsearch.rest.action", "RestStatusToXContentListener", null),
+    /** Status-bearing (e.g. {@link org.elasticsearch.rest.action.RestStatusProvider}); {@code RestToXContentListener} with {@code Response::status}. */
+    STATUS("org.elasticsearch.rest.action", "RestToXContentListener", null),
 
     /** Default ToXContent; {@code RestToXContentListener}. */
     DEFAULT("org.elasticsearch.rest.action", "RestToXContentListener", null);

@@ -129,7 +129,17 @@ Do **not** read parameters that are **response params** (see 1.4); they are not 
 
 Parameters marked with `@server_response_param` in the spec must **not** be read or set on the ActionRequest in `fromRestRequest()`. They are exposed to the response layer only. The generated handler’s `responseParams()` and `allSupportedParameters()` already account for them.
 
-### 2.3 Verify the refactor
+### 2.3 Response type and `RestStatusProvider` (when the handler uses `::status`)
+
+If the hand-written handler passes a **status method reference** to the listener (e.g. `new RestToXContentListener<>(channel, XxxResponse::status)`), the HTTP status is taken from the response. For the generated handler to do the same, the **ActionResponse** class must implement **`RestStatusProvider`** (`org.elasticsearch.rest.action.RestStatusProvider`).
+
+- **Interface**: `RestStatusProvider` declares a single method `RestStatus status();`.
+- **ActionResponse**: Add `implements RestStatusProvider` to the response class and ensure it has a `RestStatus status()` method (add `@Override` if the method already exists).
+- The code generator’s `ListenerResolver` checks for this interface; when present, it emits `RestToXContentListener<>(channel, ResponseType::status)` so the REST status comes from the response.
+
+If you omit this, the generated handler will use `RestToXContentListener<>(channel)` and the response will always be HTTP 200.
+
+### 2.4 Verify the refactor
 
 Temporarily change the **existing** hand-written handler to call `XxxRequest.fromRestRequest(request)` instead of inlining the logic. Run the relevant YAML REST tests to confirm behavior is unchanged.
 
@@ -173,6 +183,7 @@ Temporarily change the **existing** hand-written handler to call `XxxRequest.fro
 - [ ] **Spec**: If the endpoint serves both GET and HEAD (e.g. indices.get / indices.exists), set `methods: ['GET', 'HEAD']` in `urls`.
 - [ ] **Schema**: Regenerated from spec and copied to `rest-api-spec/src/main/resources/schema/schema.json`.
 - [ ] **ActionRequest**: `fromRestRequest(RestRequest)` implemented; every **supported** (non–response) param is **consumed** (read) — no `hasParam()`-only checks; use `RestUtils.consumeDeprecatedLocalParameter(request)` for `local` where applicable; response params are not read.
+- [ ] **ActionResponse**: If the hand-written handler uses a listener with `::status` (e.g. `RestToXContentListener<>(channel, XxxResponse::status)`), the response class implements `RestStatusProvider` so the generator emits the same pattern.
 - [ ] **Handler**: Hand-written handler removed from source; its registration removed from `ActionModule.initRestHandlers()`.
 - [ ] **Tests**: YAML REST tests for the endpoint pass with the generated handler.
 
@@ -180,6 +191,6 @@ Temporarily change the **existing** hand-written handler to call `XxxRequest.fro
 
 ## References
 
-- **Project plan**: [es-rest-handler-codegen-plan.md](es-rest-handler-codegen-plan.md) — schema layout, `BaseRestHandler` contract, response params, capabilities, allowSystemIndexAccess, canTripCircuitBreaker, naming, generator architecture.
+- **Project plan**: [es-rest-handler-codegen-plan.md](es-rest-handler-codegen-plan.md) — schema layout, `BaseRestHandler` contract, response params, capabilities, allowSystemIndexAccess, canTripCircuitBreaker, naming, generator architecture, response listener selection (`RestStatusProvider`).
 - **Schema regeneration**: [README](README.md), `elasticsearch-specification/README.md`.
 - **Changed files**: [CHANGED-FILES.md](CHANGED-FILES.md) — list of files touched by this project (update when you change/remove handlers or spec).

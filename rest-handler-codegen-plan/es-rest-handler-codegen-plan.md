@@ -118,11 +118,11 @@ Multi-valued params like `index` use `Strings.splitStringByCommaToArray(request.
 The listener wrapping the response is determined by the ActionResponse class hierarchy:
 
 - **Default**: `RestToXContentListener<>(channel)` — for responses implementing `ToXContentObject`. Returns HTTP 200.
-- **Status-bearing**: `RestStatusToXContentListener<>(channel, r -> r.status())` — for responses implementing `StatusToXContentObject` (document CRUD: index, update, delete). HTTP status comes from the response itself.
+- **Status-bearing**: `RestToXContentListener<>(channel, ResponseType::status)` — for responses implementing `RestStatusProvider` (see `org.elasticsearch.rest.action.RestStatusProvider`). HTTP status comes from the response’s `status()` method (e.g. cluster health, document CRUD: index, update, delete).
 - **Chunked**: `RestRefCountedChunkedToXContentListener<>(channel)` — for responses implementing `ChunkedToXContentObject` (search). Streams the response.
 - **Nodes responses**: `RestActions.NodesResponseRestListener<>(channel)` — for responses extending `BaseNodesResponse` (_nodes/* APIs). Wraps in `{_nodes: {}, cluster_name: ..., nodes: {}}` envelope.
 
-The generator should inspect the ActionResponse class (derivable from the transport action's type parameters) and pick the listener automatically. Priority order: ChunkedToXContentObject > BaseNodesResponse > StatusToXContentObject > ToXContentObject (default).
+The generator inspects the ActionResponse class (derivable from the transport action's type parameters) and picks the listener automatically. Priority order: ChunkedToXContentObject > BaseNodesResponse > RestStatusProvider > ToXContentObject (default). Response types that expose a REST status (e.g. `ClusterHealthResponse`, `DeleteResponse`) must implement `RestStatusProvider` so the generator emits `RestToXContentListener<>(channel, ResponseType::status)`.
 
 ### ServerlessScope Annotation
 
@@ -584,10 +584,10 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 #### Task 1.7: Implement ListenerResolver
 
 - Given the `ActionResponse` class (resolved by `TransportActionResolver` in task 1.5), determine which response listener to use.
-- Use reflection to inspect the ActionResponse class hierarchy. Check which interfaces it implements, in priority order:
+- Use reflection to inspect the ActionResponse class hierarchy. Check which interfaces/superclasses it implements or extends, in priority order:
   1. `ChunkedToXContentObject` → `RestRefCountedChunkedToXContentListener`
   2. `BaseNodesResponse` (check superclass chain) → `RestActions.NodesResponseRestListener`
-  3. `StatusToXContentObject` → `RestStatusToXContentListener`
+  3. `RestStatusProvider` → `RestToXContentListener` with `ResponseType::status`
   4. Default → `RestToXContentListener`
 - This runs at generation time using the same classpath available to the TransportActionResolver.
 

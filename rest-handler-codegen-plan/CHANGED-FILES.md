@@ -48,7 +48,7 @@ List of files created, modified, or removed for this project. **Update this file
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/TypeMapperTests.java` — unit tests for TypeMapper
 - **Task 1.7 (ListenerResolver):**
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/RestListenerType.java` — enum of supported listeners (CHUNKED, NODES, STATUS, DEFAULT) with package/class and getClassName() for JavaPoet; replaces ListenerKind
-  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ListenerResolver.java` — resolve listener from ActionResponse class via classloader-by-name checks (ChunkedToXContentObject, BaseNodesResponse, StatusToXContentObject, default)
+  - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/ListenerResolver.java` — resolve listener from ActionResponse class via classloader-by-name checks (ChunkedToXContentObject, BaseNodesResponse, RestStatusProvider, default)
   - `build-tools-internal/src/test/java/org/elasticsearch/gradle/resthandler/ListenerResolverTests.java` — unit tests for ListenerResolver (plain class → DEFAULT; optional server-on-classpath tests for SearchResponse→CHUNKED, NodesInfoResponse→NODES, AcknowledgedResponse→DEFAULT)
 - **Task 1.8 (HandlerCodeEmitter):**
   - `build-tools-internal/src/main/java/org/elasticsearch/gradle/resthandler/HandlerCodeEmitter.java` — JavaPoet-based emitter: routes(), getName(), supportedQueryParameters(), prepareRequest(); package from transport action (org.elasticsearch.rest.action + suffix after "action."); RestHandler.Route, BaseRestHandler.RestChannelConsumer; action type TYPE/INSTANCE; emitRegistry(Consumer<RestHandler>) for GeneratedRestHandlerRegistry

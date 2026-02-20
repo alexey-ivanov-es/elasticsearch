@@ -16,13 +16,13 @@ package org.elasticsearch.gradle.resthandler;
  * the server module.
  * <p>
  * Priority order: ChunkedToXContentObject → BaseNodesResponse →
- * StatusToXContentObject → default (RestToXContentListener).
+ * RestStatusProvider → default (RestToXContentListener).
  */
 public final class ListenerResolver {
 
     private static final String CHUNKED_TO_XCONTENT_OBJECT = "org.elasticsearch.common.xcontent.ChunkedToXContentObject";
     private static final String BASE_NODES_RESPONSE = "org.elasticsearch.action.support.nodes.BaseNodesResponse";
-    private static final String STATUS_TO_XCONTENT_OBJECT = "org.elasticsearch.rest.action.StatusToXContentObject";
+    private static final String REST_STATUS_PROVIDER = "org.elasticsearch.rest.action.RestStatusProvider";
 
     private ListenerResolver() {}
 
@@ -44,7 +44,7 @@ public final class ListenerResolver {
         if (isAssignableFrom(responseClass, BASE_NODES_RESPONSE, loader)) {
             return RestListenerType.NODES;
         }
-        if (isAssignableFrom(responseClass, STATUS_TO_XCONTENT_OBJECT, loader)) {
+        if (isAssignableFrom(responseClass, REST_STATUS_PROVIDER, loader)) {
             return RestListenerType.STATUS;
         }
         return RestListenerType.DEFAULT;
