@@ -10,21 +10,20 @@
 package org.elasticsearch.rest.action;
 
 import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.core.Releasable;
+import org.elasticsearch.core.RefCounted;
 
 /**
- * Marker interface for {@link ActionRequest}s whose body/source is a
- * {@link Releasable} that must be released when the response is sent.
- * When a generated REST handler's request type implements this interface,
- * the generator wraps the response listener with
- * {@code ActionListener.withRef(listener, request.getSourceForRelease())}
+ * Interface for {@link ActionRequest}s whose body/source is a {@link RefCounted}
+ * that must be released when the response is sent. When a generated REST handler's
+ * request type implements this interface, the generator wraps the response listener
+ * with {@code ActionListener.withRef(listener, request.getSourceForRelease())}
  * so that the source is released on completion.
  */
 public interface ReleasableSourceRequest {
 
     /**
-     * Returns the releasable source to release when the request completes
+     * Returns the ref-counted source to release when the request completes
      * (success or failure), or {@code null} if there is nothing to release.
      */
-    Releasable getSourceForRelease();
+    RefCounted getSourceForRelease();
 }

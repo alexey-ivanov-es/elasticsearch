@@ -153,8 +153,8 @@ If you omit this, the generated handler will use the plain `client` and the requ
 
 If the hand-written handler wraps the response listener with **`ActionListener.withRef(listener, content)`** so that the request body (e.g. a `ReleasableBytesReference`) is released when the request completes (success or failure), the **ActionRequest** class must implement **`ReleasableSourceRequest`** (`org.elasticsearch.rest.action.ReleasableSourceRequest`).
 
-- **Interface**: `ReleasableSourceRequest` declares a single method `Releasable getSourceForRelease()`. Return the releasable to release when the request completes, or `null` if there is nothing to release.
-- **ActionRequest**: Add `implements ReleasableSourceRequest` and implement `getSourceForRelease()`. For example, when the request holds a `BytesReference` that may be a `ReleasableBytesReference`, return `source instanceof Releasable ? (Releasable) source : null`.
+- **Interface**: `ReleasableSourceRequest` declares a single method `RefCounted getSourceForRelease()`. Return the ref-counted source to release when the request completes, or `null` if there is nothing to release. `ActionListener.withRef` requires a `RefCounted` (e.g. `ReleasableBytesReference` implements `RefCounted`).
+- **ActionRequest**: Add `implements ReleasableSourceRequest` and implement `getSourceForRelease()`. For example, when the request holds a `BytesReference` that may be a `ReleasableBytesReference`, return `source instanceof RefCounted ? (RefCounted) source : null`.
 - The code generator’s `ReleasableSourceRequestResolver` checks for this interface at generation time; when present, it emits `ActionListener.withRef(listener, ((ReleasableSourceRequest) actionRequest).getSourceForRelease())` so the source is released when the listener completes.
 
 If you omit this, the generated handler will not release the body and you may leak ref-counted resources (e.g. `ReleasableBytesReference` from `RestRequest.contentOrSourceParam()`).
@@ -205,7 +205,7 @@ Temporarily change the **existing** hand-written handler to call `XxxRequest.fro
 - [ ] **ActionRequest**: `fromRestRequest(RestRequest)` implemented; every **supported** (non–response) param is **consumed** (read) — no `hasParam()`-only checks; use `RestUtils.consumeDeprecatedLocalParameter(request)` for `local` where applicable; response params are not read.
 - [ ] **ActionResponse**: If the hand-written handler uses a listener with `::status` (e.g. `RestToXContentListener<>(channel, XxxResponse::status)`), the response class implements `RestStatusProvider` so the generator emits the same pattern.
 - [ ] **ActionRequest**: If the hand-written handler uses `RestCancellableNodeClient`, the request class implements `CancellableActionRequest` so the generator wraps the client and preserves cancellation on disconnect.
-- [ ] **ActionRequest**: If the hand-written handler uses `ActionListener.withRef(listener, content)` to release the request body when the response is sent, the request class implements `ReleasableSourceRequest` and `getSourceForRelease()` returns the releasable (or `null`).
+- [ ] **ActionRequest**: If the hand-written handler uses `ActionListener.withRef(listener, content)` to release the request body when the response is sent, the request class implements `ReleasableSourceRequest` and `getSourceForRelease()` returns the `RefCounted` (or `null`).
 - [ ] **Handler**: Hand-written handler removed from source; its registration removed from `ActionModule.initRestHandlers()`.
 - [ ] **Tests**: YAML REST tests for the endpoint pass with the generated handler.
 

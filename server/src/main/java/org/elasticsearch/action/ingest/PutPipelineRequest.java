@@ -15,7 +15,7 @@ import org.elasticsearch.common.bytes.ReleasableBytesReference;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.xcontent.XContentHelper;
-import org.elasticsearch.core.Releasable;
+import org.elasticsearch.core.RefCounted;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.core.Tuple;
 import org.elasticsearch.rest.RestRequest;
@@ -118,8 +118,8 @@ public class PutPipelineRequest extends AcknowledgedRequest<PutPipelineRequest> 
     }
 
     @Override
-    public Releasable getSourceForRelease() {
-        return source instanceof Releasable ? (Releasable) source : null;
+    public RefCounted getSourceForRelease() {
+        return source instanceof RefCounted ? (RefCounted) source : null;
     }
 
     @Override
