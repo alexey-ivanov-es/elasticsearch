@@ -28,7 +28,7 @@ Tasks are taken from the full project plan. Update the status when a task is com
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 2.1 | Extend Generator Scope Filter | Not done |
+| 2.1 | Extend Generator Scope Filter | Done |
 | 2.2 | Add `fromRestRequest()` to PoC ActionRequests (Phase 2) | Not done |
 | 2.3 | Add Server-Side Annotations to Phase 2 Endpoints | Not done |
 | 2.4 | Generate and Swap (Phase 2) | Not done |

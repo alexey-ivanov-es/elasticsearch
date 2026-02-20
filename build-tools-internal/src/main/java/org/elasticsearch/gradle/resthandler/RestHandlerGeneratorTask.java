@@ -12,8 +12,10 @@ package org.elasticsearch.gradle.resthandler;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 
+import org.elasticsearch.gradle.resthandler.model.Body;
 import org.elasticsearch.gradle.resthandler.model.Endpoint;
 import org.elasticsearch.gradle.resthandler.model.Schema;
+import org.elasticsearch.gradle.resthandler.model.TypeDefinition;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
@@ -89,6 +91,22 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
         return p.toAbsolutePath().normalize();
     }
 
+    /**
+     * Whether this endpoint's request body kind is supported for generation (Phase 1: no_body;
+     * Phase 2: properties, value). Endpoints with other or missing body definitions are skipped.
+     */
+    private static boolean isSupportedBodyKind(TypeDefinition requestType) {
+        if (requestType == null) {
+            return false;
+        }
+        Body body = requestType.body();
+        if (body == null || body.kind() == null) {
+            return true;
+        }
+        String kind = body.kind();
+        return "no_body".equals(kind) || "properties".equals(kind) || "value".equals(kind);
+    }
+
     @TaskAction
     public void generate() throws IOException {
         Path schemaPath = getSchemaFile().get().getAsFile().toPath();
@@ -127,11 +145,15 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
                 if (transportAction == null || transportAction.isBlank()) {
                     continue;
                 }
+                TypeDefinition requestType = parsed.getRequestType(endpoint);
+                if (isSupportedBodyKind(requestType) == false) {
+                    getLogger().debug("Skipping endpoint {}: unsupported body kind", endpoint.name());
+                    continue;
+                }
                 try {
                     ResolvedTransportAction resolvedAction = TransportActionResolver.resolve(transportAction, loader);
                     RestListenerType listenerType = ListenerResolver.resolve(resolvedAction.responseClass());
                     boolean useRestCancellableClient = CancellableActionRequestResolver.isCancellable(resolvedAction.requestClass());
-                    org.elasticsearch.gradle.resthandler.model.TypeDefinition requestType = parsed.getRequestType(endpoint);
                     JavaFile javaFile = HandlerCodeEmitter.emit(
                         endpoint,
                         requestType,
