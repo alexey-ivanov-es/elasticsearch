@@ -10,25 +10,20 @@
 package org.elasticsearch.action.admin.cluster.health;
 
 import org.elasticsearch.action.ActionRequestValidationException;
-import org.elasticsearch.action.ClusterStatsLevel;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.action.support.ActiveShardCount;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.action.support.master.MasterNodeReadRequest;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.Priority;
-import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.rest.RestRequest;
-import org.elasticsearch.rest.RestUtils;
 import org.elasticsearch.tasks.CancellableTask;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.tasks.TaskId;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Map;
 
 public class ClusterHealthRequest extends MasterNodeReadRequest<ClusterHealthRequest> implements IndicesRequest.Replaceable {
@@ -67,41 +62,6 @@ public class ClusterHealthRequest extends MasterNodeReadRequest<ClusterHealthReq
         }
         waitForNoInitializingShards = in.readBoolean();
         indicesOptions = IndicesOptions.readIndicesOptions(in);
-    }
-
-    /**
-     * Build a cluster health request from a REST request (path and query parameters).
-     */
-    public static ClusterHealthRequest fromRestRequest(RestRequest request) {
-        String[] indices = Strings.splitStringByCommaToArray(request.param("index"));
-        final TimeValue masterNodeTimeout = request.hasParam(RestUtils.REST_MASTER_TIMEOUT_PARAM)
-            ? RestUtils.getMasterNodeTimeout(request)
-            : request.paramAsTime("timeout", RestUtils.REST_MASTER_TIMEOUT_DEFAULT);
-        final ClusterHealthRequest r = new ClusterHealthRequest(masterNodeTimeout, indices);
-        r.indicesOptions(IndicesOptions.fromRequest(request, r.indicesOptions()));
-        r.local(request.paramAsBoolean("local", r.local()));
-        r.timeout(request.paramAsTime("timeout", r.timeout()));
-        String waitForStatus = request.param("wait_for_status");
-        if (waitForStatus != null) {
-            r.waitForStatus(ClusterHealthStatus.valueOf(waitForStatus.toUpperCase(Locale.ROOT)));
-        }
-        r.waitForNoRelocatingShards(request.paramAsBoolean("wait_for_no_relocating_shards", r.waitForNoRelocatingShards()));
-        r.waitForNoInitializingShards(request.paramAsBoolean("wait_for_no_initializing_shards", r.waitForNoInitializingShards()));
-        if (request.hasParam("wait_for_relocating_shards")) {
-            throw new IllegalArgumentException(
-                "wait_for_relocating_shards has been removed, use wait_for_no_relocating_shards [true/false] instead"
-            );
-        }
-        String waitForActiveShards = request.param("wait_for_active_shards");
-        if (waitForActiveShards != null) {
-            r.waitForActiveShards(ActiveShardCount.parseString(waitForActiveShards));
-        }
-        r.waitForNodes(request.param("wait_for_nodes", r.waitForNodes()));
-        if (request.param("wait_for_events") != null) {
-            r.waitForEvents(Priority.valueOf(request.param("wait_for_events").toUpperCase(Locale.ROOT)));
-        }
-        ClusterStatsLevel.of(request, ClusterStatsLevel.CLUSTER);
-        return r;
     }
 
     @Override
