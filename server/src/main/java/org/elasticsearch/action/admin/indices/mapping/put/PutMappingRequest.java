@@ -23,6 +23,9 @@ import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.util.CollectionUtils;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.index.Index;
+import org.elasticsearch.index.mapper.MapperService;
+import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.RestUtils;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentFactory;
 import org.elasticsearch.xcontent.XContentType;
@@ -35,6 +38,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
+import static org.elasticsearch.index.mapper.MapperService.SINGLE_MAPPING_NAME;
+import static org.elasticsearch.index.mapper.MapperService.isMappingSourceTyped;
 
 /**
  * Puts mapping definition into one or more indices.
@@ -112,6 +117,25 @@ public class PutMappingRequest extends AcknowledgedRequest<PutMappingRequest> im
     public PutMappingRequest(String... indices) {
         super(TRAPPY_IMPLICIT_DEFAULT_MASTER_NODE_TIMEOUT, DEFAULT_ACK_TIMEOUT);
         this.indices = indices;
+    }
+
+    /**
+     * Creates a new put-mapping request from a REST request. Parses path and query parameters
+     * and required body (mapping definition).
+     */
+    public static PutMappingRequest fromRestRequest(RestRequest request) throws IOException {
+        String[] indices = Strings.splitStringByCommaToArray(request.param("index"));
+        PutMappingRequest putMappingRequest = new PutMappingRequest(indices);
+        Map<String, Object> sourceAsMap = XContentHelper.convertToMap(request.requiredContent(), false, request.getXContentType()).v2();
+        if (isMappingSourceTyped(SINGLE_MAPPING_NAME, sourceAsMap)) {
+            throw new IllegalArgumentException("Types cannot be provided in put mapping requests");
+        }
+        putMappingRequest.source(sourceAsMap);
+        putMappingRequest.ackTimeout(RestUtils.getAckTimeout(request));
+        putMappingRequest.masterNodeTimeout(RestUtils.getMasterNodeTimeout(request));
+        putMappingRequest.indicesOptions(IndicesOptions.fromRequest(request, putMappingRequest.indicesOptions()));
+        putMappingRequest.writeIndexOnly(request.paramAsBoolean("write_index_only", false));
+        return putMappingRequest;
     }
 
     @Override

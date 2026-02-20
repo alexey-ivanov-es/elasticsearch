@@ -67,6 +67,10 @@ List of files created, modified, or removed for this project. **Update this file
   - `server/.../action/admin/indices/delete/DeleteIndexRequest.java` — add fromRestRequest(RestRequest); handler prepareRequest unchanged, now delegates to it
   - `server/.../action/admin/indices/get/GetIndexRequest.java` — add fromRestRequest(RestRequest); RestGetIndicesAction.prepareRequest delegates to it
   - `server/.../action/admin/cluster/tasks/PendingClusterTasksRequest.java` — add fromRestRequest(RestRequest) when implemented for cluster.pending_tasks PoC
+- **Task 2.2 (Phase 2 fromRestRequest):**
+  - `server/.../action/admin/indices/create/CreateIndexRequest.java` — add fromRestRequest(RestRequest) with body parsing (prepareMappingsFromRest); RestCreateIndexAction delegates to it
+  - `server/.../action/admin/indices/mapping/put/PutMappingRequest.java` — add fromRestRequest(RestRequest) with required body; RestPutMappingAction delegates to it
+  - `server/.../action/ingest/PutPipelineRequest.java` — add fromRestRequest(RestRequest) with contentOrSourceParam and if_version; RestPutPipelineAction delegates to it
 
 ---
 
@@ -82,6 +86,7 @@ List of files created, modified, or removed for this project. **Update this file
 - **Task 1.11:** `server/.../action/ActionModule.java` — remove hand-written registration for RestPendingClusterTasksAction (generated RestClusterPendingTasksAction registered via GeneratedRestHandlerRegistry).
 - **Task 1.4:** `elasticsearch-specification/compiler/src/model/metamodel.ts` — add serverTransportAction to Endpoint; `elasticsearch-specification/compiler/src/model/utils.ts` — parse @server_transport_action and set endpoint.serverTransportAction; `elasticsearch-specification/specification/indices/delete/IndicesDeleteRequest.ts`, `indices/get/IndicesGetRequest.ts`, `cluster/pending_tasks/ClusterPendingTasksRequest.ts` — add @server_transport_action JSDoc; `cluster/get_settings/ClusterGetSettingsRequest.ts` — no @server_transport_action (removed); `rest-api-spec/src/main/resources/schema/schema.json` — serverTransportAction only for indices.delete, indices.get, cluster.pending_tasks. Parser compatibility with full schema: `build-tools-internal/.../SchemaParser.java` — disable FAIL_ON_UNKNOWN_PROPERTIES; `model/TypeDefinition.java` — name as TypeReference (nested {name, namespace}); `model/TypeDescriptor.java` — value as Object (string or nested descriptor); `model/SchemaParserTests.java` — test schema uses nested type name
 - **Response params for indices.get:** `elasticsearch-specification/specification/indices/get/IndicesGetRequest.ts` — add @server_response_params flat_settings; regenerate schema (compiler output → rest-api-spec/src/main/resources/schema/schema.json); `server/.../action/admin/indices/get/GetIndexRequest.java` — remove flat_settings consumption workaround (flat_settings is now a response param in generated handler).
+- **Task 2.2:** `server/.../rest/action/admin/indices/RestCreateIndexAction.java`, `RestPutMappingAction.java`, `server/.../rest/action/ingest/RestPutPipelineAction.java` — prepareRequest() refactored to call XxxRequest.fromRestRequest(request).
 
 ---
 

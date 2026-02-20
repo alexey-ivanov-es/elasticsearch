@@ -11,18 +11,52 @@ package org.elasticsearch.action.ingest;
 
 import org.elasticsearch.action.support.master.AcknowledgedRequest;
 import org.elasticsearch.common.bytes.BytesReference;
+import org.elasticsearch.common.bytes.ReleasableBytesReference;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.core.Tuple;
+import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.RestUtils;
 import org.elasticsearch.xcontent.ToXContentObject;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentType;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Objects;
 
 public class PutPipelineRequest extends AcknowledgedRequest<PutPipelineRequest> implements ToXContentObject {
+
+    /**
+     * Creates a new put-pipeline request from a REST request. Parses path and query parameters
+     * and body (pipeline definition). The returned request's source may be a {@link ReleasableBytesReference};
+     * the caller is responsible for releasing it (e.g. via {@code ActionListener.withRef(listener, request.getSource())}
+     * when the source is releasable).
+     */
+    public static PutPipelineRequest fromRestRequest(RestRequest restRequest) {
+        Integer ifVersion = null;
+        if (restRequest.hasParam("if_version")) {
+            String versionString = restRequest.param("if_version");
+            try {
+                ifVersion = Integer.parseInt(versionString);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(
+                    String.format(Locale.ROOT, "invalid value [%s] specified for [if_version]. must be an integer value", versionString)
+                );
+            }
+        }
+        Tuple<XContentType, ReleasableBytesReference> sourceTuple = restRequest.contentOrSourceParam();
+        return new PutPipelineRequest(
+            RestUtils.getMasterNodeTimeout(restRequest),
+            RestUtils.getAckTimeout(restRequest),
+            restRequest.param("id"),
+            sourceTuple.v2(),
+            sourceTuple.v1(),
+            ifVersion
+        );
+    }
 
     private final String id;
     private final BytesReference source;
