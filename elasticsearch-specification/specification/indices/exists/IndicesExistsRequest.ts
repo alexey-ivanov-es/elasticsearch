@@ -33,7 +33,7 @@ export interface Request extends RequestBase {
   urls: [
     {
       path: '/{index}'
-      methods: ['HEAD']
+      methods: ['GET', 'HEAD']
     }
   ]
   path_parts: {
