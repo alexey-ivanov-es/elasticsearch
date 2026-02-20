@@ -12,7 +12,7 @@ Build a Java code generator (Gradle plugin) that reads the compiled specificatio
 
 ### Repository Context
 
-- **`elasticsearch-specification`** (https://github.com/elastic/elasticsearch-specification) — external repo containing TypeScript API definitions that compile to `output/schema/schema.json`. This is the upstream source of truth. The repository is available as a sibling directory to the elasticsearch repo (e.g. at `../elasticsearch-specification` when working from the elasticsearch repo root; both typically live under the same parent, e.g. `.../src/elasticsearch` and `.../src/elasticsearch-specification`).
+- **`elasticsearch-specification`** (https://github.com/elastic/elasticsearch-specification) — external repo containing TypeScript API definitions that compile to `output/schema/schema.json`. This is the upstream source of truth. The repository is available in the root of the elasticsearch repo (e.g. at `./elasticsearch-specification` when working from the elasticsearch repo root; both typically live under the same parent).
 - **`elasticsearch`** (https://github.com/elastic/elasticsearch) — the server repo where the generator plugin, vendored spec files, and generated handlers live.
 
 ### Vendored Spec Files
@@ -193,7 +193,7 @@ These are expressed as JSDoc tags in the TypeScript spec:
  */
 ```
 
-For the PoC: `cluster.get_settings` uses `responseParams` (`flat_settings`, `include_defaults`), providing an immediate test case. The other two PoC endpoints don't need it.
+For the PoC endpoints, none use `responseParams`. It becomes relevant when migrating endpoints like `cluster.get_settings` (`responseParams: ["flat_settings", "include_defaults"]`).
 
 ### Spec Compiler Changes
 
@@ -275,7 +275,7 @@ The full endpoint name (including namespace) is converted from `dot.separated.sn
 Examples:
 - `indices.delete` → `RestIndicesDeleteAction`
 - `indices.get` → `RestIndicesGetAction`
-- `cluster.get_settings` → `RestClusterGetSettingsAction`
+- `cluster.pending_tasks` → `RestClusterPendingTasksAction`
 - `ingest.put_pipeline` → `RestIngestPutPipelineAction`
 - `search` (top-level) → `RestSearchAction`
 - `indices.put_mapping` → `RestIndicesPutMappingAction`
@@ -522,7 +522,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 
 2. **`indices.get`** — `GET /{index}`, `HEAD /{index}`. Path param, query params (`flat_settings`, `include_defaults`, `local`, `features`). Response: `GetIndexResponse`. Listener: `RestToXContentListener`. Tests HEAD method support and multiple routes for same endpoint.
 
-3. **`cluster.get_settings`** — `GET /_cluster/settings`. No path params, query params (`flat_settings`, `include_defaults`, `master_timeout`, `timeout`). Response: `ClusterGetSettingsResponse`. Listener: `RestToXContentListener`. Tests a different namespace (cluster) and exercises `responseParams()` — `flat_settings` and `include_defaults` are response params that affect response serialization, not request preparation.
+3. **`cluster.pending_tasks`** — `GET /_cluster/pending_tasks`. No path params, query params (`local`, `master_timeout`). Response: `PendingClusterTasksResponse`. Listener: `RestToXContentListener`. Tests a different namespace (cluster), simple parameter set, no special method overrides.
 
 ### Implementation Tasks
 
@@ -553,7 +553,6 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 #### Task 1.4: Add Server-Side Annotations to PoC Endpoints in the Spec
 
 - In the `elasticsearch-specification` repo, add the `@server_transport_action` JSDoc tag to the TypeScript request definitions for the 3 PoC endpoints.
-- For `cluster.get_settings`, also add `@server_response_params flat_settings,include_defaults`.
 - Extend the spec compiler to parse all server-side tags (`@server_transport_action`, `@server_capabilities`, `@server_allow_system_index_access`, `@server_response_params`) and include them as fields on the endpoint object in `schema.json`.
 - Regenerate `schema.json` and verify the fields appear correctly.
 - Copy the regenerated `schema.json` to the vendored location in the `elasticsearch` repo: `rest-api-spec/src/main/resources/schema/schema.json`.
@@ -596,7 +595,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 #### Task 1.9: Handle Optional Method Overrides (`responseParams`, `supportedCapabilities`, `allowSystemIndexAccessByDefault`)
 
 - In `HandlerCodeEmitter`, generate conditional overrides based on spec fields:
-  - **`responseParams()`**: if the endpoint has `responseParams` in the spec, generate an override returning `Set.of(...)` with the listed parameter names. These are query parameters consumed during response serialization rather than request preparation. `BaseRestHandler` accepts both `supportedQueryParameters()` and `responseParams()` when checking for unrecognized parameters, so response params need only be in the `responseParams()` set — they should NOT be duplicated into `supportedQueryParameters()`. For the PoC, `cluster.get_settings` has `responseParams: ["flat_settings", "include_defaults"]` — this is our test case.
+  - **`responseParams()`**: if the endpoint has `responseParams` in the spec, generate an override returning `Set.of(...)` with the listed parameter names. These are query parameters consumed during response serialization rather than request preparation. `BaseRestHandler` accepts both `supportedQueryParameters()` and `responseParams()` when checking for unrecognized parameters, so response params need only be in the `responseParams()` set — they should NOT be duplicated into `supportedQueryParameters()`. Not exercised by the PoC endpoints, but needed for later migrations (e.g. `cluster.get_settings`).
   - **`supportedCapabilities()`**: if the endpoint has `capabilities` in the spec, generate an override returning `Set.of(...)` with the listed capability strings.
   - **`allowSystemIndexAccessByDefault()`**: if the endpoint has `allowSystemIndexAccess: true`, generate an override returning `true`.
   - If none of these fields are present, no overrides are generated (the defaults from `BaseRestHandler`/`RestHandler` apply).
@@ -627,7 +626,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 
 - Generator Gradle task runs successfully as part of the build.
 - Generated handlers compile without manual edits.
-- All existing YAML REST tests for `indices.delete`, `indices.get`, and `cluster.get_settings` pass with the generated handlers.
+- All existing YAML REST tests for `indices.delete`, `indices.get`, and `cluster.pending_tasks` pass with the generated handlers.
 - Generated code is readable and follows Elasticsearch code conventions.
 
 ---
