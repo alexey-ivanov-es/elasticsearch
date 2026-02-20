@@ -143,6 +143,12 @@ Some handlers override `allowSystemIndexAccessByDefault()` (defined on `RestHand
 
 The generator must emit an `allowSystemIndexAccessByDefault()` override returning `true` when the spec indicates it. The spec should be extended with an `allowSystemIndexAccess: true` boolean on the endpoint object. For the PoC, the 3 chosen endpoints do NOT override this method, so this is not needed immediately but should be handled before wider migration.
 
+### Circuit Breaker
+
+Some handlers override `canTripCircuitBreaker()` (defined on `RestHandler` interface, default returns `true`). When `false`, the request is not counted against the in-flight request circuit breaker (e.g. for read-only or lightweight admin APIs). Examples: `cluster.health`, `cluster.get_settings`, `cluster.pending_tasks`.
+
+The generator must emit a `canTripCircuitBreaker()` override returning `false` when the spec indicates it. The spec should be extended with a `canTripCircuitBreaker: false` boolean on the endpoint object. When absent or `true`, no override is generated (the interface default applies).
+
 ### Transport Action Dispatch
 
 Generated handlers **always** use `client.execute(TransportXxxAction.TYPE, actionRequest, listener)`. The `TYPE` is a static `ActionType` constant on the transport action class. The generator needs the fully qualified transport action class name to reference this constant. This choice is intentional for consistency and to derive the action type from the transport action at generation time. Some existing hand-written handlers use the client facade (e.g. `client.admin().indices().delete(...)`); when those are replaced by generated handlers, dispatch will switch to the `client.execute(..., TYPE, ...)` pattern.
@@ -179,6 +185,7 @@ Several more optional fields are needed on the endpoint object in `schema.json` 
 
 - **`capabilities`** (array of strings, optional): the set of capability strings this handler advertises via `supportedCapabilities()`. Example: `"capabilities": ["search_query_rules"]`. When absent or empty, the default `Set.of()` is used.
 - **`allowSystemIndexAccess`** (boolean, optional, default `false`): when `true`, the generated handler overrides `allowSystemIndexAccessByDefault()` to return `true`.
+- **`canTripCircuitBreaker`** (boolean, optional): when `false`, the generated handler overrides `canTripCircuitBreaker()` to return `false`. When absent or `true`, no override is generated (the `RestHandler` default is `true`).
 - **`responseParams`** (array of strings, optional): query parameter names that are consumed during response serialization rather than during request preparation. These go into the generated `responseParams()` override. Example: `"responseParams": ["flat_settings", "include_defaults"]`. The parameters listed here are still part of the endpoint's query params in the spec, but the generator must route them to `responseParams()` and exclude them from `supportedQueryParameters()`. When absent or empty, no `responseParams()` override is generated.
 
 These are expressed as JSDoc tags in the TypeScript spec:
@@ -189,6 +196,7 @@ These are expressed as JSDoc tags in the TypeScript spec:
  * @server_transport_action org.elasticsearch.action.search.TransportSearchAction
  * @server_capabilities search_query_rules,search_phase_took
  * @server_allow_system_index_access false
+ * @server_can_trip_circuit_breaker false
  * @server_response_params typed_keys,rest_total_hits_as_int
  */
 ```
@@ -201,7 +209,8 @@ The `elasticsearch-specification` compiler needs changes to parse new JSDoc tags
 1. `@server_transport_action` → `serverTransportAction` string field on the endpoint object. Optional — endpoints without it are skipped by the generator.
 2. `@server_capabilities` → `capabilities` array of strings on the endpoint object. Optional.
 3. `@server_allow_system_index_access` → `allowSystemIndexAccess` boolean on the endpoint object. Optional, defaults to `false`.
-4. `@server_response_params` → `responseParams` array of strings on the endpoint object. Optional.
+4. `@server_can_trip_circuit_breaker` → `canTripCircuitBreaker` boolean on the endpoint object. Optional; when `false`, the generator emits `canTripCircuitBreaker()` returning `false`.
+5. `@server_response_params` → `responseParams` array of strings on the endpoint object. Optional.
 
 For the PoC, add this tag to the 3 phase-1 endpoints and the 3 phase-2 endpoints in the TypeScript spec. After regenerating `schema.json` in the `elasticsearch-specification` repo, copy the result to the vendored location in the `elasticsearch` repo (`rest-api-spec/src/main/resources/schema/schema.json`).
 
@@ -541,7 +550,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 #### Task 1.2: Define the Data Model
 
 - Create Java records (or classes) mirroring the schema.json structure: `Schema`, `Endpoint`, `UrlPattern`, `TypeDefinition`, `Property`, `TypeDescriptor`, `Body`, `Availability`, `AvailabilityDetail`, `TypeReference`.
-- The `Endpoint` record must include the server-side extension fields: `serverTransportAction` (String, nullable), `capabilities` (List<String>, nullable), `allowSystemIndexAccess` (boolean, default false), `responseParams` (List<String>, nullable).
+- The `Endpoint` record must include the server-side extension fields: `serverTransportAction` (String, nullable), `capabilities` (List<String>, nullable), `allowSystemIndexAccess` (boolean, default false), `canTripCircuitBreaker` (boolean, nullable), `responseParams` (List<String>, nullable).
 - These are internal to the generator — they don't need to be part of the Elasticsearch server runtime.
 
 #### Task 1.3: Implement Schema Parser
@@ -553,7 +562,7 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 #### Task 1.4: Add Server-Side Annotations to PoC Endpoints in the Spec
 
 - In the `elasticsearch-specification` repo, add the `@server_transport_action` JSDoc tag to the TypeScript request definitions for the 3 PoC endpoints.
-- Extend the spec compiler to parse all server-side tags (`@server_transport_action`, `@server_capabilities`, `@server_allow_system_index_access`, `@server_response_params`) and include them as fields on the endpoint object in `schema.json`.
+- Extend the spec compiler to parse all server-side tags (`@server_transport_action`, `@server_capabilities`, `@server_allow_system_index_access`, `@server_can_trip_circuit_breaker`, `@server_response_params`) and include them as fields on the endpoint object in `schema.json`.
 - Regenerate `schema.json` and verify the fields appear correctly.
 - Copy the regenerated `schema.json` to the vendored location in the `elasticsearch` repo: `rest-api-spec/src/main/resources/schema/schema.json`.
 
@@ -592,17 +601,19 @@ Endpoints that use only GET, DELETE, or HEAD methods, have NO request body (`bod
 - Add a `@Generated` annotation or file header comment marking the file as generated.
 - **Also generate `GeneratedRestHandlerRegistry`**: a single class with a static `registerHandlers()` method that instantiates and registers every generated handler. This class is regenerated on every run, reflecting the current set of generated endpoints.
 
-#### Task 1.9: Handle Optional Method Overrides (`responseParams`, `supportedCapabilities`, `allowSystemIndexAccessByDefault`)
+#### Task 1.9: Handle Optional Method Overrides (`responseParams`, `supportedCapabilities`, `allowSystemIndexAccessByDefault`, `canTripCircuitBreaker`)
 
 - In `HandlerCodeEmitter`, generate conditional overrides based on spec fields:
   - **`responseParams()`**: if the endpoint has `responseParams` in the spec, generate an override returning `Set.of(...)` with the listed parameter names. These are query parameters consumed during response serialization rather than request preparation. `BaseRestHandler` accepts both `supportedQueryParameters()` and `responseParams()` when checking for unrecognized parameters, so response params need only be in the `responseParams()` set — they should NOT be duplicated into `supportedQueryParameters()`. Not exercised by the PoC endpoints, but needed for later migrations (e.g. `cluster.get_settings`).
   - **`supportedCapabilities()`**: if the endpoint has `capabilities` in the spec, generate an override returning `Set.of(...)` with the listed capability strings.
   - **`allowSystemIndexAccessByDefault()`**: if the endpoint has `allowSystemIndexAccess: true`, generate an override returning `true`.
+  - **`canTripCircuitBreaker()`**: if the endpoint has `canTripCircuitBreaker: false`, generate an override returning `false`. When absent or true, no override is generated (the `RestHandler` default is `true`).
   - If none of these fields are present, no overrides are generated (the defaults from `BaseRestHandler`/`RestHandler` apply).
 - Add unit tests verifying that:
   - An endpoint with `responseParams` produces the correct `responseParams()` override, and those params are excluded from `supportedQueryParameters()`.
   - An endpoint with `capabilities` produces the correct `supportedCapabilities()` override.
   - An endpoint with `allowSystemIndexAccess: true` produces the correct override.
+  - An endpoint with `canTripCircuitBreaker: false` produces the correct override.
   - An endpoint without any of these produces no overrides.
 
 #### Task 1.10: Add `fromRestRequest()` to PoC ActionRequests
@@ -958,7 +969,7 @@ After generating handlers, validate that:
 
 ### Per-Endpoint Migration Checklist
 
-1. Add server-side annotations to the endpoint's request definition in the TypeScript spec: `@server_transport_action` (required), plus `@server_response_params`, `@server_capabilities`, `@server_allow_system_index_access` as needed. Regenerate `schema.json` and copy to the vendored location in the elasticsearch repo.
+1. Add server-side annotations to the endpoint's request definition in the TypeScript spec: `@server_transport_action` (required), plus `@server_response_params`, `@server_capabilities`, `@server_allow_system_index_access`, `@server_can_trip_circuit_breaker` as needed. Regenerate `schema.json` and copy to the vendored location in the elasticsearch repo.
 2. Add `fromRestRequest()` to the ActionRequest class (refactor from existing handler).
 3. Run YAML REST tests to verify refactoring.
 4. Enable generation for this endpoint (the generator picks it up automatically from the `serverTransportAction` field in schema.json). The `GeneratedRestHandlerRegistry` is regenerated to include the new handler.

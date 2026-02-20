@@ -49,7 +49,17 @@ If the hand-written handler overrides `allowSystemIndexAccessByDefault()` to ret
 
 Omit this tag (or use `false`) for endpoints that do not allow system index access by default.
 
-### 1.4 Optional: response params (field-level)
+### 1.4 Optional: can trip circuit breaker
+
+If the hand-written handler overrides `canTripCircuitBreaker()` to return `false` (so the request is not counted against the in-flight circuit breaker), add:
+
+```ts
+ * @server_can_trip_circuit_breaker false
+```
+
+Omit this tag (or use `true`) for endpoints that use the default (`true`). The generator only emits an override when the value is `false`.
+
+### 1.5 Optional: response params (field-level)
 
 Some query parameters are **not** consumed when building the `ActionRequest`; they are only used when serializing the response (e.g. `flat_settings`, `include_defaults`). For such parameters:
 
@@ -72,7 +82,7 @@ Some query parameters are **not** consumed when building the `ActionRequest`; th
 
 - In the **ActionRequest’s `fromRestRequest()`**, do **not** read or use that parameter; the response layer will read it when rendering the response.
 
-### 1.5 HTTP methods (including HEAD for “exists” APIs)
+### 1.6 HTTP methods (including HEAD for “exists” APIs)
 
 The generator emits one `Route(method, path)` per (method, path) pair from the spec’s `urls`. If the same path is used for both “get” and “exists” (e.g. GET returns body, HEAD returns only status), **both methods must be listed** in the spec:
 
@@ -158,6 +168,7 @@ Temporarily change the **existing** hand-written handler to call `XxxRequest.fro
 - [ ] **Spec**: `@server_transport_action` added (required).
 - [ ] **Spec**: `@server_capabilities` added if the handler advertises capabilities.
 - [ ] **Spec**: `@server_allow_system_index_access true` added if the handler allows system index access by default.
+- [ ] **Spec**: `@server_can_trip_circuit_breaker false` added if the handler overrides `canTripCircuitBreaker()` to return `false`.
 - [ ] **Spec**: For params used only in response serialization, add `@server_response_param` on the **field** in the request’s query parameters.
 - [ ] **Spec**: If the endpoint serves both GET and HEAD (e.g. indices.get / indices.exists), set `methods: ['GET', 'HEAD']` in `urls`.
 - [ ] **Schema**: Regenerated from spec and copied to `rest-api-spec/src/main/resources/schema/schema.json`.
@@ -169,6 +180,6 @@ Temporarily change the **existing** hand-written handler to call `XxxRequest.fro
 
 ## References
 
-- **Project plan**: [es-rest-handler-codegen-plan.md](es-rest-handler-codegen-plan.md) — schema layout, `BaseRestHandler` contract, response params, capabilities, allowSystemIndexAccess, naming, generator architecture.
+- **Project plan**: [es-rest-handler-codegen-plan.md](es-rest-handler-codegen-plan.md) — schema layout, `BaseRestHandler` contract, response params, capabilities, allowSystemIndexAccess, canTripCircuitBreaker, naming, generator architecture.
 - **Schema regeneration**: [README](README.md), `elasticsearch-specification/README.md`.
 - **Changed files**: [CHANGED-FILES.md](CHANGED-FILES.md) — list of files touched by this project (update when you change/remove handlers or spec).

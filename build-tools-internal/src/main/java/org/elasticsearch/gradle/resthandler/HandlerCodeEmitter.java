@@ -119,6 +119,7 @@ public final class HandlerCodeEmitter {
         List<String> capabilitiesList = endpoint.capabilities() != null ? endpoint.capabilities() : List.of();
         boolean hasCapabilities = capabilitiesList.isEmpty() == false;
         boolean allowSystemIndexAccess = Boolean.TRUE.equals(endpoint.allowSystemIndexAccess());
+        boolean canTripCircuitBreaker = Boolean.FALSE.equals(endpoint.canTripCircuitBreaker());
 
         CodeBlock listenerNew = buildListenerInstantiation(listenerType, listenerClass, responseClass);
         MethodSpec prepareRequestMethod = MethodSpec.methodBuilder("prepareRequest")
@@ -158,6 +159,9 @@ public final class HandlerCodeEmitter {
         }
         if (allowSystemIndexAccess) {
             typeBuilder.addMethod(buildAllowSystemIndexAccessByDefaultMethod());
+        }
+        if (canTripCircuitBreaker) {
+            typeBuilder.addMethod(buildCanTripCircuitBreakerMethod());
         }
         typeBuilder.addMethod(prepareRequestMethod);
 
@@ -276,6 +280,15 @@ public final class HandlerCodeEmitter {
             .addModifiers(Modifier.PUBLIC)
             .returns(boolean.class)
             .addStatement("return true")
+            .build();
+    }
+
+    private static MethodSpec buildCanTripCircuitBreakerMethod() {
+        return MethodSpec.methodBuilder("canTripCircuitBreaker")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(boolean.class)
+            .addStatement("return false")
             .build();
     }
 

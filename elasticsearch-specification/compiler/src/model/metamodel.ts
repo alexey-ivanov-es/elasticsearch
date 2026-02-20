@@ -495,6 +495,11 @@ export class Endpoint {
   allowSystemIndexAccess?: boolean
 
   /**
+   * When false, the generated handler overrides canTripCircuitBreaker() to return false.
+   */
+  canTripCircuitBreaker?: boolean
+
+  /**
    * Query parameter names consumed during response serialization (e.g. flat_settings, include_defaults).
    * These are emitted in responseParams() and excluded from supportedQueryParameters().
    */

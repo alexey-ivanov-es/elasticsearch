@@ -29,5 +29,6 @@ public record Endpoint(
     @JsonProperty("serverTransportAction") String serverTransportAction,
     @JsonProperty("capabilities") List<String> capabilities,
     @JsonProperty("allowSystemIndexAccess") Boolean allowSystemIndexAccess,
+    @JsonProperty("canTripCircuitBreaker") Boolean canTripCircuitBreaker,
     @JsonProperty("responseParams") List<String> responseParams
 ) {}

@@ -45,7 +45,7 @@ public class HandlerCodeEmitterTests {
         List<UrlPattern> urls,
         Availability availability
     ) {
-        return endpoint(name, urls, availability, null, null, null);
+        return endpoint(name, urls, availability, null, null, null, null);
     }
 
     private static Endpoint endpoint(
@@ -54,6 +54,7 @@ public class HandlerCodeEmitterTests {
         Availability availability,
         List<String> capabilities,
         Boolean allowSystemIndexAccess,
+        Boolean canTripCircuitBreaker,
         List<String> responseParams
     ) {
         return new Endpoint(
@@ -68,6 +69,7 @@ public class HandlerCodeEmitterTests {
             "org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction",
             capabilities,
             allowSystemIndexAccess,
+            canTripCircuitBreaker,
             responseParams
         );
     }
@@ -223,6 +225,7 @@ public class HandlerCodeEmitterTests {
             null,
             null,
             null,
+            null,
             List.of("flat_settings", "include_defaults")
         );
         TypeDefinition requestType = new TypeDefinition(
@@ -278,6 +281,7 @@ public class HandlerCodeEmitterTests {
             null,
             List.of("search_query_rules", "search_phase_took"),
             null,
+            null,
             null
         );
         ResolvedTransportAction resolved = new ResolvedTransportAction(
@@ -305,6 +309,7 @@ public class HandlerCodeEmitterTests {
             null,
             null,
             true,
+            null,
             null
         );
         ResolvedTransportAction resolved = new ResolvedTransportAction(
@@ -321,6 +326,33 @@ public class HandlerCodeEmitterTests {
         String source = javaFile.toString();
         assertTrue("Should override allowSystemIndexAccessByDefault()", source.contains("allowSystemIndexAccessByDefault()"));
         assertTrue("Should return true", source.contains("return true"));
+    }
+
+    @Test
+    public void emitWithCanTripCircuitBreakerFalseProducesOverride() {
+        Endpoint endpoint = endpoint(
+            "indices.delete",
+            List.of(new UrlPattern("/{index}", List.of("DELETE"))),
+            null,
+            null,
+            null,
+            false,
+            null
+        );
+        ResolvedTransportAction resolved = new ResolvedTransportAction(
+            FakeTransportAction.class,
+            FakeRequest.class,
+            FakeResponse.class,
+            FakeTransportAction.class,
+            "TYPE"
+        );
+        RestListenerType listenerType = RestListenerType.DEFAULT;
+
+        com.squareup.javapoet.JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, null, resolved, listenerType);
+
+        String source = javaFile.toString();
+        assertTrue("Should override canTripCircuitBreaker()", source.contains("canTripCircuitBreaker()"));
+        assertTrue("Should return false", source.contains("return false"));
     }
 
     @Test
@@ -348,6 +380,10 @@ public class HandlerCodeEmitterTests {
         assertFalse(
             "Should not override allowSystemIndexAccessByDefault",
             source.contains("allowSystemIndexAccessByDefault()")
+        );
+        assertFalse(
+            "Should not override canTripCircuitBreaker",
+            source.contains("canTripCircuitBreaker()")
         );
     }
 
