@@ -151,7 +151,7 @@ The generator must emit a `canTripCircuitBreaker()` override returning `false` w
 
 ### Transport Action Dispatch
 
-Generated handlers **always** use `client.execute(TransportXxxAction.TYPE, actionRequest, listener)`. The `TYPE` is a static `ActionType` constant on the transport action class. The generator needs the fully qualified transport action class name to reference this constant. This choice is intentional for consistency and to derive the action type from the transport action at generation time. Some existing hand-written handlers use the client facade (e.g. `client.admin().indices().delete(...)`); when those are replaced by generated handlers, dispatch will switch to the `client.execute(..., TYPE, ...)` pattern.
+Generated handlers use `client.execute(TransportXxxAction.TYPE, actionRequest, listener)` unless the request type implements **`CancellableActionRequest`** (see Phase 4a). In that case the generator wraps the client in `RestCancellableNodeClient(client, request.getHttpChannel())` before calling `execute(...)` so that closing the HTTP channel cancels the in-flight request. The `TYPE` is a static `ActionType` constant on the transport action class. The generator needs the fully qualified transport action class name to reference this constant. This choice is intentional for consistency and to derive the action type from the transport action at generation time. Some existing hand-written handlers use the client facade (e.g. `client.admin().indices().delete(...)`); when those are replaced by generated handlers, dispatch will switch to the `client.execute(..., TYPE, ...)` pattern.
 
 ---
 
@@ -883,20 +883,18 @@ Good candidates will be apparent after implementing 3a and 3b — they'll be the
 
 ## 12. Phase 4: Complex and Special Cases
 
-### Phase 4a: Cancellable Endpoints
+### Phase 4a: Cancellable Endpoints (implemented)
 
-Some long-running endpoints wrap the `NodeClient` in `RestCancellableNodeClient` so the request can be cancelled when the HTTP connection is closed. The generator needs to support this.
+Some endpoints wrap the `NodeClient` in `RestCancellableNodeClient` so the request can be cancelled when the HTTP connection is closed. The generator supports this via a **marker interface on the ActionRequest**.
 
-**Trigger**: a new spec annotation on the endpoint (e.g. `@cancellable true`) or derived from endpoint characteristics (long-running operations).
+- **Marker interface**: `CancellableActionRequest` (`org.elasticsearch.rest.action.CancellableActionRequest`). ActionRequest types that support REST cancellation implement this (no methods). Implementations must ensure {@code createTask(...)} returns a {@code CancellableTask} so that cancellation can be propagated.
+- **Resolution**: At generation time, `CancellableActionRequestResolver.isCancellable(requestClass)` checks whether the request class implements this interface (via classloader-by-name, so build-tools-internal does not depend on server).
+- **Generated code**: When the request is cancellable, the generator emits:
+  `return channel -> new RestCancellableNodeClient(client, request.getHttpChannel()).execute(TYPE, actionRequest, listener);`
+  instead of `return channel -> client.execute(TYPE, actionRequest, listener);`
+- **Migration**: If the hand-written handler uses `RestCancellableNodeClient`, add `implements CancellableActionRequest` to the ActionRequest class so the generated handler preserves the behaviour. No spec annotation is required.
 
-**Code change**: instead of `client.execute(TYPE, request, listener)`, generate:
-
-```java
-RestCancellableNodeClient cancelClient = new RestCancellableNodeClient(client, request.getHttpChannel());
-cancelClient.execute(TYPE, actionRequest, listener);
-```
-
-**PoC**: `_search`, `_cluster/health`
+**Examples**: `cluster.health` (`ClusterHealthRequest` implements `CancellableActionRequest`), `_search`, and other long-running or cancellable operations.
 
 ### Phase 4b: Custom Response Handling
 

@@ -76,17 +76,19 @@ public final class HandlerCodeEmitter {
     /**
      * Generate a Java source file for the given endpoint and resolved action/listener.
      *
-     * @param endpoint         the API endpoint from the spec
-     * @param requestType      the request type definition (for query param names); may be null
-     * @param resolvedAction   the resolved transport action and request/response classes
-     * @param listenerType the resolved response listener type
+     * @param endpoint               the API endpoint from the spec
+     * @param requestType            the request type definition (for query param names); may be null
+     * @param resolvedAction         the resolved transport action and request/response classes
+     * @param listenerType           the resolved response listener type
+     * @param useRestCancellableClient when true, wrap client in RestCancellableNodeClient before execute
      * @return a JavaFile ready to write to disk
      */
     public static JavaFile emit(
         Endpoint endpoint,
         TypeDefinition requestType,
         ResolvedTransportAction resolvedAction,
-        RestListenerType listenerType
+        RestListenerType listenerType,
+        boolean useRestCancellableClient
     ) {
         String packageName = packageForTransportAction(resolvedAction.transportActionClass().getName());
         String handlerClassName = handlerClassName(endpoint.name());
@@ -103,6 +105,7 @@ public final class HandlerCodeEmitter {
         ClassName actionTypeClass = classNameFromFqn(resolvedAction.actionTypeReferenceClass().getName());
         ClassName listenerClass = listenerType.getClassName();
         ClassName responseClass = classNameFromFqn(resolvedAction.responseClass().getName());
+        ClassName restCancellableNodeClient = ClassName.get("org.elasticsearch.rest.action", "RestCancellableNodeClient");
 
         MethodSpec routesMethod = buildRoutesMethod(endpoint, route, restRequestMethod);
         MethodSpec getNameMethod = MethodSpec.methodBuilder("getName")
@@ -122,21 +125,17 @@ public final class HandlerCodeEmitter {
         boolean canTripCircuitBreaker = Boolean.FALSE.equals(endpoint.canTripCircuitBreaker());
 
         CodeBlock listenerNew = buildListenerInstantiation(listenerType, listenerClass, responseClass);
-        MethodSpec prepareRequestMethod = MethodSpec.methodBuilder("prepareRequest")
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(restChannelConsumer)
-            .addParameter(restRequest, "request")
-            .addParameter(nodeClient, "client")
-            .addException(IOException.class)
-            .addStatement("$T actionRequest = $T.fromRestRequest(request)", requestClass, requestClass)
-            .addStatement(
-                "return channel -> client.execute($T.$L, actionRequest, $L)",
-                actionTypeClass,
-                resolvedAction.actionTypeReferenceField(),
-                listenerNew
-            )
-            .build();
+        MethodSpec prepareRequestMethod = buildPrepareRequestMethod(
+            restChannelConsumer,
+            restRequest,
+            nodeClient,
+            requestClass,
+            actionTypeClass,
+            resolvedAction.actionTypeReferenceField(),
+            listenerNew,
+            useRestCancellableClient,
+            restCancellableNodeClient
+        );
 
         TypeSpec.Builder typeBuilder = TypeSpec.classBuilder(handlerClassName)
             .addModifiers(Modifier.PUBLIC)
@@ -323,6 +322,44 @@ public final class HandlerCodeEmitter {
             case "HEAD" -> "HEAD";
             default -> "GET";
         };
+    }
+
+    private static MethodSpec buildPrepareRequestMethod(
+        ClassName restChannelConsumer,
+        ClassName restRequest,
+        ClassName nodeClient,
+        ClassName requestClass,
+        ClassName actionTypeClass,
+        String actionTypeReferenceField,
+        CodeBlock listenerNew,
+        boolean useRestCancellableClient,
+        ClassName restCancellableNodeClient
+    ) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("prepareRequest")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(restChannelConsumer)
+            .addParameter(restRequest, "request")
+            .addParameter(nodeClient, "client")
+            .addException(IOException.class)
+            .addStatement("$T actionRequest = $T.fromRestRequest(request)", requestClass, requestClass);
+        if (useRestCancellableClient) {
+            builder.addStatement(
+                "return channel -> new $T(client, request.getHttpChannel()).execute($T.$L, actionRequest, $L)",
+                restCancellableNodeClient,
+                actionTypeClass,
+                actionTypeReferenceField,
+                listenerNew
+            );
+        } else {
+            builder.addStatement(
+                "return channel -> client.execute($T.$L, actionRequest, $L)",
+                actionTypeClass,
+                actionTypeReferenceField,
+                listenerNew
+            );
+        }
+        return builder.build();
     }
 
     private static CodeBlock buildListenerInstantiation(RestListenerType listenerType, ClassName listenerClass, ClassName responseClass) {

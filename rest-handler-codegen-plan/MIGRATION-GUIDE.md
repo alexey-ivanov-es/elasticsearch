@@ -139,7 +139,17 @@ If the hand-written handler passes a **status method reference** to the listener
 
 If you omit this, the generated handler will use `RestToXContentListener<>(channel)` and the response will always be HTTP 200.
 
-### 2.4 Verify the refactor
+### 2.4 ActionRequest and `CancellableActionRequest` (when the handler uses `RestCancellableNodeClient`)
+
+If the hand-written handler wraps the client in **`RestCancellableNodeClient`** (e.g. so that closing the HTTP connection cancels the request), the **ActionRequest** class must implement the marker interface **`CancellableActionRequest`** (`org.elasticsearch.rest.action.CancellableActionRequest`).
+
+- **Interface**: `CancellableActionRequest` is a marker (no methods). It indicates that the request supports being cancelled when the REST channel is closed. Implementations must ensure that {@code createTask(...)} returns a {@code CancellableTask} so that cancellation can be propagated.
+- **ActionRequest**: Add `implements CancellableActionRequest` to the request class.
+- The code generator’s `CancellableActionRequestResolver` checks for this interface at generation time; when present, it emits `new RestCancellableNodeClient(client, request.getHttpChannel()).execute(...)` instead of `client.execute(...)`.
+
+If you omit this, the generated handler will use the plain `client` and the request will not be cancelled when the client disconnects.
+
+### 2.5 Verify the refactor
 
 Temporarily change the **existing** hand-written handler to call `XxxRequest.fromRestRequest(request)` instead of inlining the logic. Run the relevant YAML REST tests to confirm behavior is unchanged.
 
@@ -184,6 +194,7 @@ Temporarily change the **existing** hand-written handler to call `XxxRequest.fro
 - [ ] **Schema**: Regenerated from spec and copied to `rest-api-spec/src/main/resources/schema/schema.json`.
 - [ ] **ActionRequest**: `fromRestRequest(RestRequest)` implemented; every **supported** (non–response) param is **consumed** (read) — no `hasParam()`-only checks; use `RestUtils.consumeDeprecatedLocalParameter(request)` for `local` where applicable; response params are not read.
 - [ ] **ActionResponse**: If the hand-written handler uses a listener with `::status` (e.g. `RestToXContentListener<>(channel, XxxResponse::status)`), the response class implements `RestStatusProvider` so the generator emits the same pattern.
+- [ ] **ActionRequest**: If the hand-written handler uses `RestCancellableNodeClient`, the request class implements `CancellableActionRequest` so the generator wraps the client and preserves cancellation on disconnect.
 - [ ] **Handler**: Hand-written handler removed from source; its registration removed from `ActionModule.initRestHandlers()`.
 - [ ] **Tests**: YAML REST tests for the endpoint pass with the generated handler.
 

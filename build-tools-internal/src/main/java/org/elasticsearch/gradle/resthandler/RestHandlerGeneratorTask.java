@@ -130,8 +130,15 @@ public abstract class RestHandlerGeneratorTask extends DefaultTask {
                 try {
                     ResolvedTransportAction resolvedAction = TransportActionResolver.resolve(transportAction, loader);
                     RestListenerType listenerType = ListenerResolver.resolve(resolvedAction.responseClass());
+                    boolean useRestCancellableClient = CancellableActionRequestResolver.isCancellable(resolvedAction.requestClass());
                     org.elasticsearch.gradle.resthandler.model.TypeDefinition requestType = parsed.getRequestType(endpoint);
-                    JavaFile javaFile = HandlerCodeEmitter.emit(endpoint, requestType, resolvedAction, listenerType);
+                    JavaFile javaFile = HandlerCodeEmitter.emit(
+                        endpoint,
+                        requestType,
+                        resolvedAction,
+                        listenerType,
+                        useRestCancellableClient
+                    );
                     Path writtenPath = javaFile.writeToPath(outputPath);
                     generatedPaths.add(canonical(writtenPath));
                     String packageName = HandlerCodeEmitter.packageForTransportAction(resolvedAction.transportActionClass().getName());
