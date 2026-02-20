@@ -415,9 +415,10 @@ public final class HandlerCodeEmitter {
 
     /**
      * All parameter names the handler must declare as supported so that consumed params match
-     * (BaseRestHandler assertion). Includes: query params from spec, path params, and when the
-     * request has an "index" path param, the IndicesOptions query params consumed by
-     * IndicesOptions.fromRequest() (allow_no_indices, ignore_unavailable, ignore_throttled).
+     * (BaseRestHandler assertion). Includes only query params and path params from the spec.
+     * Do not add IndicesOptions params (allow_no_indices, ignore_unavailable, ignore_throttled)
+     * unless the spec declares them; endpoints that use IndicesOptions.fromRequest() must
+     * declare those query parameters in the TypeScript spec.
      */
     private static Set<String> allSupportedParamNames(TypeDefinition requestType) {
         Set<String> names = new TreeSet<>();
@@ -427,21 +428,12 @@ public final class HandlerCodeEmitter {
         if (requestType.query() != null) {
             requestType.query().stream().map(p -> p.name()).filter(n -> n != null).forEach(names::add);
         }
-        boolean hasIndexPath = false;
         if (requestType.path() != null) {
             for (var p : requestType.path()) {
                 if (p.name() != null) {
                     names.add(p.name());
-                    if ("index".equals(p.name())) {
-                        hasIndexPath = true;
-                    }
                 }
             }
-        }
-        if (hasIndexPath) {
-            names.add("allow_no_indices");
-            names.add("ignore_throttled");
-            names.add("ignore_unavailable");
         }
         return names;
     }
