@@ -13,8 +13,11 @@ import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.support.master.MasterNodeReadRequest;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.rest.RestRequest;
 
 import java.io.IOException;
+
+import static org.elasticsearch.rest.RestUtils.getMasterNodeTimeout;
 
 public class PendingClusterTasksRequest extends MasterNodeReadRequest<PendingClusterTasksRequest> {
 
@@ -24,6 +27,15 @@ public class PendingClusterTasksRequest extends MasterNodeReadRequest<PendingClu
 
     public PendingClusterTasksRequest(StreamInput in) throws IOException {
         super(in);
+    }
+
+    /**
+     * Create a request from a REST request. Used by the REST handler and by generated handlers.
+     */
+    public static PendingClusterTasksRequest fromRestRequest(RestRequest request) {
+        PendingClusterTasksRequest r = new PendingClusterTasksRequest(getMasterNodeTimeout(request));
+        r.local(request.paramAsBoolean("local", r.local()));
+        return r;
     }
 
     @Override
