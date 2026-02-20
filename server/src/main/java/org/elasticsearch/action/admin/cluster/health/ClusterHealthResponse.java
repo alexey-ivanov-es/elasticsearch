@@ -21,6 +21,7 @@ import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.rest.action.RestStatusProvider;
 import org.elasticsearch.xcontent.ToXContentObject;
 import org.elasticsearch.xcontent.XContentBuilder;
 
@@ -29,7 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class ClusterHealthResponse extends ActionResponse implements ToXContentObject {
+public class ClusterHealthResponse extends ActionResponse implements ToXContentObject, RestStatusProvider {
     static final String CLUSTER_NAME = "cluster_name";
     static final String STATUS = "status";
     static final String TIMED_OUT = "timed_out";
@@ -252,6 +253,7 @@ public class ClusterHealthResponse extends ActionResponse implements ToXContentO
         return Strings.toString(this);
     }
 
+    @Override
     public RestStatus status() {
         return isTimedOut() ? RestStatus.REQUEST_TIMEOUT : RestStatus.OK;
     }

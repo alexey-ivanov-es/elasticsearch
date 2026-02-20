@@ -10,17 +10,14 @@
 package org.elasticsearch.rest.action.admin.cluster;
 
 import org.elasticsearch.action.ClusterStatsLevel;
-import org.elasticsearch.action.NodeStatsLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.support.ActiveShardCount;
-import org.elasticsearch.client.internal.node.NodeClient;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.Priority;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.test.ESTestCase;
 import org.elasticsearch.test.rest.FakeRestRequest;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +25,6 @@ import static org.elasticsearch.rest.RestUtils.REST_MASTER_TIMEOUT_PARAM;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.object.HasToString.hasToString;
-import static org.mockito.Mockito.mock;
 
 public class RestClusterHealthActionTests extends ESTestCase {
 
@@ -61,7 +57,7 @@ public class RestClusterHealthActionTests extends ESTestCase {
         params.put("wait_for_events", waitForEvents.name());
 
         FakeRestRequest restRequest = buildRestRequest(params);
-        ClusterHealthRequest clusterHealthRequest = RestClusterHealthAction.fromRequest(restRequest);
+        ClusterHealthRequest clusterHealthRequest = ClusterHealthRequest.fromRestRequest(restRequest);
         assertThat(clusterHealthRequest.indices().length, equalTo(1));
         assertThat(clusterHealthRequest.indices()[0], equalTo(index));
         assertThat(clusterHealthRequest.local(), equalTo(local));
@@ -76,40 +72,26 @@ public class RestClusterHealthActionTests extends ESTestCase {
 
     }
 
-    public void testLevelValidation() throws IOException {
-        RestClusterHealthAction action = new RestClusterHealthAction();
+    /**
+     * Level is a response param; fromRestRequest does not read or validate it.
+     * Valid levels are validated when the response is serialized (ClusterStatsLevel.of).
+     */
+    public void testFromRestRequestWithLevelParam() {
         final HashMap<String, String> params = new HashMap<>();
         params.put("level", ClusterStatsLevel.CLUSTER.getLevel());
-
-        // cluster is valid
         RestRequest request = buildRestRequest(params);
-        action.prepareRequest(request, mock(NodeClient.class));
+        ClusterHealthRequest req = ClusterHealthRequest.fromRestRequest(request);
+        assertNotNull(req);
+    }
 
-        // indices is valid
-        params.put("level", ClusterStatsLevel.INDICES.getLevel());
-        request = buildRestRequest(params);
-        action.prepareRequest(request, mock(NodeClient.class));
-
-        // shards is valid
-        params.put("level", ClusterStatsLevel.SHARDS.getLevel());
-        request = buildRestRequest(params);
-        action.prepareRequest(request, mock(NodeClient.class));
-
-        params.put("level", NodeStatsLevel.NODE.getLevel());
-        final RestRequest invalidLevelRequest1 = new FakeRestRequest.Builder(xContentRegistry()).withPath("/_stats")
-            .withParams(params)
-            .build();
-
+    /**
+     * Invalid level is rejected by ClusterStatsLevel.of() when the response is serialized.
+     */
+    public void testInvalidLevelRejectedByClusterStatsLevel() {
         IllegalArgumentException e = expectThrows(
             IllegalArgumentException.class,
-            () -> action.prepareRequest(invalidLevelRequest1, mock(NodeClient.class))
+            () -> ClusterStatsLevel.of("invalid")
         );
-        assertThat(e, hasToString(containsString("level parameter must be one of [cluster] or [indices] or [shards] but was [node]")));
-
-        params.put("level", "invalid");
-        final RestRequest invalidLevelRequest = buildRestRequest(params);
-
-        e = expectThrows(IllegalArgumentException.class, () -> action.prepareRequest(invalidLevelRequest, mock(NodeClient.class)));
         assertThat(e, hasToString(containsString("level parameter must be one of [cluster] or [indices] or [shards] but was [invalid]")));
     }
 

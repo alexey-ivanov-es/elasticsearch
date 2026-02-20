@@ -48,6 +48,10 @@ import { WaitForNodes } from './types'
  * @cluster_privileges monitor, manage
  * @doc_id cluster-health
  * @doc_tag cluster
+ * @server_transport_action org.elasticsearch.action.admin.cluster.health.TransportClusterHealthAction
+ * @server_capabilities unassigned_pri_shard_count
+ * @server_allow_system_index_access true
+ * @server_can_trip_circuit_breaker false
  */
 export interface Request extends RequestBase {
   urls: [
@@ -78,6 +82,7 @@ export interface Request extends RequestBase {
     /**
      * Return health information at a specific level of detail.
      * @server_default cluster
+     * @server_response_param
      */
     level?: Level
     /**
