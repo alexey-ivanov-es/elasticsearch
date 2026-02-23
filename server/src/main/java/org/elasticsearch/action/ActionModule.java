@@ -367,7 +367,6 @@ import org.elasticsearch.rest.action.admin.indices.RestResolveIndexAction;
 import org.elasticsearch.rest.action.admin.indices.RestRolloverIndexAction;
 import org.elasticsearch.rest.action.admin.indices.RestSimulateIndexTemplateAction;
 import org.elasticsearch.rest.action.admin.indices.RestSimulateTemplateAction;
-import org.elasticsearch.rest.action.admin.indices.RestUpdateSettingsAction;
 import org.elasticsearch.rest.action.admin.indices.RestValidateQueryAction;
 import org.elasticsearch.rest.action.cat.AbstractCatAction;
 import org.elasticsearch.rest.action.cat.RestAliasAction;
@@ -941,7 +940,6 @@ public class ActionModule extends AbstractModule {
         registerHandler.accept(new RestGetHealthAction());
         registerHandler.accept(new RestPrevalidateNodeRemovalAction());
 
-        registerHandler.accept(new RestUpdateSettingsAction());
         registerHandler.accept(new RestGetSettingsAction());
 
         registerHandler.accept(new RestAnalyzeAction());

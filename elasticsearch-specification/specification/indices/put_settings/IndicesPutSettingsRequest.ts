@@ -85,6 +85,7 @@ import { IndexSettings } from '@indices/_types/IndexSettings'
  * @index_privileges manage
  * @doc_id indices-update-settings
  * @ext_doc_id index-settings
+ * @server_transport_action org.elasticsearch.action.admin.indices.settings.put.TransportUpdateSettingsAction
  */
 export interface Request extends RequestBase {
   urls: [
@@ -128,6 +129,7 @@ export interface Request extends RequestBase {
     /**
      * If `true`, returns settings in flat format.
      * @server_default false
+     * @server_response_param
      */
     flat_settings?: boolean
     /**

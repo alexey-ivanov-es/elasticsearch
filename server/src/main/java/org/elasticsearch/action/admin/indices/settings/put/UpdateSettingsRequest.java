@@ -18,6 +18,8 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.rest.RestRequest;
+import org.elasticsearch.rest.RestUtils;
 import org.elasticsearch.xcontent.ToXContentObject;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentParser;
@@ -210,6 +212,24 @@ public class UpdateSettingsRequest extends AcknowledgedRequest<UpdateSettingsReq
         settings.toXContent(builder, params);
         builder.endObject();
         return builder;
+    }
+
+    /**
+     * Builds an {@link UpdateSettingsRequest} from a REST request.
+     * Consumes all supported query parameters and the request body.
+     */
+    public static UpdateSettingsRequest fromRestRequest(RestRequest request) throws IOException {
+        String[] indices = Strings.splitStringByCommaToArray(request.param("index"));
+        UpdateSettingsRequest updateSettingsRequest = new UpdateSettingsRequest(indices);
+        updateSettingsRequest.ackTimeout(RestUtils.getAckTimeout(request));
+        updateSettingsRequest.masterNodeTimeout(RestUtils.getMasterNodeTimeout(request));
+        updateSettingsRequest.setPreserveExisting(request.paramAsBoolean("preserve_existing", updateSettingsRequest.isPreserveExisting()));
+        updateSettingsRequest.indicesOptions(IndicesOptions.fromRequest(request, updateSettingsRequest.indicesOptions()));
+        updateSettingsRequest.reopen(request.paramAsBoolean("reopen", false));
+        try (XContentParser parser = request.contentParser()) {
+            updateSettingsRequest.fromXContent(parser);
+        }
+        return updateSettingsRequest;
     }
 
     public UpdateSettingsRequest fromXContent(XContentParser parser) throws IOException {

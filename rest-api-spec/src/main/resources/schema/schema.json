@@ -9644,6 +9644,10 @@
       "responseMediaType": [
         "application/json"
       ],
+      "responseParams": [
+        "flat_settings"
+      ],
+      "serverTransportAction": "org.elasticsearch.action.admin.indices.settings.put.TransportUpdateSettingsAction",
       "urls": [
         {
           "methods": [
@@ -162539,6 +162543,7 @@
           "name": "flat_settings",
           "required": false,
           "serverDefault": false,
+          "serverResponseParam": true,
           "type": {
             "kind": "instance_of",
             "type": {
@@ -162613,7 +162618,7 @@
           }
         }
       ],
-      "specLocation": "indices/put_settings/IndicesPutSettingsRequest.ts#L25-L169"
+      "specLocation": "indices/put_settings/IndicesPutSettingsRequest.ts#L25-L171"
     },
     {
       "kind": "response",
