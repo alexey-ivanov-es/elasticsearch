@@ -39,8 +39,8 @@ public class PutPipelineRequest extends AcknowledgedRequest<PutPipelineRequest> 
      */
     public static PutPipelineRequest fromRestRequest(RestRequest restRequest) {
         Integer ifVersion = null;
-        if (restRequest.hasParam("if_version")) {
-            String versionString = restRequest.param("if_version");
+        String versionString = restRequest.param("if_version");
+        if (versionString != null && versionString.isEmpty() == false) {
             try {
                 ifVersion = Integer.parseInt(versionString);
             } catch (NumberFormatException e) {

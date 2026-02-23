@@ -75,6 +75,12 @@ export interface Request extends RequestBase {
   response_media_type: MediaType.Json
   query_parameters: {
     /**
+     * If false, the request returns an error if any wildcard expression, index alias, or _all value targets only
+     * missing or closed indices. This behavior applies even if the request targets other open indices.
+     * @server_default true
+     */
+    allow_no_indices?: boolean
+    /**
      * Expand wildcard expression to concrete indices that are open, closed or both.
      * @server_default all
      */
@@ -85,6 +91,16 @@ export interface Request extends RequestBase {
      * @server_response_param
      */
     level?: Level
+    /**
+     * If true, include throttled indices in the response. Deprecated; use ignore_throttled=false.
+     * @deprecated 7.0.0 Use ignore_throttled=false instead.
+     */
+    ignore_throttled?: boolean
+    /**
+     * If false, requests that target a missing index return an error.
+     * @server_default false
+     */
+    ignore_unavailable?: boolean
     /**
      * If true, retrieve information from the local node only.
      * If false, retrieve information from the master node.

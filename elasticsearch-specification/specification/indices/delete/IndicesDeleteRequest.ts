@@ -74,6 +74,11 @@ export interface Request extends RequestBase {
      */
     ignore_unavailable?: boolean
     /**
+     * If true, include throttled indices in the delete. Deprecated; use ignore_throttled=false.
+     * @deprecated 7.0.0 Use ignore_throttled=false instead.
+     */
+    ignore_throttled?: boolean
+    /**
      * Period to wait for a connection to the master node.
      * If no response is received before the timeout expires, the request fails and returns an error.
      * @server_default 30s

@@ -75,6 +75,11 @@ export interface Request extends RequestBase {
      */
     ignore_unavailable?: boolean
     /**
+     * If true, include throttled indices in the response. Deprecated; use ignore_throttled=false.
+     * @deprecated 7.0.0 Use ignore_throttled=false instead.
+     */
+    ignore_throttled?: boolean
+    /**
      * If true, return all default settings in the response.
      * @server_default false
      */

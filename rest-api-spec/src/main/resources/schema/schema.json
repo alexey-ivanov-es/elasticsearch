@@ -126313,6 +126313,19 @@
       ],
       "query": [
         {
+          "description": "If false, the request returns an error if any wildcard expression, index alias, or _all value targets only\nmissing or closed indices. This behavior applies even if the request targets other open indices.",
+          "name": "allow_no_indices",
+          "required": false,
+          "serverDefault": true,
+          "type": {
+            "kind": "instance_of",
+            "type": {
+              "name": "boolean",
+              "namespace": "_builtins"
+            }
+          }
+        },
+        {
           "description": "Expand wildcard expression to concrete indices that are open, closed or both.",
           "name": "expand_wildcards",
           "required": false,
@@ -126336,6 +126349,35 @@
             "type": {
               "name": "Level",
               "namespace": "_types"
+            }
+          }
+        },
+        {
+          "deprecation": {
+            "description": "Use ignore_throttled=false instead.",
+            "version": "7.0.0"
+          },
+          "description": "If true, include throttled indices in the response. Deprecated; use ignore_throttled=false.",
+          "name": "ignore_throttled",
+          "required": false,
+          "type": {
+            "kind": "instance_of",
+            "type": {
+              "name": "boolean",
+              "namespace": "_builtins"
+            }
+          }
+        },
+        {
+          "description": "If false, requests that target a missing index return an error.",
+          "name": "ignore_unavailable",
+          "required": false,
+          "serverDefault": false,
+          "type": {
+            "kind": "instance_of",
+            "type": {
+              "name": "boolean",
+              "namespace": "_builtins"
             }
           }
         },
@@ -126470,7 +126512,7 @@
           }
         }
       ],
-      "specLocation": "cluster/health/ClusterHealthRequest.ts#L33-L147"
+      "specLocation": "cluster/health/ClusterHealthRequest.ts#L33-L163"
     },
     {
       "kind": "response",
@@ -154692,6 +154734,22 @@
           }
         },
         {
+          "deprecation": {
+            "description": "Use ignore_throttled=false instead.",
+            "version": "7.0.0"
+          },
+          "description": "If true, include throttled indices in the delete. Deprecated; use ignore_throttled=false.",
+          "name": "ignore_throttled",
+          "required": false,
+          "type": {
+            "kind": "instance_of",
+            "type": {
+              "name": "boolean",
+              "namespace": "_builtins"
+            }
+          }
+        },
+        {
           "description": "Period to wait for a connection to the master node.\nIf no response is received before the timeout expires, the request fails and returns an error.",
           "name": "master_timeout",
           "required": false,
@@ -154718,7 +154776,7 @@
           }
         }
       ],
-      "specLocation": "indices/delete/IndicesDeleteRequest.ts#L24-L89"
+      "specLocation": "indices/delete/IndicesDeleteRequest.ts#L24-L94"
     },
     {
       "kind": "response",
@@ -157112,7 +157170,7 @@
         "name": "Feature",
         "namespace": "indices.get"
       },
-      "specLocation": "indices/get/IndicesGetRequest.ts#L102-L106"
+      "specLocation": "indices/get/IndicesGetRequest.ts#L107-L111"
     },
     {
       "kind": "type_alias",
@@ -157120,7 +157178,7 @@
         "name": "Features",
         "namespace": "indices.get"
       },
-      "specLocation": "indices/get/IndicesGetRequest.ts#L107-L107",
+      "specLocation": "indices/get/IndicesGetRequest.ts#L112-L112",
       "type": {
         "kind": "union_of",
         "items": [
@@ -157237,6 +157295,22 @@
           }
         },
         {
+          "deprecation": {
+            "description": "Use ignore_throttled=false instead.",
+            "version": "7.0.0"
+          },
+          "description": "If true, include throttled indices in the response. Deprecated; use ignore_throttled=false.",
+          "name": "ignore_throttled",
+          "required": false,
+          "type": {
+            "kind": "instance_of",
+            "type": {
+              "name": "boolean",
+              "namespace": "_builtins"
+            }
+          }
+        },
+        {
           "description": "If true, return all default settings in the response.",
           "name": "include_defaults",
           "required": false,
@@ -157295,7 +157369,7 @@
           }
         }
       ],
-      "specLocation": "indices/get/IndicesGetRequest.ts#L24-L100"
+      "specLocation": "indices/get/IndicesGetRequest.ts#L24-L105"
     },
     {
       "kind": "response",
@@ -162224,6 +162298,22 @@
           }
         },
         {
+          "deprecation": {
+            "description": "Use ignore_throttled=false instead.",
+            "version": "7.0.0"
+          },
+          "description": "If true, include throttled indices. Deprecated; use ignore_throttled=false.",
+          "name": "ignore_throttled",
+          "required": false,
+          "type": {
+            "kind": "instance_of",
+            "type": {
+              "name": "boolean",
+              "namespace": "_builtins"
+            }
+          }
+        },
+        {
           "description": "Period to wait for a connection to the master node.\nIf no response is received before the timeout expires, the request fails and returns an error.",
           "name": "master_timeout",
           "required": false,
@@ -162263,7 +162353,7 @@
           }
         }
       ],
-      "specLocation": "indices/put_mapping/IndicesPutMappingRequest.ts#L42-L173"
+      "specLocation": "indices/put_mapping/IndicesPutMappingRequest.ts#L42-L178"
     },
     {
       "kind": "response",
@@ -162566,6 +162656,22 @@
           }
         },
         {
+          "deprecation": {
+            "description": "Use ignore_throttled=false instead.",
+            "version": "7.0.0"
+          },
+          "description": "If true, include throttled indices. Deprecated; use ignore_throttled=false.",
+          "name": "ignore_throttled",
+          "required": false,
+          "type": {
+            "kind": "instance_of",
+            "type": {
+              "name": "boolean",
+              "namespace": "_builtins"
+            }
+          }
+        },
+        {
           "description": "Period to wait for a connection to the master node. If no response is\nreceived before the timeout expires, the request fails and returns an\nerror.",
           "name": "master_timeout",
           "required": false,
@@ -162618,7 +162724,7 @@
           }
         }
       ],
-      "specLocation": "indices/put_settings/IndicesPutSettingsRequest.ts#L25-L171"
+      "specLocation": "indices/put_settings/IndicesPutSettingsRequest.ts#L25-L176"
     },
     {
       "kind": "response",
